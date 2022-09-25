@@ -1,3 +1,12 @@
+.header {
+  display: flex;
+  align-items: center;  
+}
+
+.title {
+  flex-grow: 10;
+}
+
 nav a {
   padding: 1rem;
   text-decoration: none;

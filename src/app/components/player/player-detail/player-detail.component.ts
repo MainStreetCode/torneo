@@ -2,7 +2,6 @@ import { Location } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { PlayerService } from 'src/app/services/player/player.service';
-import { Tournament } from 'src/app/services/tournament/tournament';
 import { Player } from '../player';
 
 @Component({

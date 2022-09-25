@@ -16,9 +16,12 @@ import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
 import { environment } from 'src/environments/environment';
 import { MatCardModule } from '@angular/material/card';
+import { QRCodeModule } from 'angularx-qrcode';
 
 import { TournamentDetailComponent } from './components/tournament/tournament-detail/tournament-detail.component';
-import { TournamentsComponent } from './components/tournament/tournament-list/tournaments.component';
+import { TournamentsComponent } from './components/tournament/tournaments/tournaments.component';
+import { UserComponent } from './components/user/user-detail/user.component';
+import { LoginComponent } from './components/user/login/login.component';
 
 @NgModule({
   declarations: [
@@ -29,7 +32,9 @@ import { TournamentsComponent } from './components/tournament/tournament-list/to
     DashboardComponent,
     PlayerSearchComponent,
     TournamentsComponent,
-    TournamentDetailComponent
+    TournamentDetailComponent,
+    UserComponent,
+    LoginComponent
   ],
   imports: [
     BrowserModule,
@@ -40,7 +45,8 @@ import { TournamentsComponent } from './components/tournament/tournament-list/to
     MatIconModule,
     MatCardModule,
     AngularFireModule.initializeApp(environment.firebase),
-    AngularFirestoreModule
+    AngularFirestoreModule,
+    QRCodeModule
   ],
   providers: [],
   bootstrap: [AppComponent]

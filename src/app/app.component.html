@@ -1,6 +1,30 @@
-<mat-toolbar color="primary">
+<mat-toolbar color="primary" class="header">
   <mat-icon>bar_chart</mat-icon>
-  <span (click)="goHome()">{{title}}</span>
+  <div class="title">    
+    <span (click)="goHome()">{{title}}</span>
+  </div>
+
+  <div *ngIf="!(isLoggedIn$ | async)">
+    <button class="mdc-button mdc-button--raised" (click)="login()">
+      <div class="mdc-button__ripple"></div>
+      <!-- <mat-icon>save</mat-icon>     -->
+      <span class="mdc-button__label">        
+        <span class="mdc-button__label">Login</span>
+      </span>
+    </button>
+  </div>
+
+  <div *ngIf="(isLoggedIn$ | async)">
+    <button class="mdc-button mdc-button--raised" (click)="logout()">
+      <div class="mdc-button__ripple"></div>
+      <!-- <mat-icon>save</mat-icon>     -->
+      <span class="mdc-button__label">        
+        <span class="mdc-button__label">Logout</span>
+      </span>
+    </button>
+  </div>
+
+
 </mat-toolbar>
 
 <nav>

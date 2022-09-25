@@ -2,10 +2,12 @@
 
     <mat-toolbar color="accent"><span>{{tournament.name | uppercase}} Details</span></mat-toolbar>    
 
-    <div><span>id: </span>{{tournament.id}}</div>
-    <div class="content">        
+    <div class="content">
+        <div><span>id: </span>{{tournament.id}}</div>
         <label for="tournament-name">Tournament name: </label>
         <input id="tournament-name" [(ngModel)]="tournament.name" placeholder="name">
+
+        <qrcode *ngIf="tournamentURL" [qrdata]="tournamentURL" [width]="256" [errorCorrectionLevel]="'M'"></qrcode>
 
         <div class="flex-box-basic">
             <button class="mdc-button mdc-button--raised flex-box-item" (click)="save()">
@@ -26,5 +28,6 @@
         </div>
     </div>
     
+    <!-- Player list -->
     <app-players [tournament]="tournament"></app-players>
 </div>

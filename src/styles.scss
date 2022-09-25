@@ -1,6 +1,8 @@
 @use "@material/button/styles";
 @use "@material/card";
 @import 'https://fonts.googleapis.com/icon?family=Material+Icons';
+@import '~@angular/material/theming';
+@import '~firebaseui/dist/firebaseui.css';
 
 body {
     margin: 0;

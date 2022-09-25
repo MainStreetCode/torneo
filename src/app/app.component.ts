@@ -1,47 +1,36 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
-import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Router } from '@angular/router';
+import firebase from "firebase/compat/app";
 import { Observable } from 'rxjs';
-import { User } from './components/player/user';
-
+import { environment } from 'src/environments/environment';
+import { AuthService } from './services/auth.service';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'Torneo';
-  users: User[] = [];
+  isLoggedIn$: Observable<boolean>;
 
-  constructor(private store: AngularFirestore, private router: Router) {
-    // todo = this.store.collection('todo').valueChanges({ idField: 'id' }) as Observable<Task[]>;
-    // inProgress = this.store.collection('inProgress').valueChanges({ idField: 'id' }) as Observable<Task[]>;
-    // done = this.store.collection('done').valueChanges({ idField: 'id' }) as Observable<Task[]>;
-
-    this.initializeStore();
+  constructor(private router: Router, private authService: AuthService) {
+    
   }
 
-  private initializeStore(): void {
-    // const userStore = this.store.collection('users').valueChanges({ id: 'id' }) as Observable<User[]>;
-    // userStore.subscribe({
-    //   next: (users) => {
-    //     this.users = users;
-    //   }
-    // });
+  ngOnInit(): void {     
+    this.isLoggedIn$ = this.authService.isLoggedIn$;
+  }
 
-    // const app = initializeApp(environment.firebase);
-    // const db = getFirestore(app);
-    // const messageRef = doc(db, 'torunaments', tournamentId, players, playerId);
-
-    
+  login(): void {
+    this.router.navigateByUrl('login');
+  }
+  
+  logout(): void {
+    firebase.auth().signOut();
   }
 
   goHome(): void {
     this.router.navigateByUrl('');
   }
-
-  // // Initialize Firebase
-  // const app = initializeApp(firebaseConfig);
-  // const analytics = getAnalytics(app);
 }

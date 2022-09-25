@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { from, Observable, of } from 'rxjs';
 import { Player } from 'src/app/components/player/player';
 import { MessageService } from '../message/message.service';
-import { map } from 'rxjs/operators';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Collection } from '../collection';
 import { Tournament } from '../tournament/tournament';

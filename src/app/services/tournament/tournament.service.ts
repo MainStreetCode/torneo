@@ -2,15 +2,8 @@ import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { Player } from 'src/app/components/player/player';
 import { MessageService } from '../message/message.service';
 import { Tournament } from './tournament';
-import { getFirestore } from "firebase/firestore";
-import { environment } from '../../../environments/environment';
-import { initializeApp } from '@angular/fire/app';
-import * as firebase from 'firebase/compat';
-import { FieldValue } from "firebase/firestore";
-import { arrayUnion } from '@angular/fire/firestore';
 import { Collection } from '../collection';
 
 @Injectable({

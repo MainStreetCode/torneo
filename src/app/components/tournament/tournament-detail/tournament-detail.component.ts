@@ -3,6 +3,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Tournament } from 'src/app/services/tournament/tournament';
 import { TournamentService } from 'src/app/services/tournament/tournament.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-tournament-detail',
@@ -11,8 +12,11 @@ import { TournamentService } from 'src/app/services/tournament/tournament.servic
 })
 export class TournamentDetailComponent implements OnInit {
   @Input() tournament?: Tournament;
+  public tournamentURL: string;
 
-  constructor(private route: ActivatedRoute, private tournamentService: TournamentService, private location: Location) { }
+  constructor(private route: ActivatedRoute, private tournamentService: TournamentService, private location: Location) { 
+    
+  }
 
   ngOnInit(): void {
     this.getTournament();
@@ -21,7 +25,10 @@ export class TournamentDetailComponent implements OnInit {
   getTournament(): void {
     const id = this.route.snapshot.paramMap.get('tournamentId');
     this.tournamentService.getTournament(id).subscribe({
-      next: (tournament) => this.tournament = tournament
+      next: (tournament) => {
+        this.tournament = tournament;
+        this.tournamentURL = `${environment.url}/tournament/${this.tournament.id}`;
+      }
     });
   }
 
