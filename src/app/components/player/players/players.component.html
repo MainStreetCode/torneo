@@ -1,0 +1,39 @@
+<div class="players">
+  <mat-toolbar color="accent"><span>Players</span></mat-toolbar>  
+
+  <mat-toolbar color="secondary"><span>Add new player</span></mat-toolbar>
+
+  <div class="content">
+    <label for="new-player">Player name: </label>
+    <input id="new-player" #playerName />
+
+    <!-- (click) passes input value to add() and then clears the input -->
+    <button class="add-button" (click)="add(playerName.value); playerName.value=''">
+      Add player
+    </button>
+  </div>
+
+  <mat-toolbar color="secondary"><span>Player List</span></mat-toolbar>
+  <div class="player-list">      
+    <mat-card class="mdc-card card" *ngFor="let player of players">
+      <div class="mdc-card__primary-action details" tabindex="0">
+        <button class="mdc-button" (click)="showPlayerDetail(player)">
+          <span class="mdc-button__ripple"></span>
+          <span class="mdc-button__label">{{player.name}}</span>
+          <!-- <span class="badge">{{player.id}}</span>    -->
+          <div class="mdc-card__ripple"></div>
+        </button>      
+      </div>
+      
+      <button class="mdc-button mdc-card__action mdc-card__action--button" title="player details" (click)="showPlayerDetail(player)">
+        <div class="mdc-button__ripple"></div>
+        <span class="mdc-button__label"><mat-icon>edit</mat-icon></span>
+      </button>
+      <button class="mdc-button mdc-card__action mdc-card__action--button" title="delete player" (click)="delete(player)">
+        <div class="mdc-button__ripple"></div>
+        <span class="mdc-button__label"><mat-icon>delete</mat-icon></span>
+      </button>
+      
+    </mat-card>
+  </div>
+</div>

@@ -1,0 +1,13 @@
+<mat-toolbar color="primary">
+  <mat-icon>bar_chart</mat-icon>
+  <span (click)="goHome()">{{title}}</span>
+</mat-toolbar>
+
+<nav>
+  <a routerLink="/dashboard">Dashboard</a>
+  <a routerLink="/tournaments">Tournaments</a>
+  <a routerLink="/players">Players</a>  
+</nav>
+
+<router-outlet></router-outlet>
+<app-system-messages></app-system-messages>

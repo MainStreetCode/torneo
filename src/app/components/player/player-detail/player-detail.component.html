@@ -1,0 +1,30 @@
+<div class="content" *ngIf="player">
+
+  <mat-toolbar color="accent"><span>{{player.name | uppercase}} Details</span></mat-toolbar>
+  
+  <div class="content">
+    <div><span>id: </span>{{player.id}}</div>
+    <div>
+      <label for="player-name">Player name: </label>
+      <input id="player-name" [(ngModel)]="player.name" placeholder="name">
+    </div>
+  </div>
+
+  <div class="flex-box-basic">
+    <button class="mdc-button mdc-button--raised flex-box-item" (click)="save()">
+      <div class="mdc-button__ripple"></div>
+      <!-- <mat-icon>save</mat-icon>     -->
+      <span class="mdc-button__label">        
+        <span class="mdc-button__label">Save</span>
+      </span>
+    </button>
+  
+    <button class="mdc-button mdc-button--raised flex-box-item" (click)="goBack()">
+      <div class="mdc-button__ripple"></div>
+      <!-- <mat-icon><span class="material-symbols-outlined">arrow_back</span></mat-icon>     -->
+      <span class="mdc-button__label">        
+        <span class="mdc-button__label">Back</span>
+      </span>
+    </button>
+  </div>
+</div>

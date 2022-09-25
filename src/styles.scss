@@ -1,0 +1,20 @@
+@use "@material/button/styles";
+@use "@material/card";
+@import 'https://fonts.googleapis.com/icon?family=Material+Icons';
+
+body {
+    margin: 0;
+}
+
+.content {
+    padding: 1rem;
+}
+
+.flex-box-basic {
+    display: flex;
+    gap: 1rem;
+}
+
+.flex-box-item {
+    flex: auto;
+}

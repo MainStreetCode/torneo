@@ -1,0 +1,30 @@
+<div class="content" *ngIf="tournament">
+
+    <mat-toolbar color="accent"><span>{{tournament.name | uppercase}} Details</span></mat-toolbar>    
+
+    <div><span>id: </span>{{tournament.id}}</div>
+    <div class="content">        
+        <label for="tournament-name">Tournament name: </label>
+        <input id="tournament-name" [(ngModel)]="tournament.name" placeholder="name">
+
+        <div class="flex-box-basic">
+            <button class="mdc-button mdc-button--raised flex-box-item" (click)="save()">
+            <div class="mdc-button__ripple"></div>
+            <!-- <mat-icon>save</mat-icon>     -->
+            <span class="mdc-button__label">        
+                <span class="mdc-button__label">Save</span>
+            </span>
+            </button>
+        
+            <button class="mdc-button mdc-button--raised flex-box-item" (click)="goBack()">
+                <div class="mdc-button__ripple"></div>
+                <!-- <mat-icon><span class="material-symbols-outlined">arrow_back</span></mat-icon>     -->
+                <span class="mdc-button__label">        
+                    <span class="mdc-button__label">Back</span>
+                </span>
+            </button>
+        </div>
+    </div>
+    
+    <app-players [tournament]="tournament"></app-players>
+</div>
