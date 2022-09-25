@@ -1,0 +1,2 @@
+# torneo
+Euchre Tournament App
