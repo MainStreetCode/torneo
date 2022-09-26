@@ -24,6 +24,7 @@
     "@angular/router": "^14.2.3",
     "@material/button": "^14.0.0",
     "@material/card": "^14.0.0",
+    "@material/tab-bar": "^14.0.0",
     "angularx-qrcode": "^14.0.0",
     "firebaseui": "^6.0.1",
     "rxjs": "~6.6.0",

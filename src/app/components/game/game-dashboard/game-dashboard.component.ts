@@ -6,11 +6,11 @@ import { GameService } from 'src/app/services/game/game.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
-  selector: 'app-game-detail',
-  templateUrl: './game-detail.component.html',
-  styleUrls: ['./game-detail.component.css']
+  selector: 'app-game-dashboard',
+  templateUrl: './game-dashboard.component.html',
+  styleUrls: ['./game-dashboard.component.css']
 })
-export class GameDetailComponent implements OnInit {
+export class GameDashboardComponent implements OnInit {
   @Input() game?: Game;
   public gameURL: string;
 
@@ -27,18 +27,9 @@ export class GameDetailComponent implements OnInit {
     this.gameService.getGame(id).subscribe({
       next: (game) => {
         this.game = game;
-        this.gameURL = `${environment.url}/game/${this.game.id}`;
+        this.gameURL = `${environment.url}/game/${this.game.id}/dashboard`;
       }
     });
   }
 
-  goBack(): void {
-    this.location.back();
-  }
-
-  save(): void {
-    if (this.game) {
-      this.gameService.updateGame(this.game);
-    }
-  }
 }

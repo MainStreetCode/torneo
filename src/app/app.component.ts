@@ -15,17 +15,17 @@ export class AppComponent implements OnInit {
   isLoggedIn$: Observable<boolean>;
 
   constructor(private router: Router, private authService: AuthService) {
-    
+
   }
 
-  ngOnInit(): void {     
+  ngOnInit(): void {
     this.isLoggedIn$ = this.authService.isLoggedIn$;
   }
 
   login(): void {
     this.router.navigateByUrl('login');
   }
-  
+
   logout(): void {
     firebase.auth().signOut();
   }

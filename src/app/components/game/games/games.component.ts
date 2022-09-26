@@ -35,7 +35,11 @@ export class GamesComponent implements OnInit {
     this.gameService.deleteGame(game.id);
   }
 
-  update(game: Game): void {
-    this.router.navigateByUrl(`/game/${game.id}`);
+  dashboard(game: Game): void {
+    this.router.navigateByUrl(`/game/${game.id}/dashboard`);
+  }
+
+  configuration(game: Game): void {
+    this.router.navigateByUrl(`/game/${game.id}/configuration`);
   }
 }

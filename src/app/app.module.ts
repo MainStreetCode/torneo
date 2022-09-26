@@ -18,10 +18,11 @@ import { environment } from 'src/environments/environment';
 import { MatCardModule } from '@angular/material/card';
 import { QRCodeModule } from 'angularx-qrcode';
 
-import { GameDetailComponent } from './components/game/game-detail/game-detail.component';
+import { GameConfigurationComponent } from './components/game/game-configuration/game-configuration.component';
 import { GamesComponent } from './components/game/games/games.component';
 import { UserComponent } from './components/user/user-detail/user.component';
 import { LoginComponent } from './components/user/login/login.component';
+import { GameDashboardComponent } from './components/game/game-dashboard/game-dashboard.component';
 
 @NgModule({
   declarations: [
@@ -32,9 +33,10 @@ import { LoginComponent } from './components/user/login/login.component';
     DashboardComponent,
     PlayerSearchComponent,
     GamesComponent,
-    GameDetailComponent,
+    GameConfigurationComponent,
     UserComponent,
-    LoginComponent
+    LoginComponent,
+    GameDashboardComponent
   ],
   imports: [
     BrowserModule,

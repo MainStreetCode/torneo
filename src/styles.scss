@@ -1,5 +1,9 @@
 @use "@material/button/styles";
 @use "@material/card";
+@use "@material/tab-bar/mdc-tab-bar";
+@use "@material/tab-scroller/mdc-tab-scroller";
+@use "@material/tab-indicator/mdc-tab-indicator";
+@use "@material/tab/mdc-tab";
 @import 'https://fonts.googleapis.com/icon?family=Material+Icons';
 @import '~@angular/material/theming';
 @import '~firebaseui/dist/firebaseui.css';
