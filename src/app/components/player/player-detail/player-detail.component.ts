@@ -1,7 +1,7 @@
 import { Location } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { PlayerService } from 'src/app/services/player/player.service';
+import { GamePlayerService } from 'src/app/services/gamePlayer/game-player.service';
 import { Player } from '../player';
 
 @Component({
@@ -11,20 +11,20 @@ import { Player } from '../player';
 })
 export class PlayerDetailComponent implements OnInit {
   @Input() player?: Player;
-  @Input() tournamentId?: string;
+  @Input() gameId?: string;
 
 
-  constructor(private route: ActivatedRoute, private playerService: PlayerService, private location: Location) { }
+  constructor(private route: ActivatedRoute, private playerService: GamePlayerService, private location: Location) { }
 
   ngOnInit(): void {
     this.getPlayer();
   }
 
   getPlayer(): void {
-    this.tournamentId = this.route.snapshot.paramMap.get('tournamentId');
+    this.gameId = this.route.snapshot.paramMap.get('gameId');
     const playerId = this.route.snapshot.paramMap.get('playerId');
 
-    this.playerService.getPlayer(playerId, this.tournamentId).subscribe({
+    this.playerService.getPlayer(playerId, this.gameId).subscribe({
       next: (player) => this.player = player
     });
   }
@@ -35,7 +35,7 @@ export class PlayerDetailComponent implements OnInit {
 
   save(): void {
     if (this.player) {
-      this.playerService.updatePlayer(this.player, this.tournamentId);
+      this.playerService.updatePlayer(this.player, this.gameId);
     }
   }
 }

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { PlayerService } from 'src/app/services/player/player.service';
+import { GamePlayerService } from 'src/app/services/gamePlayer/game-player.service';
 import { Player } from '../player/player';
 @Component({
   selector: 'app-dashboard',
@@ -9,7 +9,7 @@ import { Player } from '../player/player';
 export class DashboardComponent implements OnInit {
   players: Player[] = [];
 
-  constructor(private playerService: PlayerService) { }
+  constructor(private playerService: GamePlayerService) { }
 
   ngOnInit(): void {
 

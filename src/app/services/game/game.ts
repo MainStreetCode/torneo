@@ -1,11 +1,10 @@
 import { Player } from 'src/app/components/player/player';
 import { User } from 'src/app/components/player/user';
 
-export interface Tournament {
+export interface Game {
     id: string;
     name: string;
-    players: Player[];
+    gamePlayers: Player[];
     admins: User[]
-    rounds: number;
-    buyIn: number;
+    rounds: number;    
 }

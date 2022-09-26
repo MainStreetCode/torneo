@@ -5,7 +5,7 @@ import { Observable, Subject } from 'rxjs';
 import {
    debounceTime, distinctUntilChanged, switchMap
  } from 'rxjs/operators';
-import { PlayerService } from 'src/app/services/player/player.service';
+import { GamePlayerService } from 'src/app/services/gamePlayer/game-player.service';
 import { Player } from '../player';
 
 
@@ -18,7 +18,7 @@ export class PlayerSearchComponent implements OnInit {
   players$!: Observable<Player[]>;
   private searchTerms = new Subject<string>();
 
-  constructor(private playerService: PlayerService) {}
+  constructor(private playerService: GamePlayerService) {}
 
   // Push a search term into the observable stream.
   search(term: string): void {

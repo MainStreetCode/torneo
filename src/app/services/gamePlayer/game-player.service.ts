@@ -4,46 +4,46 @@ import { Player } from 'src/app/components/player/player';
 import { MessageService } from '../message/message.service';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Collection } from '../collection';
-import { Tournament } from '../tournament/tournament';
+import { Game } from '../game/game';
 
 @Injectable({
   providedIn: 'root'
 })
-export class PlayerService {
+export class GamePlayerService {
   // public players$: Observable<Player[]>;
 
   constructor(private messageService: MessageService, private store: AngularFirestore) {
     // this.players$ = this.store.collection(Collection.Players).valueChanges({ idField: 'id' }) as Observable<Player[]>;
   }
 
-  playersForTournament(tournamentId: string): Observable<Player[]> {
-    return this.store.collection(Collection.Tournaments)
-      .doc(tournamentId)
-      .collection(Collection.Players)
+  playersForGame(gameId: string): Observable<Player[]> {
+    return this.store.collection(Collection.Games)
+      .doc(gameId)
+      .collection(Collection.GamePlayers)
       .valueChanges({ idField: 'id' }) as Observable<Player[]>;
   }
 
-  getPlayer(playerId: string, tournamentId: string): Observable<Player | undefined> {
-    return this.store.collection(Collection.Tournaments)
-      .doc(tournamentId)
-      .collection(Collection.Players)
+  getPlayer(playerId: string, gameId: string): Observable<Player | undefined> {
+    return this.store.collection(Collection.Games)
+      .doc(gameId)
+      .collection(Collection.GamePlayers)
       .doc(playerId)
       .valueChanges({ idField: 'id' }) as Observable<Player>;
   }
 
-  addPlayer(player: Player, tournamentId: string): void {
-    this.store.collection(Collection.Tournaments).doc(tournamentId).collection('players').add(player).then(
+  addPlayer(player: Player, gameId: string): void {
+    this.store.collection(Collection.Games).doc(gameId).collection('players').add(player).then(
       () => {
-        this.log(`addPlayerToTournament w/ id=${tournamentId} ${player.name}`);
+        this.log(`addPlayerToGame w/ id=${gameId} ${player.name}`);
       },
-      err => this.handleError<Tournament>('addPlayerToTournament')
+      err => this.handleError<Game>('addPlayerToGame')
     );
   }
 
-  updatePlayer(player: Player, tournamentId: string): void {
-    this.store.collection(Collection.Tournaments)
-      .doc(tournamentId)
-      .collection(Collection.Players)
+  updatePlayer(player: Player, gameId: string): void {
+    this.store.collection(Collection.Games)
+      .doc(gameId)
+      .collection(Collection.GamePlayers)
       .doc(player.id).update(player).then(
       () => {
         this.log(`updated player w/ id=${player.id}`);
@@ -52,11 +52,11 @@ export class PlayerService {
     );
   }
 
-  deletePlayer(playerId: string, tournament: Tournament): void {
+  deletePlayer(playerId: string, game: Game): void {
     // this.store.collection(this.storeName).doc<Player>(id).delete()
-    this.store.collection(Collection.Tournaments)
-    .doc(tournament.id)
-    .collection(Collection.Players)
+    this.store.collection(Collection.Games)
+    .doc(game.id)
+    .collection(Collection.GamePlayers)
     .doc(playerId).delete().then(
         () => {
           this.log(`deleted player w/ id=${playerId}`);

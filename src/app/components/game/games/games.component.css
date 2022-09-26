@@ -1,18 +1,18 @@
-.tournaments .content {    
+.games .content {    
   padding: 1rem;
 }
 
-.tournaments .card {
+.games .card {
   display: flex;
   align-items: center;
   margin: 1rem;
 }
 
-.tournaments .details {
+.games .details {
   flex-grow: 10;
 }
 
-.tournaments .badge {
+.games .badge {
   display: inline-block;
   font-size: small;
   color: white;

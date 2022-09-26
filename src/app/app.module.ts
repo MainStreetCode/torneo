@@ -18,8 +18,8 @@ import { environment } from 'src/environments/environment';
 import { MatCardModule } from '@angular/material/card';
 import { QRCodeModule } from 'angularx-qrcode';
 
-import { TournamentDetailComponent } from './components/tournament/tournament-detail/tournament-detail.component';
-import { TournamentsComponent } from './components/tournament/tournaments/tournaments.component';
+import { GameDetailComponent } from './components/game/game-detail/game-detail.component';
+import { GamesComponent } from './components/game/games/games.component';
 import { UserComponent } from './components/user/user-detail/user.component';
 import { LoginComponent } from './components/user/login/login.component';
 
@@ -31,8 +31,8 @@ import { LoginComponent } from './components/user/login/login.component';
     SystemMessagesComponent,
     DashboardComponent,
     PlayerSearchComponent,
-    TournamentsComponent,
-    TournamentDetailComponent,
+    GamesComponent,
+    GameDetailComponent,
     UserComponent,
     LoginComponent
   ],

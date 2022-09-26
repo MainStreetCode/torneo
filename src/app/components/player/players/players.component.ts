@@ -1,9 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Player } from '../player';
-import { PlayerService } from 'src/app/services/player/player.service';
+import { GamePlayerService } from 'src/app/services/gamePlayer/game-player.service';
 import { Router } from '@angular/router';
-import { Tournament } from 'src/app/services/tournament/tournament';
-import { TournamentService } from 'src/app/services/tournament/tournament.service';
+import { Game } from 'src/app/services/game/game';
+import { GameService } from 'src/app/services/game/game.service';
 
 @Component({
   selector: 'app-players',
@@ -12,16 +12,16 @@ import { TournamentService } from 'src/app/services/tournament/tournament.servic
 })
 export class PlayersComponent implements OnInit {
   players: Player[] = [];
-  @Input() tournament?: Tournament;
+  @Input() game?: Game;
 
-  constructor(private playerService: PlayerService, private router: Router, private tournamentService: TournamentService) { }
+  constructor(private playerService: GamePlayerService, private router: Router) { }
 
   ngOnInit(): void {
     this.getPlayers();
   }
 
   getPlayers(): void {
-    this.playerService.playersForTournament(this.tournament.id).subscribe({
+    this.playerService.playersForGame(this.game.id).subscribe({
       next: (players) => {
         this.players = players;
       }
@@ -33,25 +33,20 @@ export class PlayersComponent implements OnInit {
 
     if (!name) { return; }
 
-    this.addPlayerToTournament({ name } as Player);
+    this.addPlayerToGame({ name } as Player);
   }
 
   delete(player: Player): void {
-    this.playerService.deletePlayer(player.id, this.tournament);
+    this.playerService.deletePlayer(player.id, this.game);
   }
 
   showPlayerDetail(player: Player): void {
-    this.router.navigateByUrl(`/tournament/${this.tournament.id}/player/${player.id}`);
+    this.router.navigateByUrl(`/game/${this.game.id}/player/${player.id}`);
   }
 
-  addPlayerToTournament(player: Player): void {
-    if (this.tournament) {
-
-      if (!this.tournament.players) {
-        this.tournament.players = [];
-      }
-
-      this.playerService.addPlayer(player, this.tournament.id);
+  addPlayerToGame(player: Player): void {
+    if (this.game) {
+      this.playerService.addPlayer(player, this.game.id);
     }
   }
 }

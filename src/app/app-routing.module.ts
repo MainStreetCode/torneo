@@ -3,18 +3,18 @@ import { RouterModule, Routes } from '@angular/router';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { PlayerDetailComponent } from './components/player/player-detail/player-detail.component';
 import { PlayersComponent } from './components/player/players/players.component';
-import { TournamentDetailComponent } from './components/tournament/tournament-detail/tournament-detail.component';
-import { TournamentsComponent } from './components/tournament/tournaments/tournaments.component';
+import { GameDetailComponent } from './components/game/game-detail/game-detail.component';
+import { GamesComponent } from './components/game/games/games.component';
 import { LoginComponent } from './components/user/login/login.component';
 
 
 const routes: Routes = [  
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
   { path: 'players', component: PlayersComponent },
-  { path: 'tournaments', component: TournamentsComponent },
+  { path: 'games', component: GamesComponent },
   { path: 'dashboard', component: DashboardComponent },
-  { path: 'tournament/:tournamentId/player/:playerId', component: PlayerDetailComponent },
-  { path: 'tournament/:tournamentId', component: TournamentDetailComponent },
+  { path: 'game/:gameId/player/:playerId', component: PlayerDetailComponent },
+  { path: 'game/:gameId', component: GameDetailComponent },
   { path: 'login', component: LoginComponent }
 ];
 
