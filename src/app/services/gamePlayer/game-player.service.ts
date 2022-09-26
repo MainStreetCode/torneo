@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { from, Observable, of } from 'rxjs';
-import { Player } from 'src/app/components/player/player';
+import { GamePlayer } from 'src/app/components/player/gamePlayer';
 import { MessageService } from '../message/message.service';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Collection } from '../collection';
@@ -16,23 +16,23 @@ export class GamePlayerService {
     // this.players$ = this.store.collection(Collection.Players).valueChanges({ idField: 'id' }) as Observable<Player[]>;
   }
 
-  playersForGame(gameId: string): Observable<Player[]> {
+  playersForGame(gameId: string): Observable<GamePlayer[]> {
     return this.store.collection(Collection.Games)
       .doc(gameId)
       .collection(Collection.GamePlayers)
-      .valueChanges({ idField: 'id' }) as Observable<Player[]>;
+      .valueChanges({ idField: 'id' }) as Observable<GamePlayer[]>;
   }
 
-  getPlayer(playerId: string, gameId: string): Observable<Player | undefined> {
+  getPlayer(playerId: string, gameId: string): Observable<GamePlayer | undefined> {
     return this.store.collection(Collection.Games)
       .doc(gameId)
       .collection(Collection.GamePlayers)
       .doc(playerId)
-      .valueChanges({ idField: 'id' }) as Observable<Player>;
+      .valueChanges({ idField: 'id' }) as Observable<GamePlayer>;
   }
 
-  addPlayer(player: Player, gameId: string): void {
-    this.store.collection(Collection.Games).doc(gameId).collection('players').add(player).then(
+  addPlayer(player: GamePlayer, gameId: string): void {
+    this.store.collection(Collection.Games).doc(gameId).collection(Collection.GamePlayers).add(player).then(
       () => {
         this.log(`addPlayerToGame w/ id=${gameId} ${player.name}`);
       },
@@ -40,7 +40,7 @@ export class GamePlayerService {
     );
   }
 
-  updatePlayer(player: Player, gameId: string): void {
+  updatePlayer(player: GamePlayer, gameId: string): void {
     this.store.collection(Collection.Games)
       .doc(gameId)
       .collection(Collection.GamePlayers)
@@ -48,7 +48,7 @@ export class GamePlayerService {
       () => {
         this.log(`updated player w/ id=${player.id}`);
       },
-      err => this.handleError<Player>('updatePlayer')
+      err => this.handleError<GamePlayer>('updatePlayer')
     );
   }
 
@@ -61,12 +61,12 @@ export class GamePlayerService {
         () => {
           this.log(`deleted player w/ id=${playerId}`);
         },
-        err => this.handleError<Player>('deletePlayer')
+        err => this.handleError<GamePlayer>('deletePlayer')
       );
   }
 
   /* GET players whose name contains search term */
-  searchPlayers(term: string): Observable<Player[]> {
+  searchPlayers(term: string): Observable<GamePlayer[]> {
     if (!term.trim()) {
       // if not search term, return empty hero array.
       return of([]);

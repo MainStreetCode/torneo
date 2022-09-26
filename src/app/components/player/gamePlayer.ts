@@ -1,5 +1,5 @@
 import { User } from './user';
 
-export interface Player extends User{
+export interface GamePlayer extends User{
     points?: number;
 }

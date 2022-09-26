@@ -2,15 +2,15 @@ import { Location } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { GamePlayerService } from 'src/app/services/gamePlayer/game-player.service';
-import { Player } from '../player';
+import { GamePlayer } from '../gamePlayer';
 
 @Component({
-  selector: 'app-player-detail',
-  templateUrl: './player-detail.component.html',
-  styleUrls: ['./player-detail.component.css']
+  selector: 'app-game-player-detail',
+  templateUrl: './game-player-detail.component.html',
+  styleUrls: ['./game-player-detail.component.css']
 })
-export class PlayerDetailComponent implements OnInit {
-  @Input() player?: Player;
+export class GamePlayerDetailComponent implements OnInit {
+  @Input() player?: GamePlayer;
   @Input() gameId?: string;
 
 

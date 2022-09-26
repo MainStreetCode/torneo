@@ -2,9 +2,9 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
 import { AppComponent } from './app.component';
-import { PlayersComponent } from './components/player/players/players.component';
+import { GamePlayersComponent } from './components/player/game-players/game-players.component';
 import { FormsModule } from '@angular/forms';
-import { PlayerDetailComponent } from './components/player/player-detail/player-detail.component';
+import { GamePlayerDetailComponent } from './components/player/game-player-detail/player-detail.component';
 import { SystemMessagesComponent } from './components/system-messages/system-messages.component';
 import { AppRoutingModule } from './app-routing.module';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
@@ -26,8 +26,8 @@ import { LoginComponent } from './components/user/login/login.component';
 @NgModule({
   declarations: [
     AppComponent,
-    PlayersComponent,
-    PlayerDetailComponent,
+    GamePlayersComponent,
+    GamePlayerDetailComponent,
     SystemMessagesComponent,
     DashboardComponent,
     PlayerSearchComponent,

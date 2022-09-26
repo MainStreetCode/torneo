@@ -1,17 +1,17 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Player } from '../player';
+import { GamePlayer } from '../gamePlayer';
 import { GamePlayerService } from 'src/app/services/gamePlayer/game-player.service';
 import { Router } from '@angular/router';
 import { Game } from 'src/app/services/game/game';
 import { GameService } from 'src/app/services/game/game.service';
 
 @Component({
-  selector: 'app-players',
-  templateUrl: './players.component.html',
-  styleUrls: ['./players.component.css']
+  selector: 'app-game-players',
+  templateUrl: './game-players.component.html',
+  styleUrls: ['./game-players.component.css']
 })
-export class PlayersComponent implements OnInit {
-  players: Player[] = [];
+export class GamePlayersComponent implements OnInit {
+  players: GamePlayer[] = [];
   @Input() game?: Game;
 
   constructor(private playerService: GamePlayerService, private router: Router) { }
@@ -33,18 +33,18 @@ export class PlayersComponent implements OnInit {
 
     if (!name) { return; }
 
-    this.addPlayerToGame({ name } as Player);
+    this.addPlayerToGame({ name } as GamePlayer);
   }
 
-  delete(player: Player): void {
+  delete(player: GamePlayer): void {
     this.playerService.deletePlayer(player.id, this.game);
   }
 
-  showPlayerDetail(player: Player): void {
+  showPlayerDetail(player: GamePlayer): void {
     this.router.navigateByUrl(`/game/${this.game.id}/player/${player.id}`);
   }
 
-  addPlayerToGame(player: Player): void {
+  addPlayerToGame(player: GamePlayer): void {
     if (this.game) {
       this.playerService.addPlayer(player, this.game.id);
     }

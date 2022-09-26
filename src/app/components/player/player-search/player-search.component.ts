@@ -6,7 +6,7 @@ import {
    debounceTime, distinctUntilChanged, switchMap
  } from 'rxjs/operators';
 import { GamePlayerService } from 'src/app/services/gamePlayer/game-player.service';
-import { Player } from '../player';
+import { GamePlayer } from '../gamePlayer';
 
 
 @Component({
@@ -15,7 +15,7 @@ import { Player } from '../player';
   styleUrls: [ './player-search.component.css' ]
 })
 export class PlayerSearchComponent implements OnInit {
-  players$!: Observable<Player[]>;
+  players$!: Observable<GamePlayer[]>;
   private searchTerms = new Subject<string>();
 
   constructor(private playerService: GamePlayerService) {}

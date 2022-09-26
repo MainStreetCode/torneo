@@ -1,10 +1,10 @@
-import { Player } from 'src/app/components/player/player';
+import { GamePlayer } from 'src/app/components/player/gamePlayer';
 import { User } from 'src/app/components/player/user';
 
 export interface Game {
     id: string;
     name: string;
-    gamePlayers: Player[];
-    admins: User[]
-    rounds: number;    
+    gamePlayers: GamePlayer[];
+    admins: User[];
+    rounds: number;
 }
