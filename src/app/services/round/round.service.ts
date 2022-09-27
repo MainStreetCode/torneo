@@ -106,7 +106,8 @@ export class RoundService {
       }
 
       const newTable = {
-        teams: tableTeams
+        teams: tableTeams,
+        number: i + 1
       };
 
       tables.push(newTable);
