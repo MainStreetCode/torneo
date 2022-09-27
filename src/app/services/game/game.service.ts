@@ -1,10 +1,12 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, take } from 'rxjs/operators';
 import { MessageService } from '../message/message.service';
 import { Game } from './game';
 import { Collection } from '../collection';
+import { GamePlayer } from 'src/app/components/player/game-player';
+import { User } from 'src/app/components/player/user';
 
 @Injectable({
   providedIn: 'root'
@@ -24,10 +26,13 @@ export class GameService {
     );
   }
 
-  addGame(game: Game): void {    
+  addGame(game: Game, userId: string): void {
+    game.adminIds = [];
+
     this.store.collection(Collection.Games).add(game).then(
       (newGame) => {
         this.log(`added game w/ id=${newGame.id}`);
+        this.addAdmin(newGame.id, userId);
       },
       err => this.handleError<Game>('addGame')
     );
@@ -50,6 +55,29 @@ export class GameService {
         },
         err => this.handleError<Game>('deleteGame')
       );
+  }
+
+  addAdmin(gameId: string, userId: string): void {
+    this.getGame(gameId).pipe(
+      take(1)
+    ).subscribe({
+      next: (game) => {
+        if (game) {
+          game.adminIds.push(userId);
+          this.log(`adding game admin w/ id=${userId}`);
+          this.updateGame(game);
+        }
+      }
+    });
+  }
+
+  deleteAdmin(gameId: string, user: User): void {
+    this.store.collection(Collection.Games).doc(gameId).collection(Collection.Admins).doc(user.id).delete().then(
+      () => {
+        this.log(`deleted admin from game w/ id=${gameId} ${user.name}`);
+      },
+      err => this.handleError<Game>('deleteAdmin')
+    );
   }
 
   private log(message: string): void {

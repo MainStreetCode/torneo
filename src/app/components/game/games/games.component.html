@@ -16,8 +16,8 @@
   <mat-toolbar color="accent"><span>Game List</span></mat-toolbar>
   <div class="games">      
     <mat-card class="mdc-card card" *ngFor="let game of games">
-      <div class="mdc-card__primary-action details" tabindex="0">
-        <button class="mdc-button" (click)="dashboard(game)">
+      <div class="mdc-card__primary-action details" tabindex="0" (click)="dashboard(game)">
+        <button class="mdc-button">
           <span class="mdc-button__ripple"></span>
           <span class="mdc-button__label">{{game.name}}</span>
           <!-- <span class="badge">{{player.id}}</span>    -->

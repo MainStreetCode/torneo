@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Game } from 'src/app/services/game/game';
 import { GameService } from 'src/app/services/game/game.service';
-
+import { getAuth } from 'firebase/auth';
 @Component({
   selector: 'app-games',
   templateUrl: './games.component.html',
@@ -27,8 +27,12 @@ export class GamesComponent implements OnInit {
 
   add(name: string): void {
     name = name.trim();
-    if (!name) { return; }
-    this.gameService.addGame({ name } as Game);
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    if (!name || !user) { return; }
+
+    this.gameService.addGame({ name } as Game, user.uid);
   }
 
   delete(game: Game): void {

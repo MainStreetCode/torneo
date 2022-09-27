@@ -1,0 +1,21 @@
+<div class="content" *ngIf="round">
+
+    <mat-toolbar color="accent"><span>Round {{round.number}}</span></mat-toolbar>
+    
+    <div class="flex-box-basic">
+      <div class="flex-box-item">
+        <span>id: </span>{{round.id}}
+      </div>      
+    </div>
+    
+    <div class="flex-box-basic">
+        <div class="flex-box-item">
+            <span>Byes ({{round.byes.length}}): </span>
+            <span *ngFor="let player of round.byes; let i = index">
+              <span *ngIf="i > 0">, </span>
+              <span>{{player.name}}</span>              
+            </span>
+        </div>
+    </div>
+
+</div>

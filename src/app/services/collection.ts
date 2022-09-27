@@ -1,4 +1,6 @@
 export enum Collection {
     Games = 'games',
-    GamePlayers = 'gamePlayers'
+    GamePlayers = 'gamePlayers',
+    Admins = 'admins',
+    Rounds = 'rounds'
 }

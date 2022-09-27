@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { GamePlayerService } from 'src/app/services/gamePlayer/game-player.service';
-import { GamePlayer } from '../player/gamePlayer';
+import { GamePlayer } from '../player/game-player';
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',

@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { GamePlayer } from '../gamePlayer';
+import { GamePlayer } from '../game-player';
 import { GamePlayerService } from 'src/app/services/gamePlayer/game-player.service';
 import { Router } from '@angular/router';
 import { Game } from 'src/app/services/game/game';
@@ -11,8 +11,8 @@ import { GameService } from 'src/app/services/game/game.service';
   styleUrls: ['./game-players.component.css']
 })
 export class GamePlayersComponent implements OnInit {
-  players: GamePlayer[] = [];
   @Input() game?: Game;
+  players: GamePlayer[] = [];
 
   constructor(private playerService: GamePlayerService, private router: Router) { }
 
@@ -40,7 +40,7 @@ export class GamePlayersComponent implements OnInit {
     this.playerService.deletePlayer(player.id, this.game);
   }
 
-  showPlayerDetail(player: GamePlayer): void {
+  view(player: GamePlayer): void {
     this.router.navigateByUrl(`/game/${this.game.id}/player/${player.id}`);
   }
 

@@ -4,7 +4,7 @@ import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
 import { GamePlayersComponent } from './components/player/game-players/game-players.component';
 import { FormsModule } from '@angular/forms';
-import { GamePlayerDetailComponent } from './components/player/game-player-detail/player-detail.component';
+import { GamePlayerDetailComponent } from './components/player/game-player-detail/game-player-detail.component';
 import { SystemMessagesComponent } from './components/system-messages/system-messages.component';
 import { AppRoutingModule } from './app-routing.module';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
@@ -23,6 +23,11 @@ import { GamesComponent } from './components/game/games/games.component';
 import { UserComponent } from './components/user/user-detail/user.component';
 import { LoginComponent } from './components/user/login/login.component';
 import { GameDashboardComponent } from './components/game/game-dashboard/game-dashboard.component';
+import { RoundsComponent } from './components/round/rounds/rounds.component';
+import { RoundDetailComponent } from './components/round/round-detail/round-detail.component';
+import { TableComponent } from './components/table/table.component';
+import { TeamComponent } from './components/team/team.component';
+import { TeamPlayerComponent } from './components/team-player/team-player.component';
 
 @NgModule({
   declarations: [
@@ -36,7 +41,12 @@ import { GameDashboardComponent } from './components/game/game-dashboard/game-da
     GameConfigurationComponent,
     UserComponent,
     LoginComponent,
-    GameDashboardComponent
+    GameDashboardComponent,
+    RoundsComponent,
+    RoundDetailComponent,
+    TableComponent,
+    TeamComponent,
+    TeamPlayerComponent
   ],
   imports: [
     BrowserModule,

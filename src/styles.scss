@@ -4,9 +4,18 @@
 @use "@material/tab-scroller/mdc-tab-scroller";
 @use "@material/tab-indicator/mdc-tab-indicator";
 @use "@material/tab/mdc-tab";
+@use "@material/checkbox";
+@use "@material/floating-label/mdc-floating-label";
+@use "@material/line-ripple/mdc-line-ripple";
+@use "@material/notched-outline/mdc-notched-outline";
+@use "@material/textfield";
+// @use "@material/form-field";
 @import 'https://fonts.googleapis.com/icon?family=Material+Icons';
 @import '~@angular/material/theming';
 @import '~firebaseui/dist/firebaseui.css';
+@include checkbox.core-styles;
+@include textfield.core-styles;
+// @include form-field.core-styles;
 
 body {
     margin: 0;
@@ -19,6 +28,7 @@ body {
 .flex-box-basic {
     display: flex;
     gap: 1rem;
+    align-items: center;
 }
 
 .flex-box-item {

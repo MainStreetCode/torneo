@@ -2,8 +2,8 @@
     <mat-toolbar color="accent"><span>{{game.name | uppercase}} Dashboard</span></mat-toolbar>    
 
     <div class="content">
-        <div><span>id: </span>{{game.id}}</div>
-        <label for="game-name">Game name: </label>
+        <div><span>Game Id: </span>{{game.id}}</div>        
+        <div><span>Rounds: </span>{{game.numberOfRounds}}</div>     
 
         <qrcode *ngIf="gameURL" [qrdata]="gameURL" [width]="256" [errorCorrectionLevel]="'M'"></qrcode>
 
@@ -21,7 +21,7 @@
         <div class="mdc-tab-scroller">
           <div class="mdc-tab-scroller__scroll-area">
             <div class="mdc-tab-scroller__scroll-content">
-              <button class="mdc-tab mdc-tab--active" role="tab" aria-selected="true" tabindex="0">
+              <button class="mdc-tab mdc-tab--active" role="tab" aria-selected="true" tabindex="0" (click)="selectTab(playersTab)">
                 <span class="mdc-tab__content">
                   <span class="mdc-tab__icon material-icons" aria-hidden="true">group</span>
                   <span class="mdc-tab__text-label">Players</span>
@@ -31,7 +31,7 @@
                 </span>
                 <span class="mdc-tab__ripple"></span>
               </button>
-              <button class="mdc-tab mdc-tab--active" role="tab" aria-selected="true" tabindex="0">
+              <button class="mdc-tab mdc-tab--active" role="tab" aria-selected="true" tabindex="0" (click)="selectTab(roundsTab)">
                 <span class="mdc-tab__content">
                   <span class="mdc-tab__icon material-icons" aria-hidden="true">table_bar</span>
                   <span class="mdc-tab__text-label">Rounds</span>
@@ -45,7 +45,7 @@
           </div>
         </div>
       </div>
-
-    <!-- Player list -->
-    <app-game-players [game]="game"></app-game-players>
+    
+    <app-game-players *ngIf="selectedTab === playersTab" [game]="game"></app-game-players>
+    <app-rounds *ngIf="selectedTab === roundsTab" [game]="game"></app-rounds>
 </div>

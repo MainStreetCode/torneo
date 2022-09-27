@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { from, Observable, of } from 'rxjs';
-import { GamePlayer } from 'src/app/components/player/gamePlayer';
+import { GamePlayer } from 'src/app/components/player/game-player';
 import { MessageService } from '../message/message.service';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Collection } from '../collection';
@@ -10,11 +10,8 @@ import { Game } from '../game/game';
   providedIn: 'root'
 })
 export class GamePlayerService {
-  // public players$: Observable<Player[]>;
 
-  constructor(private messageService: MessageService, private store: AngularFirestore) {
-    // this.players$ = this.store.collection(Collection.Players).valueChanges({ idField: 'id' }) as Observable<Player[]>;
-  }
+  constructor(private messageService: MessageService, private store: AngularFirestore) { }
 
   playersForGame(gameId: string): Observable<GamePlayer[]> {
     return this.store.collection(Collection.Games)
@@ -53,7 +50,6 @@ export class GamePlayerService {
   }
 
   deletePlayer(playerId: string, game: Game): void {
-    // this.store.collection(this.storeName).doc<Player>(id).delete()
     this.store.collection(Collection.Games)
     .doc(game.id)
     .collection(Collection.GamePlayers)

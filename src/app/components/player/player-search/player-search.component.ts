@@ -6,7 +6,7 @@ import {
    debounceTime, distinctUntilChanged, switchMap
  } from 'rxjs/operators';
 import { GamePlayerService } from 'src/app/services/gamePlayer/game-player.service';
-import { GamePlayer } from '../gamePlayer';
+import { GamePlayer } from '../game-player';
 
 
 @Component({
