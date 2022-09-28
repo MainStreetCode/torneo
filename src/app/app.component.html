@@ -24,6 +24,13 @@
     </button>
   </div>
 
+  <div *ngIf="(isLoggedIn$ | async)">
+    <button class="mdc-button" (click)="userProfile()">
+      <span class="mdc-button__ripple"></span>
+      <mat-icon color="accent">account_circle</mat-icon>
+   </button>
+  </div>
+
 
 </mat-toolbar>
 

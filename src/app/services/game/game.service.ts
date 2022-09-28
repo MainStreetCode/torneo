@@ -81,6 +81,16 @@ export class GameService {
     );
   }
 
+  isUserAdmin(playerId: string, gameId: string): Observable<boolean> {
+    return this.getGame(gameId).pipe(
+      take(1)
+    ).pipe(
+      map((game) => {
+          return !!game.adminIds.find((adminId) => adminId === playerId);
+      })
+    );
+  }
+
   deleteAdmin(gameId: string, user: User): void {
     this.store.collection(Collection.Games).doc(gameId).collection(Collection.Admins).doc(user.id).delete().then(
       () => {

@@ -3,7 +3,6 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import firebase from "firebase/compat/app";
 import { Observable } from 'rxjs';
-import { environment } from 'src/environments/environment';
 import { AuthService } from './services/auth.service';
 @Component({
   selector: 'app-root',
@@ -32,5 +31,9 @@ export class AppComponent implements OnInit {
 
   goHome(): void {
     this.router.navigateByUrl('');
+  }
+
+  userProfile(): void {
+    this.router.navigateByUrl('userProfile');
   }
 }

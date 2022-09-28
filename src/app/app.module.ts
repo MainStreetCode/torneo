@@ -20,7 +20,7 @@ import { QRCodeModule } from 'angularx-qrcode';
 
 import { GameConfigurationComponent } from './components/game/game-configuration/game-configuration.component';
 import { GamesComponent } from './components/game/games/games.component';
-import { UserComponent } from './components/user/user-detail/user.component';
+import { UserProfileComponent } from './components/user/user-profile/user-profile.component';
 import { LoginComponent } from './components/user/login/login.component';
 import { GameDashboardComponent } from './components/game/game-dashboard/game-dashboard.component';
 import { RoundsComponent } from './components/round/rounds/rounds.component';
@@ -39,7 +39,7 @@ import { TeamPlayerComponent } from './components/team-player/team-player.compon
     PlayerSearchComponent,
     GamesComponent,
     GameConfigurationComponent,
-    UserComponent,
+    UserProfileComponent,
     LoginComponent,
     GameDashboardComponent,
     RoundsComponent,

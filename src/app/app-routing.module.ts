@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { GamePlayerDetailComponent } from './components/player/game-player-detail/game-player-detail.component';
 import { GamePlayersComponent } from './components/player/game-players/game-players.component';
 import { GameConfigurationComponent } from './components/game/game-configuration/game-configuration.component';
@@ -9,7 +8,7 @@ import { LoginComponent } from './components/user/login/login.component';
 import { GameDashboardComponent } from './components/game/game-dashboard/game-dashboard.component';
 import { RoundsComponent } from './components/round/rounds/rounds.component';
 import { RoundDetailComponent } from './components/round/round-detail/round-detail.component';
-
+import { UserProfileComponent } from './components/user/user-profile/user-profile.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -19,7 +18,8 @@ const routes: Routes = [
   { path: 'game/:gameId/dashboard', component: GameDashboardComponent },
   { path: 'game/:gameId/configuration', component: GameConfigurationComponent },
   { path: 'game/:gameId/rounds', component: RoundsComponent },
-  { path: 'game/:gameId/round/:roundId', component: RoundDetailComponent }
+  { path: 'game/:gameId/round/:roundId', component: RoundDetailComponent },
+  { path: 'userProfile', component: UserProfileComponent }
 ];
 
 @NgModule({
