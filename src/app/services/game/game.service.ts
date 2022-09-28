@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Observable, of } from 'rxjs';
-import { map, take } from 'rxjs/operators';
+import { map, switchMap, take } from 'rxjs/operators';
 import { MessageService } from '../message/message.service';
 import { Game } from './game';
 import { Collection } from '../collection';
@@ -69,6 +69,16 @@ export class GameService {
         }
       }
     });
+  }
+
+  getAdmins(gameId: string): Observable<string[]> {
+    return this.getGame(gameId).pipe(
+      take(1)
+    ).pipe(
+      map((game) => {
+        return game?.adminIds ?? [];
+      })
+    );
   }
 
   deleteAdmin(gameId: string, user: User): void {

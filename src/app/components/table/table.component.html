@@ -1,1 +1,5 @@
-<p>table works!</p>
+<mat-toolbar color="secondary"><span>Table {{table.number}}</span></mat-toolbar>
+
+<div class="flex-box-basic">      
+    <app-team [team]="team" *ngFor="let team of table.teams" class="flex-box-item"></app-team>
+</div>

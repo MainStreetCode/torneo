@@ -5,6 +5,7 @@ import { MessageService } from '../message/message.service';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Collection } from '../collection';
 import { Game } from '../game/game';
+import { switchMap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -27,7 +28,7 @@ export class GamePlayerService {
       .doc(playerId)
       .valueChanges({ idField: 'id' }) as Observable<GamePlayer>;
   }
-
+  
   addPlayer(player: GamePlayer, gameId: string): void {
     this.store.collection(Collection.Games).doc(gameId).collection(Collection.GamePlayers).add(player).then(
       () => {

@@ -1,1 +1,24 @@
-<p>team works!</p>
+<mat-card class="mdc-card card team-card">
+    <div class="flex-box-item">
+        <div>Team:</div>
+        <app-team-player *ngFor="let teamPlayer of team.teamPlayers" [teamPlayer]="teamPlayer"></app-team-player>
+    </div>
+    <div class="flex-box-item">
+        <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--no-label">
+            <span class="mdc-notched-outline">
+            <span class="mdc-notched-outline__leading"></span>
+            <span class="mdc-notched-outline__trailing"></span>
+            </span>
+            <input class="mdc-text-field__input" type="text" aria-label="Label" placeholder="points" [(ngModel)]="teamPoints" [disabled]="!isEditable">
+        </label>        
+    </div>      
+    <div class="flex-box-item" *ngIf="isEditable">
+        <button class="mdc-button mdc-button--raised flex-box-item" (click)="confirmPoints()">
+            <div class="mdc-button__ripple"></div>
+            <!-- <mat-icon>save</mat-icon>     -->
+            <span class="mdc-button__label">        
+                <span class="mdc-button__label">Confirm Points</span>
+            </span>
+        </button>
+    </div>    
+</mat-card>

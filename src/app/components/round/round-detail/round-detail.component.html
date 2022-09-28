@@ -19,22 +19,5 @@
     </div>
 
     <mat-toolbar color="accent"><span>Tables</span></mat-toolbar>
-
-    <mat-card *ngFor="let table of round.tables">
-      <div>
-        <mat-toolbar color="secondary"><span>Table {{table.number}}</span></mat-toolbar>
-        <div class="flex-box-basic">        
-          <div *ngFor="let team of table.teams" class="flex-box-item">
-            <mat-card>
-              <div class="flex-box-item">
-                <div>Team:</div>
-                <div *ngFor="let teamPlayer of team.teamPlayers">
-                  {{teamPlayer.player.name }}
-                </div>
-              </div>    
-            </mat-card>      
-          </div>      
-        </div>
-      </div>
-    </mat-card>
+    <app-table [table]="table" *ngFor="let table of round.tables"></app-table>
 </div>

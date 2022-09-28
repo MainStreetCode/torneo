@@ -31,7 +31,6 @@ export class RoundsComponent implements OnInit {
   startRound(roundNumber: number): void {
     if (roundNumber <= this.game.numberOfRounds) {
       const round = {number: roundNumber} as Round;
-      // this.roundService.addRound(round, this.game.id);
       this.roundService.createRound(this.game.id);
     }
   }

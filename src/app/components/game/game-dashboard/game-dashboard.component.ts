@@ -16,8 +16,8 @@ export class GameDashboardComponent implements OnInit {
   @Input() game?: Game;
   gameURL: string;
   selectedTab = GameDashboardTab.Players;
-  playersTab = GameDashboardTab.Players;
-  roundsTab = GameDashboardTab.Rounds;
+  readonly playersTab = GameDashboardTab.Players;
+  readonly roundsTab = GameDashboardTab.Rounds;
 
   constructor(private route: ActivatedRoute, private gameService: GameService, private location: Location, private router: Router) {
 
