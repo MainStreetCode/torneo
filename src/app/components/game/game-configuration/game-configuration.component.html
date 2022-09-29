@@ -1,4 +1,5 @@
-<div class="content" *ngIf="game">
+<div *ngIf="!(this.isAdmin$ | async)">You do not have access to this page</div>
+<div class="content" *ngIf="game && (this.isAdmin$ | async)">
 
     <mat-toolbar color="accent"><span>{{game.name | uppercase}} Configuration</span></mat-toolbar>    
 

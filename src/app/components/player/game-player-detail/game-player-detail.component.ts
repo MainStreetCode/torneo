@@ -57,10 +57,10 @@ export class GamePlayerDetailComponent implements OnInit {
   toggleIsAdmin(): void {
     // if isAdmin was true, then delete player as admin
     if (this.isAdmin) {
-      this.gameService.deleteAdmin(this.gameId, this.player);
+      this.gameService.deleteAdmin(this.gameId, this.player.uid);
     } else {
       // else isAdmin was false, add player as admin
-      this.gameService.addAdmin(this.gameId, this.player.id);
+      this.gameService.addAdmin(this.gameId, this.player.uid);
     }
   }
 }

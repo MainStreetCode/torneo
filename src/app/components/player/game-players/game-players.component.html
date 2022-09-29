@@ -1,39 +1,53 @@
 <div class="players">
   <mat-toolbar color="accent"><span>Players</span></mat-toolbar>  
 
-  <mat-toolbar color="secondary"><span>Add new player</span></mat-toolbar>
+  <div class="flex-box-basic" *ngIf="!isCurrentUserGamePlayer">
+    <button class="mdc-button mdc-button--raised flex-box-item" (click)="joinGame()">
+      <div class="mdc-button__ripple"></div>
+      <!-- <mat-icon><span class="material-symbols-outlined">arrow_back</span></mat-icon>     -->
+      <span class="mdc-button__label">        
+          <span class="mdc-button__label">Join Game</span>
+      </span>
+    </button> 
+  </div>
 
-  <div class="content">
-    <label for="new-player">Player name: </label>
-    <input id="new-player" #playerName />
+  <div *ngIf="this.isAdmin$ | async">
+    <mat-toolbar color="secondary"><span>Add new player</span></mat-toolbar>
 
-    <!-- (click) passes input value to add() and then clears the input -->
-    <button class="add-button" (click)="add(playerName.value); playerName.value=''">
-      Add player
-    </button>
+    <div class="content">
+      <label for="new-player">Player name: </label>
+      <input id="new-player" #playerName />
+
+      <!-- (click) passes input value to add() and then clears the input -->
+      <button class="add-button" (click)="add(playerName.value); playerName.value=''">
+        Add player
+      </button>
+    </div>
   </div>
 
   <mat-toolbar color="secondary"><span>Player List</span></mat-toolbar>
   <div class="player-list">      
     <mat-card class="mdc-card card" *ngFor="let player of players">
       <div class="mdc-card__primary-action details" tabindex="0" (click)="view(player)">
-        <button class="mdc-button">
-          <span class="mdc-button__ripple"></span>
-          <span class="mdc-button__label">{{player.name}}</span>
-          <!-- <span class="badge">{{player.id}}</span>    -->
-          <div class="mdc-card__ripple"></div>
-        </button>      
+        <div class="flex-box-basic">
+          <div class="mdc-button__label name">
+            {{player.displayName}}
+            <span *ngIf="player.uid === currentUser.uid">(you)</span>
+          </div>          
+          <div class="mdc-button__label score">{{player.points ?? 0}}</div>
+        </div>
       </div>
       
-      <button class="mdc-button mdc-card__action mdc-card__action--button" title="player details" (click)="view(player)">
-        <div class="mdc-button__ripple"></div>
-        <span class="mdc-button__label"><mat-icon>edit</mat-icon></span>
-      </button>
-      <button class="mdc-button mdc-card__action mdc-card__action--button" title="delete player" (click)="delete(player)">
-        <div class="mdc-button__ripple"></div>
-        <span class="mdc-button__label"><mat-icon>delete</mat-icon></span>
-      </button>
-      
+      <div *ngIf="this.isAdmin$ | async">
+        <button class="mdc-button mdc-card__action mdc-card__action--button" title="player details" (click)="view(player)">
+          <div class="mdc-button__ripple"></div>
+          <span class="mdc-button__label"><mat-icon>edit</mat-icon></span>
+        </button>
+        <button class="mdc-button mdc-card__action mdc-card__action--button" title="delete player" (click)="delete(player)">
+          <div class="mdc-button__ripple"></div>
+          <span class="mdc-button__label"><mat-icon>delete</mat-icon></span>
+        </button>
+      </div>            
     </mat-card>
   </div>
 </div>

@@ -1,10 +1,10 @@
 <div class="content" *ngIf="player">
 
-  <mat-toolbar color="accent"><span>{{player.name | uppercase}} Details</span></mat-toolbar>
+  <mat-toolbar color="accent"><span>{{player.displayName | uppercase}} Details</span></mat-toolbar>
   
   <div class="flex-box-basic">
     <div class="flex-box-item">
-      <span>id: </span>{{player.id}}
+      <span>id: </span>{{player.uid}}
     </div>
   </div>
 

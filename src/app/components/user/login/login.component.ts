@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
-import { AuthService } from 'src/app/services/auth.service';
+import { AuthService } from 'src/app/services/auth/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -20,9 +20,9 @@ export class LoginComponent implements OnInit, OnDestroy {
       next: (loggedIn) => {
         if (!loggedIn) {
           this.authService.showLogin('#firebaseui-auth-container');
-        }        
+        }
       }
-    })
+    });
   }
 
   ngOnDestroy(): void {

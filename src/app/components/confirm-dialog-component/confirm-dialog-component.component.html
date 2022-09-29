@@ -1,0 +1,32 @@
+<div class="flex-box-basic">
+    <div class="flex-box-item">
+        <h1 mat-dialog-title>{{title}}</h1>
+    </div>
+</div>
+
+<div mat-dialog-content>
+    <p>{{message}}</p>
+</div>
+
+<div mat-dialog-actions>
+    <div class="flex-box-basic">
+        <div class="flex-box-item">
+            <button class="mdc-button mdc-button--raised flex-box-item" (click)="cancel()">
+                <div class="mdc-button__ripple"></div>
+                <!-- <mat-icon>save</mat-icon>     -->
+                <span class="mdc-button__label">        
+                    <span class="mdc-button__label">{{cancelButtonText}}</span>
+                </span>
+            </button>
+        </div>
+        <div class="flex-box-item">
+            <button class="mdc-button mdc-button--raised flex-box-item" (click)="confirm()">
+                <div class="mdc-button__ripple"></div>
+                <!-- <mat-icon>save</mat-icon>     -->
+                <span class="mdc-button__label">        
+                    <span class="mdc-button__label">{{confirmButtonText}}</span>
+                </span>
+            </button>
+        </div>
+    </div>
+</div>

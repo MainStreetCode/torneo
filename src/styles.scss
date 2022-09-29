@@ -9,12 +9,14 @@
 @use "@material/line-ripple/mdc-line-ripple";
 @use "@material/notched-outline/mdc-notched-outline";
 @use "@material/textfield";
+@use "@material/dialog";
 // @use "@material/form-field";
 @import 'https://fonts.googleapis.com/icon?family=Material+Icons';
 @import '~@angular/material/theming';
 @import '~firebaseui/dist/firebaseui.css';
 @include checkbox.core-styles;
 @include textfield.core-styles;
+@include dialog.core-styles;
 // @include form-field.core-styles;
 
 body {
@@ -25,7 +27,7 @@ body {
     padding: 1rem;
 }
 
-.flex-box-basic {
+.flex-box-basic {    
     display: flex;
     gap: 1rem;
     align-items: center;    

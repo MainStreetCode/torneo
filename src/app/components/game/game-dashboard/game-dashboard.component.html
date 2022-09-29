@@ -1,20 +1,20 @@
 <div class="content" *ngIf="game">
-    <mat-toolbar color="accent"><span>{{game.name | uppercase}} Dashboard</span></mat-toolbar>    
+    <mat-toolbar color="accent">      
+      <div class="flex-box-item">{{game.name | uppercase}} Dashboard</div>
+      <button class="mdc-button mdc-button--raised" (click)="goBack()">
+        <div class="mdc-button__ripple"></div>                
+        <span class="mdc-button__label">        
+            <!-- <mat-icon >arrow_back</mat-icon> -->
+            <span class="mdc-button__label">Back</span>
+        </span>
+      </button>
+    </mat-toolbar>
 
     <div class="content">
         <div><span>Game Id: </span>{{game.id}}</div>        
         <div><span>Rounds: </span>{{game.numberOfRounds}}</div>     
 
-        <qrcode *ngIf="gameURL" [qrdata]="gameURL" [width]="256" [errorCorrectionLevel]="'M'"></qrcode>
-
-        <div class="flex-box-basic">
-            <button class="mdc-button mdc-button--raised flex-box-item" (click)="goBack()">
-                <div class="mdc-button__ripple"></div>                
-                <span class="mdc-button__label">        
-                    <span class="mdc-button__label">Back</span>
-                </span>
-            </button>
-        </div>
+        <qrcode *ngIf="gameURL" [qrdata]="gameURL" [width]="256" [errorCorrectionLevel]="'M'"></qrcode>       
     </div>
     
     <div class="mdc-tab-bar" role="tablist">
@@ -45,7 +45,7 @@
           </div>
         </div>
       </div>
-    
+
     <app-game-players *ngIf="selectedTab === playersTab" [game]="game"></app-game-players>
     <app-rounds *ngIf="selectedTab === roundsTab" [game]="game"></app-rounds>
 </div>

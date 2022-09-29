@@ -32,7 +32,7 @@ export class TeamComponent implements OnInit {
 
     this.gameService.isUserAdmin(currentUser.uid, this.gameId).pipe(take(1)).subscribe({
       next: (isAdmin) => {
-        const currentTeamPlayer = this.team.teamPlayers.find((teamPlayer) => teamPlayer.player.id === currentUser.uid);
+        const currentTeamPlayer = this.team.teamPlayers.find((teamPlayer) => teamPlayer.player.uid === currentUser.uid);
 
         // if current user is admin, then set all team players points confirmed
         if (isAdmin) {
@@ -54,7 +54,7 @@ export class TeamComponent implements OnInit {
 
     this.gameService.isUserAdmin(currentUser.uid, this.gameId).pipe(take(1)).subscribe({
       next: (isAdmin) => {
-        const isTeamPlayer = this.team.teamPlayers.find((teamPlayer) => teamPlayer.player.id === currentUser.uid);
+        const isTeamPlayer = this.team.teamPlayers.find((teamPlayer) => teamPlayer.player.uid === currentUser.uid);
 
         if (isAdmin || isTeamPlayer) {
           this.isEditable = true;

@@ -27,7 +27,7 @@
       </mat-card>
 </div>
 
-<div *ngIf="rounds.length < game.numberOfRounds">
+<div *ngIf="rounds.length === 0 || (rounds.length < game.numberOfRounds)">
     <button class="mdc-button mdc-button--raised flex-box-item" (click)="startRound(rounds.length + 1)">
         <div class="mdc-button__ripple"></div>
         <!-- <mat-icon>save</mat-icon>     -->

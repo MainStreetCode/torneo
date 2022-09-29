@@ -18,7 +18,7 @@ export class GamePlayerService {
     return this.store.collection(Collection.Games)
       .doc(gameId)
       .collection(Collection.GamePlayers)
-      .valueChanges({ idField: 'id' }) as Observable<GamePlayer[]>;
+      .valueChanges({ idField: 'uid' }) as Observable<GamePlayer[]>;
   }
 
   getPlayer(playerId: string, gameId: string): Observable<GamePlayer | undefined> {
@@ -26,25 +26,36 @@ export class GamePlayerService {
       .doc(gameId)
       .collection(Collection.GamePlayers)
       .doc(playerId)
-      .valueChanges({ idField: 'id' }) as Observable<GamePlayer>;
+      .valueChanges({ idField: 'uid' }) as Observable<GamePlayer>;
   }
-  
+
   addPlayer(player: GamePlayer, gameId: string): void {
-    this.store.collection(Collection.Games).doc(gameId).collection(Collection.GamePlayers).add(player).then(
-      () => {
-        this.log(`addPlayerToGame w/ id=${gameId} ${player.name}`);
-      },
-      err => this.handleError<Game>('addPlayerToGame')
-    );
+    // if player already has an ID, then use set instead of add
+    if (player.uid) {
+      this.store.collection(Collection.Games).doc(gameId).collection(Collection.GamePlayers).doc(player.uid).set(player).then(
+        () => {
+          this.log(`addPlayerToGame w/ id=${gameId} ${player.displayName}`);
+        },
+        err => this.handleError<Game>('addPlayerToGame')
+      );
+    } else {
+      this.store.collection(Collection.Games).doc(gameId).collection(Collection.GamePlayers).add(player).then(
+        () => {
+          this.log(`addPlayerToGame w/ id=${gameId} ${player.displayName}`);
+        },
+        err => this.handleError<Game>('addPlayerToGame')
+      );
+    }
+
   }
 
   updatePlayer(player: GamePlayer, gameId: string): void {
     this.store.collection(Collection.Games)
       .doc(gameId)
       .collection(Collection.GamePlayers)
-      .doc(player.id).update(player).then(
+      .doc(player.uid).update(player).then(
       () => {
-        this.log(`updated player w/ id=${player.id}`);
+        this.log(`updated player w/ id=${player.uid}`);
       },
       err => this.handleError<GamePlayer>('updatePlayer')
     );

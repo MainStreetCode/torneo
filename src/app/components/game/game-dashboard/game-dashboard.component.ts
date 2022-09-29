@@ -42,6 +42,10 @@ export class GameDashboardComponent implements OnInit {
   getGame(): void {
     const id = this.route.snapshot.paramMap.get('gameId');
 
+    if (!id) {
+      return;
+    }
+
     this.gameService.getGame(id).subscribe({
       next: (game) => {
         this.game = game;
@@ -61,6 +65,10 @@ export class GameDashboardComponent implements OnInit {
       skipLocationChange: false
       // do not trigger navigation
     });
+  }
+
+  goBack(): void {
+    this.location.back();
   }
 }
 

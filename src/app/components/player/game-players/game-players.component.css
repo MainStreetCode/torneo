@@ -12,6 +12,14 @@
   flex-grow: 10;
 }
 
+.name {
+  flex-grow: 10;
+}
+
+.score {
+  flex-grow: 1;
+}
+
 .players .badge {
   display: inline-block;
   font-size: small;

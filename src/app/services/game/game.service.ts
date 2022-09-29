@@ -1,13 +1,11 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { Observable, of } from 'rxjs';
+import { EMPTY, Observable, of } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
 import { MessageService } from '../message/message.service';
 import { Game } from './game';
 import { Collection } from '../collection';
-import { GamePlayer } from 'src/app/components/player/game-player';
-import { User } from 'src/app/components/player/user';
-
+import { getAuth } from 'firebase/auth';
 @Injectable({
   providedIn: 'root'
 })
@@ -81,6 +79,24 @@ export class GameService {
     );
   }
 
+  isCurrentUserAdmin(gameId: string): Observable<boolean> {
+    return this.getGame(gameId).pipe(
+      take(1)
+    ).pipe(
+      map((game) => {
+        if (!game) {
+          return false;
+        }
+        const auth = getAuth();
+        const currentUser = auth.currentUser;
+        if (!currentUser) {
+          return false;
+        }
+        return !!game.adminIds.find((adminId) => adminId === currentUser.uid);
+      })
+    );
+  }
+
   isUserAdmin(playerId: string, gameId: string): Observable<boolean> {
     return this.getGame(gameId).pipe(
       take(1)
@@ -91,10 +107,10 @@ export class GameService {
     );
   }
 
-  deleteAdmin(gameId: string, user: User): void {
-    this.store.collection(Collection.Games).doc(gameId).collection(Collection.Admins).doc(user.id).delete().then(
+  deleteAdmin(gameId: string, userId: string): void {
+    this.store.collection(Collection.Games).doc(gameId).collection(Collection.Admins).doc(userId).delete().then(
       () => {
-        this.log(`deleted admin from game w/ id=${gameId} ${user.name}`);
+        this.log(`deleted admin from game w/ id=${gameId} ${userId}`);
       },
       err => this.handleError<Game>('deleteAdmin')
     );

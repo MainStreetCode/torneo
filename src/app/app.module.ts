@@ -28,6 +28,10 @@ import { RoundDetailComponent } from './components/round/round-detail/round-deta
 import { TableComponent } from './components/table/table.component';
 import { TeamComponent } from './components/team/team.component';
 import { TeamPlayerComponent } from './components/team-player/team-player.component';
+import { LoginDialogComponent } from './components/user/login/login-dialog/login-dialog-component';
+import { MatDialogModule, MAT_DIALOG_DEFAULT_OPTIONS } from '@angular/material/dialog';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ConfirmDialogComponentComponent } from './components/confirm-dialog-component/confirm-dialog-component.component';
 
 @NgModule({
   declarations: [
@@ -46,7 +50,9 @@ import { TeamPlayerComponent } from './components/team-player/team-player.compon
     RoundDetailComponent,
     TableComponent,
     TeamComponent,
-    TeamPlayerComponent
+    TeamPlayerComponent,
+    LoginDialogComponent,
+    ConfirmDialogComponentComponent
   ],
   imports: [
     BrowserModule,
@@ -56,11 +62,15 @@ import { TeamPlayerComponent } from './components/team-player/team-player.compon
     MatToolbarModule,
     MatIconModule,
     MatCardModule,
+    MatDialogModule,
     AngularFireModule.initializeApp(environment.firebase),
     AngularFirestoreModule,
-    QRCodeModule
+    QRCodeModule,
+    BrowserAnimationsModule
   ],
-  providers: [],
+  providers: [
+    { provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: {hasBackdrop: true} }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
