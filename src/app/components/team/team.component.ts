@@ -1,9 +1,12 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { GameService } from 'src/app/services/game/game.service';
 import { Team } from './team';
 import { getAuth } from "firebase/auth";
 import { ActivatedRoute } from '@angular/router';
 import { take } from 'rxjs/operators';
+import { RoundService } from 'src/app/services/round/round.service';
+import { Round } from 'src/app/services/round/round';
+import { TeamService } from 'src/app/services/team/team.service';
 @Component({
   selector: 'app-team',
   templateUrl: './team.component.html',
@@ -13,40 +16,33 @@ import { take } from 'rxjs/operators';
 export class TeamComponent implements OnInit {
   @Input() team: Team;
   gameId: string;
+  roundId: string;
+  tableId: string;
   teamPoints: number;
-  isEditable = false;
   auth = getAuth();
   pointsConfirmed = false;
+  isEditable = true;
 
-  constructor(private gameService: GameService, private route: ActivatedRoute) { }
+  constructor(private gameService: GameService, private route: ActivatedRoute, private teamService: TeamService) { }
 
   ngOnInit(): void {
     this.gameId = this.route.snapshot.paramMap.get('gameId');
-    this.teamPoints = this.team.teamPlayers[0].points;
-
+    this.roundId = this.route.snapshot.paramMap.get('roundId');
     this.canEditPoints();
-  }
 
-  toggleConfirmPoints(): void {
-    const currentUser = this.auth.currentUser;
-
-    this.gameService.isUserAdmin(currentUser.uid, this.gameId).pipe(take(1)).subscribe({
-      next: (isAdmin) => {
-        const currentTeamPlayer = this.team.teamPlayers.find((teamPlayer) => teamPlayer.player.uid === currentUser.uid);
-
-        // if current user is admin, then set all team players points confirmed
-        if (isAdmin) {
-          this.team.teamPlayers.forEach((teamPlayer) => {
-            teamPlayer.isPointsConfirmed = !teamPlayer.isPointsConfirmed;
-          });
-          this.pointsConfirmed = !this.pointsConfirmed;
-        } else if (currentTeamPlayer) {
-          // else if user is a team player, then only set their points confirmed value
-          currentTeamPlayer.isPointsConfirmed = !currentTeamPlayer.isPointsConfirmed;
-          this.pointsConfirmed = currentTeamPlayer.isPointsConfirmed;
+    // TODO: push to subscription
+    this.teamService.getTeam(this.team.id, this.tableId, this.roundId, this.gameId).subscribe({
+      next: (currentTeam) => {
+        if (currentTeam) {
+          this.teamPoints = currentTeam.points;
         }
       }
     });
+  }
+
+  pointsChanged(): void {
+    this.team.points = Number(this.teamPoints);
+    this.teamService.updateTeam(this.team, this.tableId, this.roundId, this.gameId);
   }
 
   private canEditPoints(): void {
@@ -56,7 +52,7 @@ export class TeamComponent implements OnInit {
       next: (isAdmin) => {
         const isTeamPlayer = this.team.teamPlayers.find((teamPlayer) => teamPlayer.player.uid === currentUser.uid);
 
-        if (isAdmin || isTeamPlayer) {
+        if ((isAdmin || isTeamPlayer) && !this.pointsConfirmed) {
           this.isEditable = true;
         } else {
           this.isEditable = false;

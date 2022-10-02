@@ -4,6 +4,17 @@
     There are no rounds.
 </div>
 
+<div *ngIf="!game.numberOfRounds || game.numberOfRounds === 0">
+  Number of rounds is set to 0. Edit the game configuration.
+  <button class="mdc-button mdc-button--raised flex-box-item" (click)="configuration()">
+    <div class="mdc-button__ripple"></div>
+    <!-- <mat-icon>save</mat-icon>     -->
+    <span class="mdc-button__label">        
+        <span class="mdc-button__label">Edit game config</span>
+    </span>
+</button>
+</div>
+
 <div *ngIf="rounds.length > 0" class="rounds">
     <mat-card class="mdc-card card" *ngFor="let round of rounds">
         <div class="mdc-card__primary-action details" tabindex="0" (click)="view(round)">
@@ -27,7 +38,7 @@
       </mat-card>
 </div>
 
-<div *ngIf="rounds.length === 0 || (rounds.length < game.numberOfRounds)">
+<div *ngIf="game.numberOfRounds > 0 && rounds.length === 0 || (rounds.length < game.numberOfRounds)">
     <button class="mdc-button mdc-button--raised flex-box-item" (click)="startRound(rounds.length + 1)">
         <div class="mdc-button__ripple"></div>
         <!-- <mat-icon>save</mat-icon>     -->

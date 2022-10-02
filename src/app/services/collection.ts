@@ -2,5 +2,7 @@ export enum Collection {
     Games = 'games',
     GamePlayers = 'gamePlayers',
     Admins = 'admins',
-    Rounds = 'rounds'
+    Rounds = 'rounds',
+    Tables = 'tables',
+    Teams = 'team'
 }

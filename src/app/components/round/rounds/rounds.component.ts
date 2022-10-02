@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { table } from 'console';
 import { Game } from 'src/app/services/game/game';
+import { RoundMediatorService } from 'src/app/services/round-mediator/round-mediator.service';
 import { Round } from 'src/app/services/round/round';
 import { RoundService } from 'src/app/services/round/round.service';
 
@@ -14,7 +15,7 @@ export class RoundsComponent implements OnInit {
   @Input() game: Game;
   rounds: Round[] = [];
 
-  constructor(private roundService: RoundService, private router: Router) { }
+  constructor(private roundService: RoundService, private router: Router, private roundMediatorService: RoundMediatorService) { }
 
   ngOnInit(): void {
     this.getRounds();
@@ -30,8 +31,7 @@ export class RoundsComponent implements OnInit {
 
   startRound(roundNumber: number): void {
     if (roundNumber <= this.game.numberOfRounds) {
-      const round = {number: roundNumber} as Round;
-      this.roundService.createRound(this.game.id);
+      this.roundMediatorService.createRound(this.game.id);
     }
   }
 
@@ -41,5 +41,9 @@ export class RoundsComponent implements OnInit {
 
   view(round: Round): void {
     this.router.navigateByUrl(`/game/${this.game.id}/round/${round.id}`);
+  }
+
+  configuration(): void {
+    this.router.navigateByUrl(`/game/${this.game.id}/configuration`);
   }
 }

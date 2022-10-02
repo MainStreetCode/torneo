@@ -13,11 +13,11 @@
             <span>Byes ({{round.byes.length}}): </span>
             <span *ngFor="let player of round.byes; let i = index">
               <span *ngIf="i > 0">, </span>
-              <span>{{player.name}}</span>              
+              <span>{{player.displayName}}</span>              
             </span>
         </div>
     </div>
 
     <mat-toolbar color="accent"><span>Tables</span></mat-toolbar>
-    <app-table [table]="table" *ngFor="let table of round.tables"></app-table>
+    <app-table [table]="table" *ngFor="let table of tables"></app-table>
 </div>

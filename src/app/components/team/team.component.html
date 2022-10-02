@@ -9,23 +9,7 @@
             <span class="mdc-notched-outline__leading"></span>
             <span class="mdc-notched-outline__trailing"></span>
             </span>
-            <input class="mdc-text-field__input" type="text" aria-label="Label" placeholder="points" [(ngModel)]="teamPoints" [disabled]="!isEditable">
+            <input class="mdc-text-field__input" type="text" aria-label="Label" placeholder="points" [(ngModel)]="teamPoints" [disabled]="!isEditable" (change)="pointsChanged()">
         </label>        
-    </div>      
-    <div class="flex-box-item" *ngIf="isEditable">
-        <button class="mdc-button mdc-button--raised flex-box-item" (click)="toggleConfirmPoints()" *ngIf="!pointsConfirmed">
-            <div class="mdc-button__ripple"></div>
-            <mat-icon>check</mat-icon>    
-            <span class="mdc-button__label">        
-                <span class="mdc-button__label">Confirm Points</span>
-            </span>
-        </button>
-        <button class="mdc-button mdc-button--raised flex-box-item" (click)="toggleConfirmPoints()" *ngIf="pointsConfirmed">
-            <div class="mdc-button__ripple"></div>
-            <mat-icon>cancel</mat-icon>    
-            <span class="mdc-button__label">        
-                <span class="mdc-button__label">Dispute Points</span>
-            </span>
-        </button>
-    </div>    
+    </div>          
 </mat-card>

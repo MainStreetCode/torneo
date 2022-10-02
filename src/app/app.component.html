@@ -1,42 +1,46 @@
-<mat-toolbar color="primary" class="header">
-  <mat-icon>bar_chart</mat-icon>
-  <div class="title">    
-    <span (click)="goHome()">{{title}}</span>
+<div class="background-pattern">
+  <div class="center main-content">
+    <mat-toolbar color="primary" class="header">
+      <mat-icon>bar_chart</mat-icon>
+      <div class="title">    
+        <span (click)="goHome()">{{title}}</span>
+      </div>
+
+      <div *ngIf="!(isLoggedIn$ | async)">
+        <button class="mdc-button mdc-button--raised" (click)="login()">
+          <div class="mdc-button__ripple"></div>
+          <!-- <mat-icon>save</mat-icon>     -->
+          <span class="mdc-button__label">        
+            <span class="mdc-button__label">Login</span>
+          </span>
+        </button>
+      </div>
+
+      <div *ngIf="(isLoggedIn$ | async)">
+        <button class="mdc-button mdc-button--raised" (click)="logout()">
+          <div class="mdc-button__ripple"></div>
+          <!-- <mat-icon>save</mat-icon>     -->
+          <span class="mdc-button__label">        
+            <span class="mdc-button__label">Logout</span>
+          </span>
+        </button>
+      </div>
+
+      <div *ngIf="(isLoggedIn$ | async)">
+        <button class="mdc-button" (click)="userProfile()">
+          <span class="mdc-button__ripple"></span>
+          <mat-icon color="accent">account_circle</mat-icon>
+      </button>
+      </div>
+    </mat-toolbar>
+
+    <nav>
+      <!-- <a routerLink="/dashboard">Dashboard</a> -->
+      <a routerLink="/games">Games</a>
+      <!-- <a routerLink="/players">Players</a>   -->
+    </nav>
+
+    <router-outlet></router-outlet>
+    <app-system-messages></app-system-messages>
   </div>
-
-  <div *ngIf="!(isLoggedIn$ | async)">
-    <button class="mdc-button mdc-button--raised" (click)="login()">
-      <div class="mdc-button__ripple"></div>
-      <!-- <mat-icon>save</mat-icon>     -->
-      <span class="mdc-button__label">        
-        <span class="mdc-button__label">Login</span>
-      </span>
-    </button>
-  </div>
-
-  <div *ngIf="(isLoggedIn$ | async)">
-    <button class="mdc-button mdc-button--raised" (click)="logout()">
-      <div class="mdc-button__ripple"></div>
-      <!-- <mat-icon>save</mat-icon>     -->
-      <span class="mdc-button__label">        
-        <span class="mdc-button__label">Logout</span>
-      </span>
-    </button>
-  </div>
-
-  <div *ngIf="(isLoggedIn$ | async)">
-    <button class="mdc-button" (click)="userProfile()">
-      <span class="mdc-button__ripple"></span>
-      <mat-icon color="accent">account_circle</mat-icon>
-   </button>
-  </div>
-</mat-toolbar>
-
-<nav>
-  <!-- <a routerLink="/dashboard">Dashboard</a> -->
-  <a routerLink="/games">Games</a>
-  <!-- <a routerLink="/players">Players</a>   -->
-</nav>
-
-<router-outlet></router-outlet>
-<app-system-messages></app-system-messages>
+</div>

@@ -1,4 +1,14 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { take } from 'rxjs/operators';
+import { AuthService } from 'src/app/services/auth/auth.service';
+import { GameService } from 'src/app/services/game/game.service';
+import { Round } from 'src/app/services/round/round';
+import { RoundService } from 'src/app/services/round/round.service';
+import { TableService } from 'src/app/services/table/table.service';
+import { TeamService } from 'src/app/services/team/team.service';
+import { TeamPlayer } from '../team-player/team-player';
+import { Team } from '../team/team';
 import { Table } from './table';
 
 @Component({
@@ -8,12 +18,90 @@ import { Table } from './table';
 })
 export class TableComponent implements OnInit {
   @Input() table: Table;
+  teams: Team[];
   teamScore: number;
+  isEditable = true;
+  gameId: string;
+  roundId: string;
+  pointsConfirmed = false;
+  round: Round;
+  currentTeamPlayer?: TeamPlayer;
 
-  constructor() { }
+  constructor(
+    private authService: AuthService,
+    private gameService: GameService,
+    private route: ActivatedRoute,
+    private roundService: RoundService,
+    private tableService: TableService,
+    private teamService: TeamService) { }
 
   ngOnInit(): void {
+    this.gameId = this.route.snapshot.paramMap.get('gameId');
+    this.roundId = this.route.snapshot.paramMap.get('roundId');
 
+    this.getTeams();
+    this.checkPointsConfirmed();
   }
 
+  getTeams(): void {
+    this.teamService.getTeamsForTable(this.table.id, this.roundId, this.gameId).subscribe({
+      next: (teams) => {
+        if (teams) {
+          this.teams = teams;
+          teams.forEach((team) => {
+            const currentUser = this.authService.getCurrentUser();
+            this.currentTeamPlayer = team.teamPlayers.find((teamPlayer) => teamPlayer.player.uid === currentUser.uid);
+          });
+        }
+      }
+    });
+  }
+
+  toggleConfirmPoints(): void {
+    const currentUser = this.authService.getCurrentUser();
+
+    this.gameService.isUserAdmin(currentUser.uid, this.gameId).pipe(take(1)).subscribe({
+      next: (isAdmin) => {
+
+        // if current user is admin, then set all team players points confirmed
+        if (isAdmin) {
+          this.teams.forEach((team) => {
+            team.teamPlayers.forEach((teamPlayer) => {
+              teamPlayer.isPointsConfirmed = !teamPlayer.isPointsConfirmed;
+            });
+          });
+
+          this.pointsConfirmed = !this.pointsConfirmed;
+        } else if (this.currentTeamPlayer) {
+          // else if user is a team player, then only set their points confirmed value
+          this.currentTeamPlayer.isPointsConfirmed = !this.currentTeamPlayer.isPointsConfirmed;
+          this.pointsConfirmed = this.currentTeamPlayer.isPointsConfirmed;
+        }
+
+        this.isEditable = !this.pointsConfirmed;
+      }
+    });
+
+    this.roundService.updateRound(this.round, this.gameId);
+  }
+
+  private checkPointsConfirmed(): void {
+    this.roundService.getRound(this.roundId, this.gameId).subscribe({
+      next: (round) => {
+        this.round = round;
+
+        let confirmCounter = 0;
+
+        this.teams.forEach((team) => {
+          team.teamPlayers.forEach((teamPlayer) => {
+            if (teamPlayer.isPointsConfirmed) {
+              confirmCounter++;
+            }
+          });
+        });
+
+        this.pointsConfirmed = confirmCounter === 4;
+      }
+    });
+  }
 }

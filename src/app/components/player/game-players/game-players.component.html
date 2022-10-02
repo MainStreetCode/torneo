@@ -25,7 +25,9 @@
     </div>
   </div>
 
-  <mat-toolbar color="secondary"><span>Player List</span></mat-toolbar>
+  <mat-toolbar color="secondary">
+    <span>Player List ({{players.length}})</span>
+  </mat-toolbar>
   <div class="player-list">      
     <mat-card class="mdc-card card" *ngFor="let player of players">
       <div class="mdc-card__primary-action details" tabindex="0" (click)="view(player)">

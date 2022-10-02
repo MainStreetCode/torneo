@@ -1,5 +1,25 @@
-<mat-toolbar color="secondary"><span>Table {{table.number}}</span></mat-toolbar>
+<mat-toolbar color="secondary" class="flex-box-basic">
+    <span  class="flex-box-item">Table {{table.number}}</span>
+    <div>
+        <div class="flex-box-item">
+            <button class="mdc-button mdc-button--raised flex-box-item" (click)="toggleConfirmPoints()" *ngIf="!pointsConfirmed">
+                <div class="mdc-button__ripple"></div>
+                <mat-icon>check</mat-icon>    
+                <span class="mdc-button__label">        
+                    <span class="mdc-button__label">Confirm Points</span>
+                </span>
+            </button>
+            <button class="mdc-button mdc-button--raised flex-box-item" (click)="toggleConfirmPoints()" *ngIf="pointsConfirmed">
+                <div class="mdc-button__ripple"></div>
+                <mat-icon>cancel</mat-icon>    
+                <span class="mdc-button__label">        
+                    <span class="mdc-button__label">Dispute Points</span>
+                </span>
+            </button>
+        </div>    
+        </div>
+    </mat-toolbar>
 
 <div class="flex-box-basic">      
-    <app-team [team]="team" *ngFor="let team of table.teams" class="flex-box-item"></app-team>
+    <app-team [team]="team" *ngFor="let team of teams" class="flex-box-item"></app-team>
 </div>

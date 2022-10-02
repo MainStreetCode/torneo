@@ -5,7 +5,9 @@ import { GameService } from 'src/app/services/game/game.service';
 import { GamePlayerService } from 'src/app/services/gamePlayer/game-player.service';
 import { Round } from 'src/app/services/round/round';
 import { RoundService } from 'src/app/services/round/round.service';
+import { TableService } from 'src/app/services/table/table.service';
 import { GamePlayer } from '../../player/game-player';
+import { Table } from '../../table/table';
 
 @Component({
   selector: 'app-round-detail',
@@ -14,24 +16,39 @@ import { GamePlayer } from '../../player/game-player';
 })
 export class RoundDetailComponent implements OnInit {
   gameId?: string;
+  roundId?: string;
   round?: Round;
+  tables?: Table[];
 
   constructor(
     private route: ActivatedRoute,
     private location: Location,
-    private roundService: RoundService) { }
+    private roundService: RoundService,
+    private tableService: TableService) { }
 
   ngOnInit(): void {
+    this.gameId = this.route.snapshot.paramMap.get('gameId');
+    this.roundId = this.route.snapshot.paramMap.get('roundId');
+
     this.getRound();
+    this.getTables();
   }
 
   getRound(): void {
-    this.gameId = this.route.snapshot.paramMap.get('gameId');
-    const roundId = this.route.snapshot.paramMap.get('roundId');
 
-    this.roundService.getRound(roundId, this.gameId).subscribe({
+    this.roundService.getRound(this.roundId, this.gameId).subscribe({
       next: (round) => {
         this.round = round;
+      }
+    });
+  }
+
+  getTables(): void {
+    this.tableService.getTablesForRound(this.roundId, this.gameId).subscribe({
+      next: (tables) => {
+        if (tables) {
+          this.tables = tables;
+        }
       }
     });
   }

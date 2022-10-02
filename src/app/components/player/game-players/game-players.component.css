@@ -10,6 +10,7 @@
 
 .players .details {
   flex-grow: 10;
+  cursor: pointer; 
 }
 
 .name {
