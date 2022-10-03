@@ -4,6 +4,7 @@ import { take } from 'rxjs/operators';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { GameService } from 'src/app/services/game/game.service';
 import { Round } from 'src/app/services/round/round';
+import { TableService } from 'src/app/services/table/table.service';
 import { TeamService } from 'src/app/services/team/team.service';
 import { TeamPlayer } from '../../team-player/team-player';
 import { Team } from '../../team/team';
@@ -21,14 +22,14 @@ export class TableDetailComponent implements OnInit {
   gameId: string;
   roundId: string;
   pointsConfirmed = false;
-  round: Round;
   currentTeamPlayer?: TeamPlayer;
 
   constructor(
     private authService: AuthService,
     private gameService: GameService,
     private route: ActivatedRoute,
-    private teamService: TeamService) { }
+    private teamService: TeamService,
+    private tableService: TableService) { }
 
   ngOnInit(): void {
     this.gameId = this.route.snapshot.paramMap.get('gameId');
@@ -65,20 +66,26 @@ export class TableDetailComponent implements OnInit {
             team.teamPlayers.forEach((teamPlayer) => {
               teamPlayer.isPointsConfirmed = !teamPlayer.isPointsConfirmed;
             });
-            this.teamService.updateTeam(team, this.table.id, this.roundId, this.gameId);
+            this.teamService.updateTeam(team, this.table.id, this.roundId, this.gameId).subscribe({
+              next: () => {
+                this.checkPointsConfirmed();
+              }
+            });
           });
 
-          this.pointsConfirmed = !this.pointsConfirmed;
         } else if (this.currentTeamPlayer) {
           // else if user is a team player, then only set their points confirmed value
           this.currentTeamPlayer.isPointsConfirmed = !this.currentTeamPlayer.isPointsConfirmed;
-          this.pointsConfirmed = this.currentTeamPlayer.isPointsConfirmed;
 
           // find the team to update
           this.teams.forEach((team) => {
             // if current user is on this team, then update it
             if (team.teamPlayers.find((teamPlayer) => teamPlayer.player.uid === currentUser.uid)) {
-              this.teamService.updateTeam(team, this.table.id, this.roundId, this.gameId);
+              this.teamService.updateTeam(team, this.table.id, this.roundId, this.gameId).subscribe({
+                next: () => {
+                  this.checkPointsConfirmed();
+                }
+              });
             }
           });
         }
@@ -98,5 +105,11 @@ export class TableDetailComponent implements OnInit {
     });
 
     this.pointsConfirmed = confirmCounter > 0;
+    const allPlayersConfirmed = confirmCounter === 4;
+
+    if (this.table.pointsConfirmed !== allPlayersConfirmed) {
+      this.table.pointsConfirmed = allPlayersConfirmed;
+      this.tableService.updateTable(this.table, this.roundId, this.gameId);
+    }
   }
 }

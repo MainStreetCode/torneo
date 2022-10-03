@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { table } from 'console';
-import { combineLatest, EMPTY, of } from 'rxjs';
+import { combineLatest, EMPTY, Observable, of } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
 import { GamePlayer } from 'src/app/components/player/game-player';
+import { RoundPoints } from 'src/app/components/player/game-players/round-points';
 import { Table } from 'src/app/components/table/table';
 import { Team } from 'src/app/components/team/team';
 import { GameService } from '../game/game.service';
@@ -27,6 +27,75 @@ export class RoundMediatorService {
     private messageService: MessageService,
     private teamService: TeamService,
     private tableService: TableService) { }
+
+  allTablesConfirmed(roundId: string, gameId: string): Observable<boolean> {
+    return this.tableService.getTablesForRound(roundId, gameId).pipe(
+      map((tables) => {
+        let confirmCounter = 0;
+        tables.map((table) => {
+          if (table.pointsConfirmed) {
+            confirmCounter++;
+            this.updateGamePlayerPoints(table.id, roundId, gameId);
+          }
+        });
+        const allConfirmed = confirmCounter === tables.length;
+        return allConfirmed;
+      }
+    ));
+  }
+
+  unconfirmedTables(roundId: string, gameId): Observable<Table[] | undefined> {
+    return this.tableService.getTablesForRound(roundId, gameId).pipe(
+      map((tables) => {
+        const unconfirmedTables = [];
+
+        tables.map((table) => {
+          if (!table.pointsConfirmed) {
+            unconfirmedTables.push(table);
+          }
+        });
+
+        return unconfirmedTables;
+      }
+    ));
+  }
+
+  updateGamePlayerPoints(tableId: string, roundId: string, gameId: string): void {
+    this.tableService.getTable(tableId, roundId, gameId).pipe(
+      switchMap((table) => {
+        if (table && table.pointsConfirmed) {
+          return this.teamService.getTeamsForTable(table.id, roundId, gameId);
+        }
+      })
+    ).subscribe({
+      next: (teams) => {
+        teams.map((team) => {
+          const teamPoints = team.points;
+          team.teamPlayers.map((teamPlayer) => {
+            const gamePlayer = teamPlayer.player;
+
+            if (!gamePlayer.pointsForRound) {
+              gamePlayer.pointsForRound = [];
+            }
+
+            const gamePlayerPointsForRound = gamePlayer.pointsForRound.find((roundPoints) => roundPoints.roundId === roundId);
+
+            if (gamePlayerPointsForRound) {
+              gamePlayerPointsForRound.points = teamPoints;
+            } else {
+              const newRoundPoints: RoundPoints = {
+                roundId,
+                points: teamPoints
+              };
+              gamePlayer.pointsForRound.push(newRoundPoints);
+            }
+
+            this.gamePlayerService.updatePlayer(gamePlayer, gameId);
+          });
+        });
+      }
+    });
+  }
 
   createRound(gameId: string): void {
     this.byes = [];

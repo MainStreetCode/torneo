@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { table } from 'console';
+import { of } from 'rxjs';
 import { Game } from 'src/app/services/game/game';
 import { RoundMediatorService } from 'src/app/services/round-mediator/round-mediator.service';
 import { Round } from 'src/app/services/round/round';
@@ -33,17 +34,5 @@ export class RoundsComponent implements OnInit {
     if (roundNumber <= this.game.numberOfRounds) {
       this.roundMediatorService.createRound(this.game.id);
     }
-  }
-
-  delete(round: Round): void {
-    this.roundService.deleteRound(round.id, this.game.id);
-  }
-
-  view(round: Round): void {
-    this.router.navigateByUrl(`/game/${this.game.id}/round/${round.id}`);
-  }
-
-  configuration(): void {
-    this.router.navigateByUrl(`/game/${this.game.id}/configuration`);
   }
 }

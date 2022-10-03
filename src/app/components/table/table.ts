@@ -5,4 +5,5 @@ export interface Table {
     number: number;
     name: string;
     playerIds: string[];
+    pointsConfirmed: boolean;
 }

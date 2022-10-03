@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { combineLatest, empty, EMPTY, Observable, of } from 'rxjs';
+import { combineLatest, empty, EMPTY, from, Observable, of } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
 import { GamePlayer } from 'src/app/components/player/game-player';
 import { Team } from 'src/app/components/team/team';
@@ -57,20 +57,22 @@ export class TeamService {
       .valueChanges({ idField: 'id' }) as Observable<Team[]>;
   }
 
-  updateTeam(team: Team, tableId: string, roundId: string, gameId: string): void {
-    this.store.collection(Collection.Games)
-    .doc(gameId)
-    .collection(Collection.Rounds)
-    .doc(roundId)
-    .collection(Collection.Tables)
-    .doc(tableId)
-    .collection(Collection.Teams)
-    .doc(team.id)
-    .update(team).then(
-      () => {
-        this.log(`updateTeam w/ id=${gameId} ${team.id}`);
-      },
-      err =>  this.log(`ERROR updateTeam w/ id=${team.id}`)
+  updateTeam(team: Team, tableId: string, roundId: string, gameId: string): Observable<Team | void> {
+    return from(this.store.collection(Collection.Games)
+      .doc(gameId)
+      .collection(Collection.Rounds)
+      .doc(roundId)
+      .collection(Collection.Tables)
+      .doc(tableId)
+      .collection(Collection.Teams)
+      .doc(team.id)
+      .update(team).then(
+        (docRef) => {
+          this.log(`updateTeam w/ id=${gameId} ${team.id}`);
+          return docRef;
+        },
+        err =>  this.log(`ERROR updateTeam w/ id=${team.id}`)
+      )
     );
   }
 

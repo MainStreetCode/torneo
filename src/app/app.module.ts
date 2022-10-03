@@ -33,6 +33,7 @@ import { MatDialogModule, MAT_DIALOG_DEFAULT_OPTIONS } from '@angular/material/d
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ConfirmDialogComponentComponent } from './components/confirm-dialog-component/confirm-dialog-component.component';
 import { TablesComponent } from './components/table/tables/tables/tables.component';
+import { RoundCardComponent } from './components/round/round-card/round-card.component';
 
 @NgModule({
   declarations: [
@@ -54,7 +55,8 @@ import { TablesComponent } from './components/table/tables/tables/tables.compone
     TeamPlayerComponent,
     LoginDialogComponent,
     ConfirmDialogComponentComponent,
-    TablesComponent
+    TablesComponent,
+    RoundCardComponent
   ],
   imports: [
     BrowserModule,
