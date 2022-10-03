@@ -58,4 +58,12 @@
       </span>
     </button>
   </div>
+
+  <div>
+
+ <mat-toolbar color="accent"><span>Points</span></mat-toolbar>
+ <div *ngFor="let roundPoints of player.pointsForRound; let i = index">
+    Round: {{i+1}} Points: {{roundPoints.points}}
+ </div>
+  
 </div>

@@ -60,9 +60,9 @@ export class GamePlayerService {
     );
   }
 
-  deletePlayer(playerId: string, game: Game): void {
+  deletePlayer(playerId: string, gameId: string): void {
     this.store.collection(Collection.Games)
-    .doc(game.id)
+    .doc(gameId)
     .collection(Collection.GamePlayers)
     .doc(playerId).delete().then(
         () => {

@@ -34,6 +34,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ConfirmDialogComponentComponent } from './components/confirm-dialog-component/confirm-dialog-component.component';
 import { TablesComponent } from './components/table/tables/tables/tables.component';
 import { RoundCardComponent } from './components/round/round-card/round-card.component';
+import { PlayerCardComponent } from './components/player/player-card/player-card.component';
 
 @NgModule({
   declarations: [
@@ -56,7 +57,8 @@ import { RoundCardComponent } from './components/round/round-card/round-card.com
     LoginDialogComponent,
     ConfirmDialogComponentComponent,
     TablesComponent,
-    RoundCardComponent
+    RoundCardComponent,
+    PlayerCardComponent
   ],
   imports: [
     BrowserModule,

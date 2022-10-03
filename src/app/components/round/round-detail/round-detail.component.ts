@@ -38,6 +38,17 @@ export class RoundDetailComponent implements OnInit {
 
     this.allTablesPointsConfirmed$ = this.roundMediatorService.allTablesConfirmed(this.roundId, this.gameId);
     this.unConfirmedTables$ = this.roundMediatorService.unconfirmedTables(this.roundId, this.gameId);
+
+    // TODO: run this only once when all points are confirmed
+    this.allTablesPointsConfirmed$.subscribe({
+      next: (confirmed) => {
+        if (confirmed) {
+          this.tables.forEach((table) => {
+            this.roundMediatorService.updateGamePlayerPoints(table.id, this.roundId, this.gameId);
+          });
+        }
+      }
+    });
   }
 
   getRound(): void {

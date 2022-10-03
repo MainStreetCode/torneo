@@ -9,7 +9,7 @@ import { ConfirmDialogComponentComponent } from '../../confirm-dialog-component/
 import { of } from 'rxjs';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { LoginDialogComponent } from '../../user/login/login-dialog/login-dialog-component';
-import { User } from "firebase/auth";
+import { User } from 'firebase/auth';
 @Component({
   selector: 'app-game-players',
   templateUrl: './game-players.component.html',
@@ -58,14 +58,6 @@ export class GamePlayersComponent implements OnInit {
     if (!displayName) { return; }
 
     this.addPlayerToGame({ displayName } as GamePlayer);
-  }
-
-  delete(player: GamePlayer): void {
-    this.playerService.deletePlayer(player.uid, this.game);
-  }
-
-  view(player: GamePlayer): void {
-    this.router.navigateByUrl(`/game/${this.game.id}/player/${player.uid}`);
   }
 
   addPlayerToGame(player: GamePlayer): void {

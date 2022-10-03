@@ -35,7 +35,6 @@ export class RoundMediatorService {
         tables.map((table) => {
           if (table.pointsConfirmed) {
             confirmCounter++;
-            this.updateGamePlayerPoints(table.id, roundId, gameId);
           }
         });
         const allConfirmed = confirmCounter === tables.length;
@@ -61,11 +60,12 @@ export class RoundMediatorService {
   }
 
   updateGamePlayerPoints(tableId: string, roundId: string, gameId: string): void {
-    this.tableService.getTable(tableId, roundId, gameId).pipe(
+    this.tableService.getTable(tableId, roundId, gameId).pipe(take(1),
       switchMap((table) => {
         if (table && table.pointsConfirmed) {
           return this.teamService.getTeamsForTable(table.id, roundId, gameId);
         }
+        return EMPTY;
       })
     ).subscribe({
       next: (teams) => {
