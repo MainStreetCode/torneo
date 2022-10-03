@@ -5,16 +5,16 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 import { GameService } from 'src/app/services/game/game.service';
 import { Round } from 'src/app/services/round/round';
 import { TeamService } from 'src/app/services/team/team.service';
-import { TeamPlayer } from '../team-player/team-player';
-import { Team } from '../team/team';
-import { Table } from './table';
+import { TeamPlayer } from '../../team-player/team-player';
+import { Team } from '../../team/team';
+import { Table } from './../table';
 
 @Component({
-  selector: 'app-table',
-  templateUrl: './table.component.html',
-  styleUrls: ['./table.component.css']
+  selector: 'app-table-detail',
+  templateUrl: './table-detail.component.html',
+  styleUrls: ['./table-detail.component.css']
 })
-export class TableComponent implements OnInit {
+export class TableDetailComponent implements OnInit {
   @Input() table: Table;
   teams: Team[];
   teamScore: number;

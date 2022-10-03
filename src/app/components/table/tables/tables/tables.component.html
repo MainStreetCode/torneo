@@ -1,0 +1,25 @@
+<mat-toolbar color="accent" class="flex-box-basic">
+    <div class="flex-box-item">Tables</div>
+    <div class="flex-box-basic" *ngIf="isUserPlayer">
+      <div class="flex-box-item">
+        <button class="mdc-button mdc-button--raised flex-box-item" (click)="filterTables()" *ngIf="isDataFiltered">
+          <div class="mdc-button__ripple"></div>
+          <!-- <mat-icon>cancel</mat-icon>     -->
+          <span class="mdc-button__label">        
+              <span class="mdc-button__label">Show All Tables</span>
+          </span>
+         </button>
+      </div>
+      <div class="flex-box-item">
+        <button class="mdc-button mdc-button--raised flex-box-item" (click)="filterTables()" *ngIf="!isDataFiltered">
+          <div class="mdc-button__ripple"></div>
+          <!-- <mat-icon>cancel</mat-icon>     -->
+          <span class="mdc-button__label">        
+              <span class="mdc-button__label">Show My Table</span>
+          </span>
+        </button>
+      </div>
+    </div>
+  </mat-toolbar>
+
+  <app-table-detail [table]="table" *ngFor="let table of filteredTables"></app-table-detail>

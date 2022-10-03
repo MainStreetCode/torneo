@@ -18,6 +18,5 @@
         </div>
     </div>
 
-    <mat-toolbar color="accent"><span>Tables</span></mat-toolbar>
-    <app-table [table]="table" *ngFor="let table of tables"></app-table>
+    <app-tables [tables]="tables" *ngIf="tables"></app-tables>    
 </div>

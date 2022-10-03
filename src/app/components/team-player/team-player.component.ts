@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { AuthService } from 'src/app/services/auth/auth.service';
 import { TeamPlayer } from './team-player';
 
 @Component({
@@ -8,13 +9,16 @@ import { TeamPlayer } from './team-player';
 })
 export class TeamPlayerComponent implements OnInit {
   @Input() teamPlayer: TeamPlayer;
+  isCurrentUserTeamPlayer = false;
 
-  constructor() { }
+  constructor(private authService: AuthService) { }
 
   ngOnInit(): void {
-  }
-
-  confirmPoints(): void {
-
+    const currentUser = this.authService.getCurrentUser();
+    if (this.teamPlayer.player.uid === currentUser.uid) {
+      this.isCurrentUserTeamPlayer = true;
+    } else {
+      this.isCurrentUserTeamPlayer = false;
+    }
   }
 }

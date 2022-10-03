@@ -1,6 +1,7 @@
 <mat-card class="mdc-card team-player-card">
     <div class="flex-box-item">
         {{teamPlayer.player.displayName}}
+        <span *ngIf="isCurrentUserTeamPlayer"> (you)</span>
     </div>
     <mat-icon *ngIf="teamPlayer.isPointsConfirmed">checkmark</mat-icon>
 </mat-card>

@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
-import { from, Observable, of } from 'rxjs';
+import { EMPTY, from, Observable, of } from 'rxjs';
 import { GamePlayer } from 'src/app/components/player/game-player';
 import { MessageService } from '../message/message.service';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Collection } from '../collection';
 import { Game } from '../game/game';
-import { switchMap } from 'rxjs/operators';
+import { map, switchMap } from 'rxjs/operators';
+import { Table } from 'src/app/components/table/table';
 
 @Injectable({
   providedIn: 'root'
@@ -22,11 +23,9 @@ export class GamePlayerService {
   }
 
   getPlayer(playerId: string, gameId: string): Observable<GamePlayer | undefined> {
-    return this.store.collection(Collection.Games)
-      .doc(gameId)
-      .collection(Collection.GamePlayers)
-      .doc(playerId)
-      .valueChanges({ idField: 'uid' }) as Observable<GamePlayer>;
+    return this.playersForGame(gameId).pipe(
+      map((players) => players.find((player) => player.uid === playerId))
+    );
   }
 
   addPlayer(player: GamePlayer, gameId: string): void {

@@ -1,16 +1,21 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { from, Observable } from 'rxjs';
+import { EMPTY, from, Observable, of } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
 import { Table } from 'src/app/components/table/table';
 import { Collection } from '../collection';
 import { MessageService } from '../message/message.service';
+import { TeamService } from '../team/team.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TableService {
 
-  constructor(private messageService: MessageService, private store: AngularFirestore) { }
+  constructor(
+    private messageService: MessageService,
+    private store: AngularFirestore,
+    private teamService: TeamService) { }
 
   addTable(table: Table, roundId: string, gameId: string): Observable<Table | void> {
     return from(this.store.collection(Collection.Games)
@@ -45,6 +50,20 @@ export class TableService {
       .doc(roundId)
       .collection(Collection.Tables)
       .valueChanges({ idField: 'id' }) as Observable<Table[]>;
+  }
+
+  getTableForPlayer(playerId: string, roundId: string, gameId: string): Observable<Table | undefined> {
+    const tables$ = this.getTablesForRound(roundId, gameId);
+
+    return tables$.pipe(
+      switchMap((tables) => {
+        return tables.map((table) => {
+          if (table.playerIds.find((tablePlayerId) => tablePlayerId === playerId)) {
+            return table;
+          }
+        });
+      }
+    ));
   }
 
   updateTable(table: Table, roundId: string, gameId: string): void {

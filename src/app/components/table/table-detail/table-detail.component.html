@@ -1,5 +1,5 @@
 <mat-toolbar color="secondary" class="flex-box-basic">
-    <span  class="flex-box-item">Table {{table.number}}</span>
+    <div class="flex-box-item">Table {{table.number}}</div>
     <div>
         <div class="flex-box-item">
             <button class="mdc-button mdc-button--raised flex-box-item" (click)="toggleConfirmPoints()" *ngIf="!pointsConfirmed">
@@ -13,7 +13,7 @@
                 <div class="mdc-button__ripple"></div>
                 <mat-icon>cancel</mat-icon>    
                 <span class="mdc-button__label">        
-                    <span class="mdc-button__label">Dispute Points</span>
+                    <span class="mdc-button__label">Change Points</span>
                 </span>
             </button>
         </div>    

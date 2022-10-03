@@ -4,4 +4,5 @@ export interface Table {
     id: string;
     number: number;
     name: string;
+    playerIds: string[];
 }

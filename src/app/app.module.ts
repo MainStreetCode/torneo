@@ -25,13 +25,14 @@ import { LoginComponent } from './components/user/login/login.component';
 import { GameDashboardComponent } from './components/game/game-dashboard/game-dashboard.component';
 import { RoundsComponent } from './components/round/rounds/rounds.component';
 import { RoundDetailComponent } from './components/round/round-detail/round-detail.component';
-import { TableComponent } from './components/table/table.component';
+import { TableDetailComponent } from './components/table/table-detail/table-detail.component';
 import { TeamComponent } from './components/team/team.component';
 import { TeamPlayerComponent } from './components/team-player/team-player.component';
 import { LoginDialogComponent } from './components/user/login/login-dialog/login-dialog-component';
 import { MatDialogModule, MAT_DIALOG_DEFAULT_OPTIONS } from '@angular/material/dialog';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ConfirmDialogComponentComponent } from './components/confirm-dialog-component/confirm-dialog-component.component';
+import { TablesComponent } from './components/table/tables/tables/tables.component';
 
 @NgModule({
   declarations: [
@@ -48,11 +49,12 @@ import { ConfirmDialogComponentComponent } from './components/confirm-dialog-com
     GameDashboardComponent,
     RoundsComponent,
     RoundDetailComponent,
-    TableComponent,
+    TableDetailComponent,
     TeamComponent,
     TeamPlayerComponent,
     LoginDialogComponent,
-    ConfirmDialogComponentComponent
+    ConfirmDialogComponentComponent,
+    TablesComponent
   ],
   imports: [
     BrowserModule,

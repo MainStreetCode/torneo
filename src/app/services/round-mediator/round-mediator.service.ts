@@ -12,6 +12,7 @@ import { Round } from '../round/round';
 import { RoundService } from '../round/round.service';
 import { TableService } from '../table/table.service';
 import { TeamService } from '../team/team.service';
+import { TableData } from './table-data';
 
 @Injectable({
   providedIn: 'root'
@@ -55,9 +56,17 @@ export class RoundMediatorService {
 
             return combineLatest(
               tablesData.map((tableData) => {
+
+                // get all the playerIds for this table
+                let tablePlayerIds: string[] = [];
+                tableData.teams.map((team) => {
+                  tablePlayerIds = tablePlayerIds.concat(team.teamPlayers.map((teamPlayer) => teamPlayer.player.uid));
+                });
+
                 // create tables
                 const newTable = {
-                  number: tableData.number
+                  number: tableData.number,
+                  playerIds: tablePlayerIds
                 } as Table;
 
                 return this.tableService.addTable(newTable, round.id, gameId).pipe(
@@ -75,7 +84,7 @@ export class RoundMediatorService {
               })
             );
           })
-        )
+        );
       }
     )).subscribe({
       next: (tables) => {
@@ -141,10 +150,4 @@ export class RoundMediatorService {
   private log(message: string): void {
     this.messageService.add(`RoundMediatorService: ${message}`);
   }
-}
-
-export interface TableData {
-  teams: Team[];
-  number?: number;
-  name?: string;
 }

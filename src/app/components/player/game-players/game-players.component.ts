@@ -45,6 +45,8 @@ export class GamePlayersComponent implements OnInit {
 
         if (this.players.find((player) => player.uid === this.currentUser.uid)) {
           this.isCurrentUserGamePlayer = true;
+        } else {
+          this.isCurrentUserGamePlayer = false;
         }
       }
     });
