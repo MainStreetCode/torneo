@@ -4,8 +4,6 @@ import { take } from 'rxjs/operators';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { GameService } from 'src/app/services/game/game.service';
 import { Round } from 'src/app/services/round/round';
-import { RoundService } from 'src/app/services/round/round.service';
-import { TableService } from 'src/app/services/table/table.service';
 import { TeamService } from 'src/app/services/team/team.service';
 import { TeamPlayer } from '../team-player/team-player';
 import { Team } from '../team/team';
@@ -20,7 +18,6 @@ export class TableComponent implements OnInit {
   @Input() table: Table;
   teams: Team[];
   teamScore: number;
-  isEditable = true;
   gameId: string;
   roundId: string;
   pointsConfirmed = false;
@@ -31,8 +28,6 @@ export class TableComponent implements OnInit {
     private authService: AuthService,
     private gameService: GameService,
     private route: ActivatedRoute,
-    private roundService: RoundService,
-    private tableService: TableService,
     private teamService: TeamService) { }
 
   ngOnInit(): void {
@@ -87,8 +82,6 @@ export class TableComponent implements OnInit {
             }
           });
         }
-
-        this.isEditable = !this.pointsConfirmed;
       }
     });
   }

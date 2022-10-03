@@ -1,7 +1,3 @@
 .team-card {
     margin: 1rem 0;
 }
-
-input[type="text"]:disabled {
-    background: #dddddd;
-  }

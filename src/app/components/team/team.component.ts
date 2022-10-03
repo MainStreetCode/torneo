@@ -4,8 +4,6 @@ import { Team } from './team';
 import { getAuth } from "firebase/auth";
 import { ActivatedRoute } from '@angular/router';
 import { take } from 'rxjs/operators';
-import { RoundService } from 'src/app/services/round/round.service';
-import { Round } from 'src/app/services/round/round';
 import { TeamService } from 'src/app/services/team/team.service';
 import { Table } from '../table/table';
 @Component({

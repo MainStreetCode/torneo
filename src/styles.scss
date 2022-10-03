@@ -36,3 +36,7 @@ body {
 .flex-box-item {
     flex: auto;
 }
+
+input[type="text"]:disabled {
+    background: #dddddd;
+}

@@ -1,12 +1,9 @@
 import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { GameService } from 'src/app/services/game/game.service';
-import { GamePlayerService } from 'src/app/services/gamePlayer/game-player.service';
 import { Round } from 'src/app/services/round/round';
 import { RoundService } from 'src/app/services/round/round.service';
 import { TableService } from 'src/app/services/table/table.service';
-import { GamePlayer } from '../../player/game-player';
 import { Table } from '../../table/table';
 
 @Component({
@@ -22,7 +19,6 @@ export class RoundDetailComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private location: Location,
     private roundService: RoundService,
     private tableService: TableService) { }
 
