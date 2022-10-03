@@ -40,7 +40,6 @@ export class TableComponent implements OnInit {
     this.roundId = this.route.snapshot.paramMap.get('roundId');
 
     this.getTeams();
-    this.checkPointsConfirmed();
   }
 
   getTeams(): void {
@@ -52,6 +51,8 @@ export class TableComponent implements OnInit {
             const currentUser = this.authService.getCurrentUser();
             this.currentTeamPlayer = team.teamPlayers.find((teamPlayer) => teamPlayer.player.uid === currentUser.uid);
           });
+
+          this.checkPointsConfirmed();
         }
       }
     });
@@ -69,6 +70,7 @@ export class TableComponent implements OnInit {
             team.teamPlayers.forEach((teamPlayer) => {
               teamPlayer.isPointsConfirmed = !teamPlayer.isPointsConfirmed;
             });
+            this.teamService.updateTeam(team, this.table.id, this.roundId, this.gameId);
           });
 
           this.pointsConfirmed = !this.pointsConfirmed;
@@ -76,32 +78,32 @@ export class TableComponent implements OnInit {
           // else if user is a team player, then only set their points confirmed value
           this.currentTeamPlayer.isPointsConfirmed = !this.currentTeamPlayer.isPointsConfirmed;
           this.pointsConfirmed = this.currentTeamPlayer.isPointsConfirmed;
+
+          // find the team to update
+          this.teams.forEach((team) => {
+            // if current user is on this team, then update it
+            if (team.teamPlayers.find((teamPlayer) => teamPlayer.player.uid === currentUser.uid)) {
+              this.teamService.updateTeam(team, this.table.id, this.roundId, this.gameId);
+            }
+          });
         }
 
         this.isEditable = !this.pointsConfirmed;
       }
     });
-
-    this.roundService.updateRound(this.round, this.gameId);
   }
 
   private checkPointsConfirmed(): void {
-    this.roundService.getRound(this.roundId, this.gameId).subscribe({
-      next: (round) => {
-        this.round = round;
+    let confirmCounter = 0;
 
-        let confirmCounter = 0;
-
-        this.teams.forEach((team) => {
-          team.teamPlayers.forEach((teamPlayer) => {
-            if (teamPlayer.isPointsConfirmed) {
-              confirmCounter++;
-            }
-          });
-        });
-
-        this.pointsConfirmed = confirmCounter === 4;
-      }
+    this.teams.forEach((team) => {
+      team.teamPlayers.forEach((teamPlayer) => {
+        if (teamPlayer.isPointsConfirmed) {
+          confirmCounter++;
+        }
+      });
     });
+
+    this.pointsConfirmed = confirmCounter > 0;
   }
 }

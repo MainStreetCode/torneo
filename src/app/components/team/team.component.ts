@@ -7,6 +7,7 @@ import { take } from 'rxjs/operators';
 import { RoundService } from 'src/app/services/round/round.service';
 import { Round } from 'src/app/services/round/round';
 import { TeamService } from 'src/app/services/team/team.service';
+import { Table } from '../table/table';
 @Component({
   selector: 'app-team',
   templateUrl: './team.component.html',
@@ -15,9 +16,9 @@ import { TeamService } from 'src/app/services/team/team.service';
 
 export class TeamComponent implements OnInit {
   @Input() team: Team;
+  @Input() table: Table;
   gameId: string;
   roundId: string;
-  tableId: string;
   teamPoints: number;
   auth = getAuth();
   pointsConfirmed = false;
@@ -31,10 +32,18 @@ export class TeamComponent implements OnInit {
     this.canEditPoints();
 
     // TODO: push to subscription
-    this.teamService.getTeam(this.team.id, this.tableId, this.roundId, this.gameId).subscribe({
+    this.teamService.getTeam(this.team.id, this.table.id, this.roundId, this.gameId).subscribe({
       next: (currentTeam) => {
         if (currentTeam) {
           this.teamPoints = currentTeam.points;
+
+          currentTeam.teamPlayers.forEach((teamPlayer) => {
+            if (teamPlayer.isPointsConfirmed) {
+              this.pointsConfirmed = true;
+            }
+          });
+
+          this.canEditPoints();
         }
       }
     });
@@ -42,7 +51,7 @@ export class TeamComponent implements OnInit {
 
   pointsChanged(): void {
     this.team.points = Number(this.teamPoints);
-    this.teamService.updateTeam(this.team, this.tableId, this.roundId, this.gameId);
+    this.teamService.updateTeam(this.team, this.table.id, this.roundId, this.gameId);
   }
 
   private canEditPoints(): void {

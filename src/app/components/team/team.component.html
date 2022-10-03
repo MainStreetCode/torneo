@@ -9,7 +9,7 @@
             <span class="mdc-notched-outline__leading"></span>
             <span class="mdc-notched-outline__trailing"></span>
             </span>
-            <input class="mdc-text-field__input" type="text" aria-label="Label" placeholder="points" [(ngModel)]="teamPoints" [disabled]="!isEditable" (change)="pointsChanged()">
+            <input class="mdc-text-field__input" type="text" aria-label="Label" placeholder="points" [(ngModel)]="teamPoints" [disabled]="!isEditable" (input)="pointsChanged()">
         </label>        
     </div>          
 </mat-card>
