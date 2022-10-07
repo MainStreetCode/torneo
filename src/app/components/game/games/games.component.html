@@ -1,16 +1,23 @@
-<div class="games">
-  <h1 class="mat-h1">Games</h1>
+<div>
+  <mat-toolbar class="mat-h1" color="secondary">Games</mat-toolbar>
 
   <mat-toolbar color="accent"><span>Add new game</span></mat-toolbar>
 
-  <div class="content">
-    <label for="new-game">Game name: </label>
-    <input id="new-game" #gameName />
+  <div class="content flex-box-basic">
+    <div>
+      <label for="new-game">Game name: </label>
+      <input id="new-game" #gameName />
+    </div>
 
-    <!-- (click) passes input value to add() and then clears the input -->
-    <button class="add-button" (click)="add(gameName.value); gameName.value=''">
-      Add game
-    </button>
+    <div>
+      <!-- (click) passes input value to add() and then clears the input -->
+      <button mat-raised-button color="primary" [disabled]="!gameName.value" (click)="add(gameName.value); gameName.value=''">
+        <mat-icon>add</mat-icon>    
+        <span class="mdc-button__label">        
+          <span class="mdc-button__label">Create a new game</span>
+        </span>
+      </button>    
+    </div>
   </div>
 
   <mat-toolbar color="accent"><span>Game List</span></mat-toolbar>
@@ -25,15 +32,15 @@
         </button>      
       </div>
       
-      <button class="mdc-button mdc-card__action mdc-card__action--button" title="game details" (click)="configuration(game)">
-        <div class="mdc-button__ripple"></div>
-        <span class="mdc-button__label"><mat-icon>edit</mat-icon></span>
-      </button>
-      <button class="mdc-button mdc-card__action mdc-card__action--button" title="delete game" (click)="delete(game)">
-        <div class="mdc-button__ripple"></div>
-        <span class="mdc-button__label"><mat-icon>delete</mat-icon></span>
-      </button>
-      
+      <div *ngIf="isGameAdmin(game) | async">
+        <button mat-icon-button color="primary" aria-label="game details" title="game details" (click)="configuration(game)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button color="primary" aria-label="delete game" title="delete details" (click)="delete(game)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+
     </mat-card>
   </div>
 </div>

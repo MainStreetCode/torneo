@@ -1,15 +1,8 @@
-<div class="content" *ngIf="game">
-    <mat-toolbar color="accent">      
+<div *ngIf="game">
+    <!-- <mat-toolbar color="accent">      
       <div class="flex-box-item">{{game.name | uppercase}} Dashboard</div>
-      <button class="mdc-button mdc-button--raised" (click)="goBack()">
-        <div class="mdc-button__ripple"></div>                
-        <span class="mdc-button__label">        
-            <!-- <mat-icon >arrow_back</mat-icon> -->
-            <span class="mdc-button__label">Back</span>
-        </span>
-      </button>
-    </mat-toolbar>
-
+    </mat-toolbar> -->
+    <app-section-header [sectionName]="sectionName"></app-section-header>
     <div class="content">
         <div><span>Game Id: </span>{{game.id}}</div>        
         <div><span>Rounds: </span>{{game.numberOfRounds}}</div>     

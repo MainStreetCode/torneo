@@ -9,8 +9,10 @@ import { GameDashboardComponent } from './components/game/game-dashboard/game-da
 import { RoundsComponent } from './components/round/rounds/rounds.component';
 import { RoundDetailComponent } from './components/round/round-detail/round-detail.component';
 import { UserProfileComponent } from './components/user/user-profile/user-profile.component';
+import { DashboardComponent } from './components/dashboard/dashboard.component';
 
 const routes: Routes = [
+  { path: '', component: DashboardComponent },
   { path: 'login', component: LoginComponent },
   { path: 'games', component: GamesComponent },
   { path: 'gamePlayers', component: GamePlayersComponent },

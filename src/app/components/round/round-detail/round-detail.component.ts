@@ -21,6 +21,7 @@ export class RoundDetailComponent implements OnInit {
   tables?: Table[];
   unConfirmedTables$ = of([]);
   allTablesPointsConfirmed$ = of(false);
+  sectionName: string;
 
   constructor(
     private route: ActivatedRoute,
@@ -55,6 +56,7 @@ export class RoundDetailComponent implements OnInit {
     this.roundService.getRound(this.roundId, this.gameId).subscribe({
       next: (round) => {
         this.round = round;
+        this.sectionName = `Round ${round.number}`;
       }
     });
   }

@@ -1,43 +1,32 @@
-<div class="content" *ngIf="round">
+<div *ngIf="round">
 
-    <mat-toolbar color="accent" class="flex-box-basic">
-      <div class="flex-box-item">Round {{round.number}}</div>
-      <div>
-        <button class="mdc-button mdc-button--raised" (click)="goBack()">
-          <div class="mdc-button__ripple"></div>
-          <!-- <mat-icon><span class="material-symbols-outlined">arrow_back</span></mat-icon>     -->
-          <span class="mdc-button__label">        
-              <span class="mdc-button__label">Back</span>
+  <app-section-header [sectionName]="sectionName"></app-section-header>
+    
+  <div class="flex-box-basic">
+    <div class="flex-box-item">
+      <span>id: </span>{{round.id}}
+    </div>
+    <div class="flex-box-item">
+      <span>Tables with unconfirmed Points ({{ (unConfirmedTables$ | async)?.length ?? 0 }}): </span>
+      <span *ngFor="let table of (unConfirmedTables$ | async); let i = index">
+        <span *ngIf="i > 0">, </span>
+        <span>Table {{ table.number }}</span>
+      </span>
+    </div>
+    <div class="flex-box-item" *ngIf="allTablesPointsConfirmed$ | async">
+      <span>All Table's Points Confirmed</span>
+    </div>      
+  </div>
+  
+  <div class="flex-box-basic">
+      <div class="flex-box-item">
+          <span>Byes ({{round.byes.length}}): </span>
+          <span *ngFor="let player of round.byes; let i = index">
+            <span *ngIf="i > 0">, </span>
+            <span>{{player.displayName}}</span>              
           </span>
-        </button>
       </div>
-    </mat-toolbar>
-    
-    <div class="flex-box-basic">
-      <div class="flex-box-item">
-        <span>id: </span>{{round.id}}
-      </div>
-      <div class="flex-box-item">
-        <span>Tables with unconfirmed Points ({{ (unConfirmedTables$ | async)?.length ?? 0 }}): </span>
-        <span *ngFor="let table of (unConfirmedTables$ | async); let i = index">
-          <span *ngIf="i > 0">, </span>
-          <span>Table {{ table.number }}</span>
-        </span>
-      </div>
-      <div class="flex-box-item" *ngIf="allTablesPointsConfirmed$ | async">
-        <span>All Table's Points Confirmed</span>
-      </div>      
-    </div>
-    
-    <div class="flex-box-basic">
-        <div class="flex-box-item">
-            <span>Byes ({{round.byes.length}}): </span>
-            <span *ngFor="let player of round.byes; let i = index">
-              <span *ngIf="i > 0">, </span>
-              <span>{{player.displayName}}</span>              
-            </span>
-        </div>
-    </div>
+  </div>
 
-    <app-tables [tables]="tables" *ngIf="tables"></app-tables>    
+  <app-tables [tables]="tables" *ngIf="tables"></app-tables>    
 </div>

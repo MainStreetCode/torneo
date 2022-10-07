@@ -17,6 +17,9 @@ import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
 import { environment } from 'src/environments/environment';
 import { MatCardModule } from '@angular/material/card';
 import { QRCodeModule } from 'angularx-qrcode';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
 
 import { GameConfigurationComponent } from './components/game/game-configuration/game-configuration.component';
 import { GamesComponent } from './components/game/games/games.component';
@@ -35,6 +38,7 @@ import { ConfirmDialogComponentComponent } from './components/confirm-dialog-com
 import { TablesComponent } from './components/table/tables/tables/tables.component';
 import { RoundCardComponent } from './components/round/round-card/round-card.component';
 import { PlayerCardComponent } from './components/player/player-card/player-card.component';
+import { SectionHeaderComponent } from './components/section-header/section-header.component';
 
 @NgModule({
   declarations: [
@@ -58,7 +62,8 @@ import { PlayerCardComponent } from './components/player/player-card/player-card
     ConfirmDialogComponentComponent,
     TablesComponent,
     RoundCardComponent,
-    PlayerCardComponent
+    PlayerCardComponent,
+    SectionHeaderComponent
   ],
   imports: [
     BrowserModule,
@@ -69,6 +74,9 @@ import { PlayerCardComponent } from './components/player/player-card/player-card
     MatIconModule,
     MatCardModule,
     MatDialogModule,
+    MatSlideToggleModule,
+    MatButtonModule,
+    MatInputModule,
     AngularFireModule.initializeApp(environment.firebase),
     AngularFirestoreModule,
     QRCodeModule,

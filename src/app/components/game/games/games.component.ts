@@ -2,7 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Game } from 'src/app/services/game/game';
 import { GameService } from 'src/app/services/game/game.service';
-import { getAuth } from 'firebase/auth';
+import { AuthService } from 'src/app/services/auth/auth.service';
+import { map, switchMap } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { User } from 'firebase/auth';
 @Component({
   selector: 'app-games',
   templateUrl: './games.component.html',
@@ -10,8 +13,9 @@ import { getAuth } from 'firebase/auth';
 })
 export class GamesComponent implements OnInit {
   games: Game[] = [];
+  private currentUser$: Observable<User>;
 
-  constructor(private gameService: GameService, private router: Router) { }
+  constructor(private gameService: GameService, private router: Router, private authService: AuthService) { }
 
   ngOnInit(): void {
     this.getGames();
@@ -25,14 +29,29 @@ export class GamesComponent implements OnInit {
     });
   }
 
+  isGameAdmin(game: Game): Observable<boolean> {
+    const currentUser = this.authService.getCurrentUser();
+
+    if (currentUser && game.adminIds.find((adminId) => adminId === currentUser.uid)) {
+      return of(true);
+    }
+
+    return of(false);
+  }
+
   add(name: string): void {
     name = name.trim();
-    const auth = getAuth();
-    const user = auth.currentUser;
 
-    if (!name || !user) { return; }
+    const currentUser = this.authService.getCurrentUser();
+    if (!name || !currentUser) { return; }
 
-    this.gameService.addGame({ name } as Game, user.uid);
+    this.gameService.addGame({ name } as Game, currentUser.uid).subscribe({
+      next: (game) => {
+        if (game) {
+          this.configuration(game);
+        }
+      }
+    });
   }
 
   delete(game: Game): void {

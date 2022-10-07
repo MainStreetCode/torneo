@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { EMPTY, Observable, of } from 'rxjs';
+import { EMPTY, from, Observable, of } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
 import { MessageService } from '../message/message.service';
 import { Game } from './game';
@@ -24,15 +24,19 @@ export class GameService {
     );
   }
 
-  addGame(game: Game, userId: string): void {
+  addGame(game: Game, userId: string): Observable<Game | void> {
     game.adminIds = [];
 
-    this.store.collection(Collection.Games).add(game).then(
-      (newGame) => {
-        this.log(`added game w/ id=${newGame.id}`);
-        this.addAdmin(newGame.id, userId);
-      },
-      err => this.handleError<Game>('addGame')
+    return from(this.store.collection<Game>(Collection.Games)
+      .add(game).then(
+        (newGame) => {
+          game.id = newGame.id;
+          this.log(`added game w/ id=${newGame.id}`);
+          this.addAdmin(newGame.id, userId);
+          return game;
+        },
+        err =>  this.log(`addGame ${err}`)
+      )
     );
   }
 
@@ -41,7 +45,7 @@ export class GameService {
       () => {
         this.log(`updated game w/ id=${game.id}`);
       },
-      err => this.handleError<Game>('updateGame')
+      err =>  this.log(`updateGame ${err}`)
     );
   }
 
@@ -51,7 +55,7 @@ export class GameService {
         () => {
           this.log(`deleted game w/ id=${id}`);
         },
-        err => this.handleError<Game>('deleteGame')
+        err =>  this.log(`deleteGame ${err}`)
       );
   }
 
@@ -63,6 +67,21 @@ export class GameService {
         if (game) {
           game.adminIds.push(userId);
           this.log(`adding game admin w/ id=${userId}`);
+          this.updateGame(game);
+        }
+      }
+    });
+  }
+
+  deleteAdmin(gameId: string, userId: string): void {
+    this.getGame(gameId).pipe(
+      take(1)
+    ).subscribe({
+      next: (game) => {
+        if (game) {
+          const filteredAdminIds = game.adminIds.filter((adminId) => adminId !== userId);
+          game.adminIds = filteredAdminIds;
+          this.log(`deleteAdmin w/ id=${userId}`);
           this.updateGame(game);
         }
       }
@@ -107,30 +126,7 @@ export class GameService {
     );
   }
 
-  deleteAdmin(gameId: string, userId: string): void {
-    this.store.collection(Collection.Games).doc(gameId).collection(Collection.Admins).doc(userId).delete().then(
-      () => {
-        this.log(`deleted admin from game w/ id=${gameId} ${userId}`);
-      },
-      err => this.handleError<Game>('deleteAdmin')
-    );
-  }
-
   private log(message: string): void {
     this.messageService.add(`GameService: ${message}`);
-  }
-
-  private handleError<T>(operation = 'operation', result?: T) {
-    return (error: any): Observable<T> => {
-
-      // TODO: send the error to remote logging infrastructure
-      console.error(error); // log to console instead
-
-      // TODO: better job of transforming error for user consumption
-      this.log(`${operation} failed: ${error.message}`);
-
-      // Let the app keep running by returning an empty result.
-      return of(result as T);
-    };
   }
 }

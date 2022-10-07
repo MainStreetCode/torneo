@@ -11,13 +11,11 @@
     </div>
 
     <div *ngIf="this.isAdmin$ | async">
-        <button class="mdc-button mdc-card__action mdc-card__action--button" title="player details" (click)="view(player)">
-        <div class="mdc-button__ripple"></div>
-        <span class="mdc-button__label"><mat-icon>edit</mat-icon></span>
+        <button mat-icon-button color="primary" aria-label="game details" title="player details" (click)="view(player)">
+            <mat-icon>edit</mat-icon>
         </button>
-        <button class="mdc-button mdc-card__action mdc-card__action--button" title="delete player" (click)="delete(player)">
-        <div class="mdc-button__ripple"></div>
-        <span class="mdc-button__label"><mat-icon>delete</mat-icon></span>
+        <button mat-icon-button color="primary" aria-label="delete game" title="delete player" (click)="delete(player)">
+            <mat-icon>delete</mat-icon>
         </button>
     </div>            
 </mat-card>

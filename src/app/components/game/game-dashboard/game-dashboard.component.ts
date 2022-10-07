@@ -14,6 +14,7 @@ import { GameDashboardTab } from './game-dashboard-tab';
 
 export class GameDashboardComponent implements OnInit {
   @Input() game?: Game;
+  sectionName: string;
   gameURL: string;
   selectedTab = GameDashboardTab.Players;
   readonly playersTab = GameDashboardTab.Players;
@@ -50,6 +51,7 @@ export class GameDashboardComponent implements OnInit {
       next: (game) => {
         this.game = game;
         this.gameURL = `${environment.url}/game/${this.game.id}/dashboard`;
+        this.sectionName = `${this.game.name.toUpperCase()} Dashboard`;
       }
     });
   }

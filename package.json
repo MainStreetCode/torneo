@@ -26,6 +26,7 @@
     "@material/card": "^14.0.0",
     "@material/checkbox": "^14.0.0",
     "@material/dialog": "^14.0.0",
+    "@material/switch": "^14.0.0",
     "@material/tab-bar": "^14.0.0",
     "@material/textfield": "^14.0.0",
     "angularx-qrcode": "^14.0.0",

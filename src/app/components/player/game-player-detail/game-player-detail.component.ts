@@ -13,6 +13,7 @@ import { GamePlayer } from '../game-player';
 export class GamePlayerDetailComponent implements OnInit {
   @Input() player?: GamePlayer;
   @Input() gameId?: string;
+  sectionName: string;
   isAdmin = false;
 
   constructor(
@@ -30,7 +31,10 @@ export class GamePlayerDetailComponent implements OnInit {
     const playerId = this.route.snapshot.paramMap.get('playerId');
 
     this.playerService.getPlayer(playerId, this.gameId).subscribe({
-      next: (player) => this.player = player
+      next: (player) => {
+        this.player = player;
+        this.sectionName = `${player.displayName.toUpperCase()} Details`;
+      }
     });
 
     this.gameService.getGame(this.gameId).subscribe({

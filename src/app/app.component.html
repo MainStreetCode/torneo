@@ -7,38 +7,25 @@
       </div>
 
       <div *ngIf="!(isLoggedIn$ | async)">
-        <button class="mdc-button mdc-button--raised" (click)="login()">
-          <div class="mdc-button__ripple"></div>
-          <!-- <mat-icon>save</mat-icon>     -->
-          <span class="mdc-button__label">        
-            <span class="mdc-button__label">Login</span>
-          </span>
-        </button>
+        <button mat-raised-button color="accent" (click)="login()">Login</button>
       </div>
 
       <div *ngIf="(isLoggedIn$ | async)">
-        <button class="mdc-button mdc-button--raised" (click)="logout()">
-          <div class="mdc-button__ripple"></div>
-          <!-- <mat-icon>save</mat-icon>     -->
-          <span class="mdc-button__label">        
-            <span class="mdc-button__label">Logout</span>
-          </span>
-        </button>
+        <button mat-raised-button color="accent" (click)="logout()">Logout</button>
       </div>
 
       <div *ngIf="(isLoggedIn$ | async)">
-        <button class="mdc-button" (click)="userProfile()">
-          <span class="mdc-button__ripple"></span>
+        <button mat-icon-button color="primary" aria-label="User profile" (click)="userProfile()">
           <mat-icon color="accent">account_circle</mat-icon>
-      </button>
+        </button>
       </div>
     </mat-toolbar>
 
-    <nav>
+    <!-- <nav> -->
       <!-- <a routerLink="/dashboard">Dashboard</a> -->
-      <a routerLink="/games">Games</a>
+      <!-- <a routerLink="/games">Games</a> -->
       <!-- <a routerLink="/players">Players</a>   -->
-    </nav>
+    <!-- </nav> -->
 
     <router-outlet></router-outlet>
     <app-system-messages></app-system-messages>
