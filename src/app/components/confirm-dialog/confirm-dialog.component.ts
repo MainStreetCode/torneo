@@ -13,6 +13,7 @@ export class ConfirmDialogComponent implements OnInit {
   message = '';
   confirmButtonText = 'Ok';
   cancelButtonText = 'Cancel';
+  showActionButtons = true;
 
   constructor(
     public dialogRef: MatDialogRef<ConfirmDialogComponent>,
@@ -31,6 +32,9 @@ export class ConfirmDialogComponent implements OnInit {
     }
     if (this.data.cancelButtonText) {
       this.cancelButtonText = this.data.cancelButtonText;
+    }
+    if (this.data.showActionButtons !== undefined) {
+      this.showActionButtons = this.data.showActionButtons;
     }
   }
 

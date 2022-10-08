@@ -14,11 +14,17 @@ import { User } from 'firebase/auth';
 export class GamesComponent implements OnInit {
   games: Game[] = [];
   gameAdminMap: Map<string, boolean> = new Map();
+  isLoggedIn$ = of(false);
 
-  constructor(private gameService: GameService, private router: Router, private authService: AuthService) { }
+  constructor(
+    private gameService: GameService,
+    private router: Router,
+    private authService: AuthService) { }
 
   ngOnInit(): void {
     this.getGames();
+
+    this.isLoggedIn$ = this.authService.isLoggedIn$;
   }
 
   getGames(): void {

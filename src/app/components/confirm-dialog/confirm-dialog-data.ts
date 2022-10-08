@@ -1,6 +1,7 @@
 export interface ConfirmDialogData {
-    title: string;
-    message: string;
-    confirmButtonText: string;
-    cancelButtonText: string;
+    title?: string;
+    message?: string;
+    confirmButtonText?: string;
+    cancelButtonText?: string;
+    showActionButtons?: boolean;
 }

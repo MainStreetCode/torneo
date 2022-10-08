@@ -3,14 +3,13 @@
 
   <mat-toolbar color="accent"><span>Add new game</span></mat-toolbar>
 
-  <div class="content flex-box-rows">
+  <div class="content flex-box-rows" *ngIf="isLoggedIn$ | async">
     <div>
       <mat-form-field class="example-full-width" appearance="fill">
         <mat-label>Game name</mat-label>
         <input matInput id="new-game" #gameName placeholder="Angela's Euchre Tournament" value="">
       </mat-form-field>
     </div>
-
     <div>
       <!-- (click) passes input value to add() and then clears the input -->
       <button mat-raised-button color="primary" [disabled]="!gameName.value" (click)="add(gameName.value); gameName.value=''">
@@ -20,6 +19,10 @@
         </span>
       </button>    
     </div>
+  </div>
+
+  <div class="content" *ngIf="!(isLoggedIn$ | async)">
+    Login to start creating games!
   </div>
 
   <mat-toolbar color="accent"><span>Game List</span></mat-toolbar>
