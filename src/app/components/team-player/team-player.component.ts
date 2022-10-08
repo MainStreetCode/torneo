@@ -15,7 +15,8 @@ export class TeamPlayerComponent implements OnInit {
 
   ngOnInit(): void {
     const currentUser = this.authService.getCurrentUser();
-    if (this.teamPlayer.player.uid === currentUser.uid) {
+
+    if (currentUser && this.teamPlayer.player.uid === currentUser.uid) {
       this.isCurrentUserTeamPlayer = true;
     } else {
       this.isCurrentUserTeamPlayer = false;

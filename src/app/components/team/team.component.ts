@@ -55,6 +55,11 @@ export class TeamComponent implements OnInit {
   private canEditPoints(): void {
     const currentUser = this.auth.currentUser;
 
+    if (!currentUser) {
+      this.isEditable = false;
+      return;
+    }
+
     this.gameService.isUserAdmin(currentUser.uid, this.gameId).pipe(take(1)).subscribe({
       next: (isAdmin) => {
         const isTeamPlayer = this.team.teamPlayers.find((teamPlayer) => teamPlayer.player.uid === currentUser.uid);

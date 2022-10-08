@@ -14,14 +14,15 @@
         <span *ngIf="i > 0">, </span>
         <span>Table {{ table.number }}</span>
       </span>
+      <span *ngIf="allTablesPointsConfirmed$ | async">
+        All Table's Points Confirmed
+      </span>         
     </div>
     
-    <div class="flex-box-item" *ngIf="allTablesPointsConfirmed$ | async">
-      <span>All Table's Points Confirmed</span>
-    </div>      
+      
   
     <div class="flex-box-item">
-      <span>Byes ({{round.byes.length}}): </span>
+      <span class="mat-h3">Byes ({{round.byes.length}}): </span>
       <span *ngFor="let player of round.byes; let i = index">
         <span *ngIf="i > 0">, </span>
         <span>{{player.displayName}}</span>              

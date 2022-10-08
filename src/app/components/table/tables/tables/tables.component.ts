@@ -20,7 +20,7 @@ export class TablesComponent implements OnInit {
   private filterString: string | undefined;
   private gameId: string;
   private roundId: string;
-  private currentUser: User;
+  private currentUser?: User;
 
   constructor(
     private tableService: TableService,
@@ -39,6 +39,8 @@ export class TablesComponent implements OnInit {
   }
 
   filterTables(): void {
+    if (!this.currentUser) { return; }
+
     this.isDataFiltered = !this.isDataFiltered;
 
     if (this.isDataFiltered) {
@@ -61,6 +63,11 @@ export class TablesComponent implements OnInit {
   }
 
   private checkCurrentUserIsPlayer(): void {
+    if (!this.currentUser) {
+      this.isUserPlayer = false;
+      return;
+    }
+
     this.gamePlayerService.getPlayer(this.currentUser.uid, this.gameId).subscribe({
       next: (player) => {
         if (player) {

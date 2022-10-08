@@ -1,9 +1,12 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { combineLatest } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { GameService } from 'src/app/services/game/game.service';
+import { RoundMediatorService } from 'src/app/services/round-mediator/round-mediator.service';
 import { Round } from 'src/app/services/round/round';
+import { RoundService } from 'src/app/services/round/round.service';
 import { TableService } from 'src/app/services/table/table.service';
 import { TeamService } from 'src/app/services/team/team.service';
 import { TeamPlayer } from '../../team-player/team-player';
@@ -23,19 +26,34 @@ export class TableDetailComponent implements OnInit {
   roundId: string;
   pointsConfirmed = false;
   currentTeamPlayer?: TeamPlayer;
+  isDisabled = false;
 
   constructor(
     private authService: AuthService,
     private gameService: GameService,
     private route: ActivatedRoute,
     private teamService: TeamService,
-    private tableService: TableService) { }
+    private tableService: TableService,
+    private roundMediatorService: RoundMediatorService) { }
 
   ngOnInit(): void {
     this.gameId = this.route.snapshot.paramMap.get('gameId');
     this.roundId = this.route.snapshot.paramMap.get('roundId');
 
     this.getTeams();
+
+    combineLatest([
+      this.gameService.isCurrentUserAdmin(this.gameId),
+      this.roundMediatorService.allTablesConfirmed(this.roundId, this.gameId)
+    ]).subscribe({
+      next: ([isAdmin, confirmed]) => {
+        if (!isAdmin && confirmed) {
+          this.isDisabled = true;
+        } else {
+          this.isDisabled = false;
+        }
+      }
+    });
   }
 
   getTeams(): void {
@@ -45,7 +63,9 @@ export class TableDetailComponent implements OnInit {
           this.teams = teams;
           teams.forEach((team) => {
             const currentUser = this.authService.getCurrentUser();
-            this.currentTeamPlayer = team.teamPlayers.find((teamPlayer) => teamPlayer.player.uid === currentUser.uid);
+            if (currentUser) {
+              this.currentTeamPlayer = team.teamPlayers.find((teamPlayer) => teamPlayer.player.uid === currentUser.uid);
+            }
           });
 
           this.checkPointsConfirmed();
