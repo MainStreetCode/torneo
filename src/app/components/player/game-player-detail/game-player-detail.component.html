@@ -2,34 +2,34 @@
 
   <app-section-header [sectionName]="sectionName"></app-section-header>
   
-  <div class="content">
-    <div class="flex-box-basic">
-      <div class="flex-box-item">
-        <span>id: </span>{{player.uid}}
-      </div>
+
+  <div class="content flex-box-columns mat-typography">
+    <div class="flex-box-item">
+      <span class="mat-h3">Player Id: </span>
+      <span class="mat-h3">{{player.uid}}</span>
+    </div>
+
+    <div class="flex-box-item">
+      <mat-form-field appearance="fill">
+        <mat-label>Player Name</mat-label>
+        <input matInput placeholder="Player Name" [disabled]="isDisabled" [(ngModel)]="player.displayName">
+      </mat-form-field>
+    </div>
+
+    <div class="flex-box-item">
+      <mat-slide-toggle [checked]="isAdmin" [disabled]="isDisabled || !isAdmin" (click)="toggleIsAdmin()">Admin</mat-slide-toggle>
     </div>
   
-    <div class="flex-box-basic">
-      <div class="flex-box-item">
-        <mat-form-field appearance="fill">
-          <mat-label>Player Name</mat-label>
-          <input matInput placeholder="Player Name" [(ngModel)]="player.displayName">
-        </mat-form-field>
-      </div>
-    </div>
-    
-    <div class="flex-box-basic">
-      <mat-slide-toggle [checked]="isAdmin" (click)="toggleIsAdmin()">Admin</mat-slide-toggle>
-    </div>
-  
-    <div class="flex-box-basic">
-      <button mat-raised-button color="primary" (click)="save()">Save</button>
+    <div class="flex-box-item">
+      <button mat-raised-button color="primary" [disabled]="isDisabled" (click)="save()">Save</button>
     </div>
   </div>
 
+
   <mat-toolbar color="accent"><span>Points</span></mat-toolbar>  
   <div *ngFor="let roundPoints of player.pointsForRound; let i = index" class="content">
-    Round: {{i+1}} Points: {{roundPoints.points}}
+    <span class="mat-h3">Round: {{i+1}}</span>
+    <span class="mat-h3"> - Points: {{roundPoints.points}}</span>
   </div>
   
 </div>

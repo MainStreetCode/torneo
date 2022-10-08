@@ -13,7 +13,7 @@ import { User } from 'firebase/auth';
 })
 export class GamesComponent implements OnInit {
   games: Game[] = [];
-  private currentUser$: Observable<User>;
+  gameAdminMap: Map<string, boolean> = new Map();
 
   constructor(private gameService: GameService, private router: Router, private authService: AuthService) { }
 
@@ -25,18 +25,11 @@ export class GamesComponent implements OnInit {
     this.gameService.games$.subscribe({
       next: (games) => {
         this.games = games;
+        this.games.map((game) => {
+          this.gameAdminMap.set(game.id, this.isGameAdmin(game));
+        });
       }
     });
-  }
-
-  isGameAdmin(game: Game): Observable<boolean> {
-    const currentUser = this.authService.getCurrentUser();
-
-    if (currentUser && game.adminIds.find((adminId) => adminId === currentUser.uid)) {
-      return of(true);
-    }
-
-    return of(false);
   }
 
   add(name: string): void {
@@ -64,5 +57,15 @@ export class GamesComponent implements OnInit {
 
   configuration(game: Game): void {
     this.router.navigateByUrl(`/game/${game.id}/configuration`);
+  }
+
+  private isGameAdmin(game: Game): boolean {
+    const currentUser = this.authService.getCurrentUser();
+
+    if (currentUser && game.adminIds.find((adminId) => adminId === currentUser.uid)) {
+      return true;
+    }
+
+    return false;
   }
 }

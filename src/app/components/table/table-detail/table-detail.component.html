@@ -1,4 +1,4 @@
-<mat-toolbar color="secondary" class="flex-box-basic">
+<mat-toolbar color="secondary" class="flex-box-rows">
     <div class="flex-box-item">Table {{table.number}}</div>
     <div>
         <div class="flex-box-item">
@@ -20,6 +20,6 @@
         </div>
     </mat-toolbar>
 
-<div class="flex-box-basic">      
+<div class="flex-box-rows">      
     <app-team [team]="team" [table]="table" *ngFor="let team of teams" class="flex-box-item"></app-team>
 </div>

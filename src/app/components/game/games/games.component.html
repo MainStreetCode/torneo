@@ -3,10 +3,12 @@
 
   <mat-toolbar color="accent"><span>Add new game</span></mat-toolbar>
 
-  <div class="content flex-box-basic">
+  <div class="content flex-box-rows">
     <div>
-      <label for="new-game">Game name: </label>
-      <input id="new-game" #gameName />
+      <mat-form-field class="example-full-width" appearance="fill">
+        <mat-label>Game name</mat-label>
+        <input matInput id="new-game" #gameName placeholder="Angela's Euchre Tournament" value="">
+      </mat-form-field>
     </div>
 
     <div>
@@ -23,16 +25,11 @@
   <mat-toolbar color="accent"><span>Game List</span></mat-toolbar>
   <div class="games">      
     <mat-card class="mdc-card card" *ngFor="let game of games">
-      <div class="mdc-card__primary-action details" tabindex="0" (click)="dashboard(game)">
-        <button class="mdc-button">
-          <span class="mdc-button__ripple"></span>
-          <span class="mdc-button__label">{{game.name}}</span>
-          <!-- <span class="badge">{{player.id}}</span>    -->
-          <div class="mdc-card__ripple"></div>
-        </button>      
+      <div class="mdc-card__primary-action details" tabindex="0" (click)="dashboard(game)">        
+        <button mat-button (click)="dashboard(game)">{{game.name}}</button>
       </div>
       
-      <div *ngIf="isGameAdmin(game) | async">
+      <div *ngIf="gameAdminMap.get(game.id)">
         <button mat-icon-button color="primary" aria-label="game details" title="game details" (click)="configuration(game)">
           <mat-icon>edit</mat-icon>
         </button>

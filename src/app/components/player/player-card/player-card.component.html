@@ -1,9 +1,9 @@
 <mat-card class="mdc-card card">
     <div class="mdc-card__primary-action details" tabindex="0" (click)="view(player)">
-        <div class="flex-box-basic">
+        <div class="flex-box-rows">
         <div class="mdc-button__label name">
             {{player.displayName}}
-            <span *ngIf="player.uid === currentUser.uid">(you)</span>
+            <span *ngIf="currentUser && player.uid === currentUser.uid">(you)</span>
         </div>          
         <!-- // Todo total up player points -->
         <div class="mdc-button__label score">{{totalPoints}}</div> 

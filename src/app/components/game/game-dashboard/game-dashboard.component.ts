@@ -56,11 +56,12 @@ export class GameDashboardComponent implements OnInit {
     });
   }
 
-  selectTab(tab: GameDashboardTab): void {
+  selectTab(event$: Event): void {
+    this.selectedTab = event$ as unknown as GameDashboardTab;
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: {
-        selectedTab: tab
+        selectedTab: this.selectedTab
       },
       queryParamsHandling: 'merge',
       // preserve the existing query params in the route

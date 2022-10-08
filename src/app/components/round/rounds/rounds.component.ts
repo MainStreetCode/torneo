@@ -2,7 +2,9 @@ import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { table } from 'console';
 import { of } from 'rxjs';
+import { AuthService } from 'src/app/services/auth/auth.service';
 import { Game } from 'src/app/services/game/game';
+import { GameService } from 'src/app/services/game/game.service';
 import { RoundMediatorService } from 'src/app/services/round-mediator/round-mediator.service';
 import { Round } from 'src/app/services/round/round';
 import { RoundService } from 'src/app/services/round/round.service';
@@ -15,11 +17,21 @@ import { RoundService } from 'src/app/services/round/round.service';
 export class RoundsComponent implements OnInit {
   @Input() game: Game;
   rounds: Round[] = [];
+  isUserAdmin = false;
 
-  constructor(private roundService: RoundService, private router: Router, private roundMediatorService: RoundMediatorService) { }
+  constructor(
+    private roundService: RoundService,
+    private roundMediatorService: RoundMediatorService,
+    private gameService: GameService) { }
 
   ngOnInit(): void {
     this.getRounds();
+
+    this.gameService.isCurrentUserAdmin(this.game.id).subscribe({
+      next: (isAdmin) => {
+        this.isUserAdmin = isAdmin;
+      }
+    });
   }
 
   getRounds(): void {

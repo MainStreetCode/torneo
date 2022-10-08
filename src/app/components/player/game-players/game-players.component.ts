@@ -32,10 +32,10 @@ export class GamePlayersComponent implements OnInit {
     if (!this.game?.id) {
       return;
     }
-    this.getPlayers();
-
     this.currentUser = this.authService.getCurrentUser();
     this.isAdmin$ = this.gameService.isCurrentUserAdmin(this.game.id);
+
+    this.getPlayers();
   }
 
   getPlayers(): void {
@@ -43,7 +43,7 @@ export class GamePlayersComponent implements OnInit {
       next: (players) => {
         this.players = players;
 
-        if (this.players.find((player) => player.uid === this.currentUser.uid)) {
+        if (this.currentUser && this.players.find((player) => player.uid === this.currentUser.uid)) {
           this.isCurrentUserGamePlayer = true;
         } else {
           this.isCurrentUserGamePlayer = false;

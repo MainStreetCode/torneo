@@ -27,16 +27,27 @@ body {
     padding: 1rem;
 }
 
-.flex-box-basic {    
+.flex-box-rows {    
     display: flex;
+    flex-direction: row;
     gap: 1rem;
     align-items: center;    
+}
+
+.flex-box-columns {    
+    display: flex;
+    flex-direction: column;
+    align-items: left;    
 }
 
 .flex-box-item {
     flex: auto;
 }
 
-input[type="text"]:disabled {
-    background: #dddddd;
+.justify-content-center {
+    justify-content: center;
 }
+
+// input[type="text"]:disabled {
+//     background: #dddddd;
+// }

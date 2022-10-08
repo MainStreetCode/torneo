@@ -2,7 +2,7 @@
 
   <app-section-header [sectionName]="sectionName"></app-section-header>
     
-  <div class="flex-box-basic">
+  <div class="flex-box-rows">
     <div class="flex-box-item">
       <span>id: </span>{{round.id}}
     </div>
@@ -18,7 +18,7 @@
     </div>      
   </div>
   
-  <div class="flex-box-basic">
+  <div class="flex-box-rows">
       <div class="flex-box-item">
           <span>Byes ({{round.byes.length}}): </span>
           <span *ngFor="let player of round.byes; let i = index">

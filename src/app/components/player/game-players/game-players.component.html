@@ -1,27 +1,34 @@
 <div class="players">
-  <mat-toolbar color="accent"><span>Players</span></mat-toolbar>  
-
-  <div class="flex-box-basic" *ngIf="!isCurrentUserGamePlayer">
-    <button class="mdc-button mdc-button--raised flex-box-item" (click)="joinGame()">
-      <div class="mdc-button__ripple"></div>
-      <!-- <mat-icon><span class="material-symbols-outlined">arrow_back</span></mat-icon>     -->
-      <span class="mdc-button__label">        
-          <span class="mdc-button__label">Join Game</span>
-      </span>
-    </button> 
+  <div class="flex-box-rows">
+    <mat-toolbar color="accent">
+      <div class="flex-box-item">Players</div>
+      <div *ngIf="!isCurrentUserGamePlayer">
+        <button mat-raised-button color="primary" (click)="joinGame()">Join Game</button>
+      </div>
+    </mat-toolbar>  
   </div>
+  
 
   <div *ngIf="this.isAdmin$ | async">
     <mat-toolbar color="secondary"><span>Add new player</span></mat-toolbar>
 
-    <div class="content">
-      <label for="new-player">Player name: </label>
-      <input id="new-player" #playerName />
+    <div class="content flex-box-rows">
+      <div>
+        <mat-form-field class="example-full-width" appearance="fill">
+          <mat-label>Player name</mat-label>
+          <input matInput id="new-player" #playerName placeholder="Player Name" value="">
+        </mat-form-field>
+      </div>
 
-      <!-- (click) passes input value to add() and then clears the input -->
-      <button class="add-button" (click)="add(playerName.value); playerName.value=''">
-        Add player
-      </button>
+      <div>
+        <!-- (click) passes input value to add() and then clears the input -->
+        <button mat-raised-button color="primary" [disabled]="!playerName.value" (click)="add(playerName.value); playerName.value=''">
+          <mat-icon>add</mat-icon>    
+          <span class="mdc-button__label">        
+            <span class="mdc-button__label">Add player</span>
+          </span>
+        </button>    
+      </div>
     </div>
   </div>
 

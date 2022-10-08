@@ -20,6 +20,7 @@ import { QRCodeModule } from 'angularx-qrcode';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { MatTabsModule } from '@angular/material/tabs';
 
 import { GameConfigurationComponent } from './components/game/game-configuration/game-configuration.component';
 import { GamesComponent } from './components/game/games/games.component';
@@ -77,6 +78,7 @@ import { SectionHeaderComponent } from './components/section-header/section-head
     MatSlideToggleModule,
     MatButtonModule,
     MatInputModule,
+    MatTabsModule,
     AngularFireModule.initializeApp(environment.firebase),
     AngularFirestoreModule,
     QRCodeModule,

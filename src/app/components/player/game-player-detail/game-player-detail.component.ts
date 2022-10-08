@@ -1,6 +1,7 @@
 import { Location } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { AuthService } from 'src/app/services/auth/auth.service';
 import { GameService } from 'src/app/services/game/game.service';
 import { GamePlayerService } from 'src/app/services/gamePlayer/game-player.service';
 import { GamePlayer } from '../game-player';
@@ -15,15 +16,18 @@ export class GamePlayerDetailComponent implements OnInit {
   @Input() gameId?: string;
   sectionName: string;
   isAdmin = false;
+  isDisabled = true;
 
   constructor(
     private route: ActivatedRoute,
     private playerService: GamePlayerService,
     private location: Location,
-    private gameService: GameService) { }
+    private gameService: GameService,
+    private authService: AuthService) { }
 
   ngOnInit(): void {
     this.getPlayer();
+    this.setDisabledState();
   }
 
   getPlayer(): void {
@@ -66,5 +70,18 @@ export class GamePlayerDetailComponent implements OnInit {
       // else isAdmin was false, add player as admin
       this.gameService.addAdmin(this.gameId, this.player.uid);
     }
+  }
+
+  private setDisabledState(): void {
+    this.gameService.isCurrentUserAdmin(this.gameId).subscribe({
+      next: (isGameAdmin) => {
+        const currentUser = this.authService.getCurrentUser();
+
+        // if current user is game admin or is this player then isDisabled = false
+        if (currentUser && currentUser.uid === this.player.uid || isGameAdmin) {
+          this.isDisabled = false;
+        }
+      }
+    });
   }
 }

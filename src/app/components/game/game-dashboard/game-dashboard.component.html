@@ -1,44 +1,34 @@
 <div *ngIf="game">
-    <!-- <mat-toolbar color="accent">      
-      <div class="flex-box-item">{{game.name | uppercase}} Dashboard</div>
-    </mat-toolbar> -->
-    <app-section-header [sectionName]="sectionName"></app-section-header>
-    <div class="content">
-        <div><span>Game Id: </span>{{game.id}}</div>        
-        <div><span>Rounds: </span>{{game.numberOfRounds}}</div>     
-
-        <qrcode *ngIf="gameURL" [qrdata]="gameURL" [width]="256" [errorCorrectionLevel]="'M'"></qrcode>       
-    </div>
-    
-    <div class="mdc-tab-bar" role="tablist">
-        <div class="mdc-tab-scroller">
-          <div class="mdc-tab-scroller__scroll-area">
-            <div class="mdc-tab-scroller__scroll-content">
-              <button class="mdc-tab mdc-tab--active" role="tab" aria-selected="true" tabindex="0" (click)="selectTab(playersTab)">
-                <span class="mdc-tab__content">
-                  <span class="mdc-tab__icon material-icons" aria-hidden="true">group</span>
-                  <span class="mdc-tab__text-label">Players</span>
-                </span>
-                <span class="mdc-tab-indicator mdc-tab-indicator--active">
-                  <span class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"></span>
-                </span>
-                <span class="mdc-tab__ripple"></span>
-              </button>
-              <button class="mdc-tab mdc-tab--active" role="tab" aria-selected="true" tabindex="0" (click)="selectTab(roundsTab)">
-                <span class="mdc-tab__content">
-                  <span class="mdc-tab__icon material-icons" aria-hidden="true">table_bar</span>
-                  <span class="mdc-tab__text-label">Rounds</span>
-                </span>
-                <span class="mdc-tab-indicator mdc-tab-indicator--active">
-                  <span class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"></span>
-                </span>
-                <span class="mdc-tab__ripple"></span>
-              </button>
-            </div>
-          </div>
-        </div>
+  <app-section-header [sectionName]="sectionName"></app-section-header>
+  <div class="flex-box-rows justify-content-center">
+    <div class="flex-box-columns">
+      <div class="flex-box-item">
+        <span class="mat-h3">Game Id: </span>
+        <span class="mat-h3">{{game.id}}</span>
       </div>
+      <div class="flex-box-item">
+        <span class="mat-h3">Rounds: </span>
+        <span class="mat-h3">{{game.numberOfRounds ?? 0}}</span>
+      </div>         
 
-    <app-game-players *ngIf="selectedTab === playersTab" [game]="game"></app-game-players>
-    <app-rounds *ngIf="selectedTab === roundsTab" [game]="game"></app-rounds>
+      <div>
+        <qrcode *ngIf="gameURL" [qrdata]="gameURL" [width]="256" [errorCorrectionLevel]="'M'"></qrcode>
+      </div>
+    </div>      
+  </div>
+  
+  <mat-tab-group mat-stretch-tabs [selectedIndex]="selectedTab" (selectedIndexChange)="selectTab($event)">
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="example-tab-icon">group</mat-icon> Players
+      </ng-template>
+      <app-game-players [game]="game"></app-game-players>
+    </mat-tab>
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="example-tab-icon">table_bar</mat-icon> Rounds
+      </ng-template>
+      <app-rounds [game]="game"></app-rounds>
+    </mat-tab>
+  </mat-tab-group>
 </div>
