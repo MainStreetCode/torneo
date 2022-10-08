@@ -1,23 +1,11 @@
 <mat-toolbar color="accent" class="flex-box-rows">
-    <div class="flex-box-item">Tables</div>
-    <div class="flex-box-rows" *ngIf="isUserPlayer">
+    <div class="flex-box-item flex-box-item-large">Tables</div>
+    <div *ngIf="isUserPlayer">
       <div class="flex-box-item">
-        <button class="mdc-button mdc-button--raised flex-box-item" (click)="filterTables()" *ngIf="isDataFiltered">
-          <div class="mdc-button__ripple"></div>
-          <!-- <mat-icon>cancel</mat-icon>     -->
-          <span class="mdc-button__label">        
-              <span class="mdc-button__label">Show All Tables</span>
-          </span>
-         </button>
+         <button mat-raised-button color="primary" [disabled]="isDisabled" (click)="filterTables()" *ngIf="isDataFiltered">Show All Table</button>
       </div>
       <div class="flex-box-item">
-        <button class="mdc-button mdc-button--raised flex-box-item" (click)="filterTables()" *ngIf="!isDataFiltered">
-          <div class="mdc-button__ripple"></div>
-          <!-- <mat-icon>cancel</mat-icon>     -->
-          <span class="mdc-button__label">        
-              <span class="mdc-button__label">Show My Table</span>
-          </span>
-        </button>
+        <button mat-raised-button color="primary" [disabled]="isDisabled" (click)="filterTables()" *ngIf="!isDataFiltered">Show My Table</button>
       </div>
     </div>
   </mat-toolbar>

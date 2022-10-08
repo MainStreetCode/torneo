@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { Game } from 'src/app/services/game/game';
 import { GameService } from 'src/app/services/game/game.service';
 import { MatDialog } from '@angular/material/dialog';
-import { ConfirmDialogComponentComponent } from '../../confirm-dialog-component/confirm-dialog-component.component';
+import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component';
 import { of } from 'rxjs';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { LoginDialogComponent } from '../../user/login/login-dialog/login-dialog-component';
@@ -95,7 +95,7 @@ export class GamePlayersComponent implements OnInit {
   }
 
   private showJoinDialog(): void {
-    const dialogRef = this.dialog.open(ConfirmDialogComponentComponent, {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '360px',
       data: {
         title: 'Join Game',

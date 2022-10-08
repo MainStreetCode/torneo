@@ -10,6 +10,7 @@
 
 .details {
     flex-grow: 10;
+    cursor: pointer; 
 }
 
 .actions {

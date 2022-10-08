@@ -32,6 +32,7 @@ body {
     flex-direction: row;
     gap: 1rem;
     align-items: center;    
+    vertical-align: middle;
 }
 
 .flex-box-columns {    
@@ -42,10 +43,34 @@ body {
 
 .flex-box-item {
     flex: auto;
+    flex-basis: 0;
 }
+
+.flex-box-item-large {
+    flex-grow: 10;
+    flex-basis: 0;
+}
+
+.flex-box-item-small {
+    flex-grow: 1;
+}
+
 
 .justify-content-center {
     justify-content: center;
+}
+
+.vertical-align-top {
+    vertical-align: top;
+}
+
+.dialog-container .mat-dialog-container {
+    min-width: 320px;
+    padding: 0;
+}
+
+.full-width {
+    width: 100%;
 }
 
 // input[type="text"]:disabled {

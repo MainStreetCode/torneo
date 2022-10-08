@@ -4,12 +4,9 @@
         <app-team-player *ngFor="let teamPlayer of team.teamPlayers" [teamPlayer]="teamPlayer"></app-team-player>
     </div>
     <div class="flex-box-item">
-        <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--no-label">
-            <span class="mdc-notched-outline">
-            <span class="mdc-notched-outline__leading"></span>
-            <span class="mdc-notched-outline__trailing"></span>
-            </span>
-            <input class="mdc-text-field__input" type="text" aria-label="Label" placeholder="points" [(ngModel)]="teamPoints" [disabled]="!isEditable" (input)="pointsChanged()">
-        </label>        
+        <mat-form-field class="full-width" appearance="fill">
+            <mat-label>Points</mat-label>
+            <input matInput id="new-game" #gameName placeholder="0" value="" [(ngModel)]="teamPoints" [disabled]="!isEditable" (input)="pointsChanged()">
+          </mat-form-field>
     </div>          
 </mat-card>

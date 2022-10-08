@@ -4,18 +4,18 @@ import { DialogData } from '../user/login/login-dialog/login-dialog-component';
 import { ConfirmDialogData } from './confirm-dialog-data';
 
 @Component({
-  selector: 'app-confirm-dialog-component',
-  templateUrl: './confirm-dialog-component.component.html',
-  styleUrls: ['./confirm-dialog-component.component.css']
+  selector: 'app-confirm-dialog',
+  templateUrl: './confirm-dialog.component.html',
+  styleUrls: ['./confirm-dialog.component.css']
 })
-export class ConfirmDialogComponentComponent implements OnInit {
+export class ConfirmDialogComponent implements OnInit {
   title = 'Confirm Dialog';
   message = '';
   confirmButtonText = 'Ok';
   cancelButtonText = 'Cancel';
 
   constructor(
-    public dialogRef: MatDialogRef<ConfirmDialogComponentComponent>,
+    public dialogRef: MatDialogRef<ConfirmDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: ConfirmDialogData,
   ) {}
 

@@ -1,10 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ConfirmDialogComponentComponent } from './confirm-dialog-component.component';
+import { ConfirmDialogComponentComponent } from './confirm-dialog.component';
 
-describe('ConfirmDialogComponentComponent', () => {
-  let component: ConfirmDialogComponentComponent;
-  let fixture: ComponentFixture<ConfirmDialogComponentComponent>;
+describe('ConfirmDialogComponent', () => {
+  let component: ConfirmDialogComponent;
+  let fixture: ComponentFixture<ConfirmDialogComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -12,7 +12,7 @@ describe('ConfirmDialogComponentComponent', () => {
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(ConfirmDialogComponentComponent);
+    fixture = TestBed.createComponent(ConfirmDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

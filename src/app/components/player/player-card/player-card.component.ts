@@ -6,6 +6,8 @@ import { GamePlayerService } from 'src/app/services/gamePlayer/game-player.servi
 import { GamePlayer } from '../game-player';
 import { User } from 'firebase/auth';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-player-card',
@@ -24,6 +26,7 @@ export class PlayerCardComponent implements OnInit {
     private gameService: GameService,
     private authService: AuthService,
     private route: ActivatedRoute,
+    private dialog: MatDialog,
     private router: Router) { }
 
   ngOnInit(): void {
@@ -47,7 +50,20 @@ export class PlayerCardComponent implements OnInit {
   }
 
   delete(player: GamePlayer): void {
-    this.playerService.deletePlayer(player.uid, this.gameId);
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      panelClass: 'dialog-container',
+      data: {
+        title: 'Delete Player',
+        message: 'Are you sure you want to delete this player?',
+        confirmButtonText: 'Yes'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.playerService.deletePlayer(player.uid, this.gameId);
+      }
+    });
   }
 
   view(player: GamePlayer): void {

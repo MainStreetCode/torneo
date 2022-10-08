@@ -1,5 +1,5 @@
 <div id="firebaseui-auth-container" class="auth-container"></div>
 
-<div *ngIf="isLoggedIn$ | async">
-    You are now logged in
+<div class="content" *ngIf="isLoggedIn$ | async">
+    <h1 mat-dialog-title>You are now logged in</h1>
 </div>

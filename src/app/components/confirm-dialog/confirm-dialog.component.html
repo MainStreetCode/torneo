@@ -1,0 +1,26 @@
+<mat-toolbar color="primary" class="header">
+    <div class="flex-box-item">
+        <h1 mat-dialog-title>{{title}}</h1>
+    </div>
+    <div>
+        <button mat-icon-button aria-label="close" (click)="cancel()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+</mat-toolbar>
+
+    <div class="content">
+        <p class="mat-body">{{message}}</p>
+    </div>
+    
+    <mat-divider></mat-divider>
+
+    <div class="content flex-box-rows">
+        <div class="flex-box-item">
+            <button mat-raised-button color="warn" class="full-width" (click)="cancel()">{{cancelButtonText}}</button>
+        </div>
+        
+        <div class="flex-box-item">
+            <button mat-raised-button color="primary" class="full-width" (click)="confirm()">{{confirmButtonText}}</button>
+        </div>
+    </div>

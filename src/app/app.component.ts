@@ -31,7 +31,7 @@ export class AppComponent implements OnInit {
 
   openDialog(): void {
     const dialogRef = this.dialog.open(LoginDialogComponent, {
-      width: '360px',
+      panelClass: 'dialog-container'
       // data: { null }
     });
 

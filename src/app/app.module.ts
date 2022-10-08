@@ -21,6 +21,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatDividerModule } from '@angular/material/divider';
 
 import { GameConfigurationComponent } from './components/game/game-configuration/game-configuration.component';
 import { GamesComponent } from './components/game/games/games.component';
@@ -35,7 +36,7 @@ import { TeamPlayerComponent } from './components/team-player/team-player.compon
 import { LoginDialogComponent } from './components/user/login/login-dialog/login-dialog-component';
 import { MatDialogModule, MAT_DIALOG_DEFAULT_OPTIONS } from '@angular/material/dialog';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ConfirmDialogComponentComponent } from './components/confirm-dialog-component/confirm-dialog-component.component';
+import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dialog.component';
 import { TablesComponent } from './components/table/tables/tables/tables.component';
 import { RoundCardComponent } from './components/round/round-card/round-card.component';
 import { PlayerCardComponent } from './components/player/player-card/player-card.component';
@@ -60,7 +61,7 @@ import { SectionHeaderComponent } from './components/section-header/section-head
     TeamComponent,
     TeamPlayerComponent,
     LoginDialogComponent,
-    ConfirmDialogComponentComponent,
+    ConfirmDialogComponent,
     TablesComponent,
     RoundCardComponent,
     PlayerCardComponent,
@@ -79,6 +80,7 @@ import { SectionHeaderComponent } from './components/section-header/section-head
     MatButtonModule,
     MatInputModule,
     MatTabsModule,
+    MatDividerModule,
     AngularFireModule.initializeApp(environment.firebase),
     AngularFirestoreModule,
     QRCodeModule,

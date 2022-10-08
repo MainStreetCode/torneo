@@ -1,21 +1,19 @@
 <mat-card class="mdc-card card">
     <div class="mdc-card__primary-action details" tabindex="0" (click)="view(round)">
-      <button class="mdc-button">
-        <span class="mdc-button__ripple"></span>
-        <span class="mdc-button__label">Round {{round.number}}</span>
-        <!-- <span class="badge">{{player.id}}</span>    -->
-        <div class="mdc-card__ripple"></div>
-      </button>      
+      <div class="flex-box-rows">
+        <div class="mdc-button__label name flex-box-item">
+          Round {{round.number}}            
+        </div>          
+      </div>   
     </div>
     
-    <mat-icon *ngIf="allTablesPointsConfirmed$ | async" title="All Points Confirmed">checkmark</mat-icon>
-
-    <button class="mdc-button mdc-card__action mdc-card__action--button" title="Delete round" (click)="delete(round)">
-        <div class="mdc-button__ripple"></div>
-        <span class="mdc-button__label"><mat-icon>delete</mat-icon></span>
-    </button>
+    <mat-icon color="accent" *ngIf="allTablesPointsConfirmed$ | async" title="All Points Confirmed">checkmark</mat-icon>
     
-    
+    <div *ngIf="this.isAdmin$ | async">
+      <button mat-icon-button color="primary" aria-label="delete round" title="delete round" (click)="delete(round)">
+          <mat-icon>delete</mat-icon>
+      </button>
+  </div>    
    
     
 </mat-card>
