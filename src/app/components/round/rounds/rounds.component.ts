@@ -1,7 +1,7 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { combineLatest, of, Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { Game } from 'src/app/services/game/game';
 import { GameService } from 'src/app/services/game/game.service';
@@ -20,6 +20,7 @@ export class RoundsComponent implements OnInit, OnDestroy {
   @Input() game: Game;
   rounds: Round[] = [];
   isUserAdmin = false;
+  allTablesPointsConfirmed$ = of(false);
   private subscriptions: Subscription[] = [];
 
   constructor(
@@ -51,6 +52,8 @@ export class RoundsComponent implements OnInit, OnDestroy {
       this.roundService.roundsForGame(this.game.id).subscribe({
         next: (rounds) => {
           this.rounds = rounds.sort((a, b) => a.number - b.number);
+          const lastRound = this.rounds[this.rounds.length - 1];
+          this.allTablesPointsConfirmed$ = this.roundMediatorService.allTablesConfirmed(lastRound.id, this.game.id);
         }
       })
     );
@@ -58,8 +61,16 @@ export class RoundsComponent implements OnInit, OnDestroy {
 
   startRound(roundNumber: number): void {
     this.subscriptions.push(
-      this.playerService.playersForGame(this.game.id).pipe(take(1)).subscribe({
-        next: (players) => {
+      combineLatest([
+        this.allTablesPointsConfirmed$,
+        this.playerService.playersForGame(this.game.id).pipe(take(1))
+      ]).subscribe({
+        next: ([allPointsConfirmed, players]) => {
+          if (!allPointsConfirmed) {
+            this.showErrorDialog('Start Round', `Please confirm all points for round ${roundNumber - 1} first`);
+            return;
+          }
+
           if (players && players.length < 4) {
             this.showErrorDialog('Start Round', 'You need to have at least 4 players to start a round');
             return;

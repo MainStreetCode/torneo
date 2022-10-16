@@ -1,8 +1,8 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 
 import { Router } from '@angular/router';
-import firebase from "firebase/compat/app";
-import { Observable } from 'rxjs';
+import firebase from 'firebase/compat/app';
+import { Observable, Subscription } from 'rxjs';
 import { AuthService } from './services/auth/auth.service';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import { DialogData, LoginDialogComponent } from './components/user/login/login-dialog/login-dialog-component';
@@ -11,9 +11,10 @@ import { DialogData, LoginDialogComponent } from './components/user/login/login-
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
   title = 'Torneo';
   isLoggedIn$: Observable<boolean>;
+  private subscriptions: Subscription[] = [];
 
   constructor(private router: Router,
               private authService: AuthService,
@@ -23,6 +24,10 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.isLoggedIn$ = this.authService.isLoggedIn$;
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach((subscription) => subscription.unsubscribe());
   }
 
   login(): void {
@@ -35,9 +40,11 @@ export class AppComponent implements OnInit {
       // data: { null }
     });
 
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
-    });
+    this.subscriptions.push(
+      dialogRef.afterClosed().subscribe(result => {
+        console.log('The dialog was closed');
+      })
+    );
   }
 
   logout(): void {

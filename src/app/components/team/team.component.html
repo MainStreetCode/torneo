@@ -1,9 +1,9 @@
 <mat-card class="mdc-card card team-card">
-    <div class="flex-box-item">
+    <div>
         <div>Team:</div>
         <app-team-player *ngFor="let teamPlayer of team.teamPlayers" [teamPlayer]="teamPlayer"></app-team-player>
     </div>
-    <div class="flex-box-item">
+    <div>
         <mat-form-field class="full-width" appearance="fill">
             <mat-label>Points</mat-label>
             <input matInput id="new-game" #gameName placeholder="0" value="" [(ngModel)]="teamPoints" [disabled]="!isEditable" (input)="pointsChanged()">
