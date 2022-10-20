@@ -15,6 +15,7 @@
     </div>
 </mat-toolbar>
 
-<div class="flex-box-rows teams">      
+<div [ngClass.gt-xs]="'flex-box-rows'"
+    [ngClass.lt-sm]="'flex-box-columns'">
     <app-team [team]="team" [table]="table" *ngFor="let team of teams" class="flex-box-item"></app-team>
 </div>

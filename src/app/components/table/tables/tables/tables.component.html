@@ -8,6 +8,6 @@
         <button mat-raised-button color="primary" [disabled]="isDisabled" (click)="filterTables()" *ngIf="!isDataFiltered">Show My Table</button>
       </div>
     </div>
-  </mat-toolbar>
+</mat-toolbar>
 
-  <app-table-detail [table]="table" *ngFor="let table of filteredTables"></app-table-detail>
+<app-table-detail [table]="table" *ngFor="let table of filteredTables"></app-table-detail>

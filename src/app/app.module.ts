@@ -41,6 +41,7 @@ import { TablesComponent } from './components/table/tables/tables/tables.compone
 import { RoundCardComponent } from './components/round/round-card/round-card.component';
 import { PlayerCardComponent } from './components/player/player-card/player-card.component';
 import { SectionHeaderComponent } from './components/section-header/section-header.component';
+import { FlexLayoutModule } from '@angular/flex-layout';
 
 @NgModule({
   declarations: [
@@ -84,7 +85,8 @@ import { SectionHeaderComponent } from './components/section-header/section-head
     AngularFireModule.initializeApp(environment.firebase),
     AngularFirestoreModule,
     QRCodeModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    FlexLayoutModule
   ],
   providers: [
     { provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: {hasBackdrop: true} }

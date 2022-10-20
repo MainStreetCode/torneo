@@ -39,11 +39,9 @@ export class TablesComponent implements OnInit {
   }
 
   filterTables(): void {
-    if (!this.currentUser) { return; }
-
     this.isDataFiltered = !this.isDataFiltered;
 
-    if (this.isDataFiltered) {
+    if (this.currentUser && this.isDataFiltered) {
       this.tableService.getTableForPlayer(this.currentUser.uid, this.roundId, this.gameId).pipe(take(1)).subscribe({
         next: (playerTable) => {
           if (playerTable) {
