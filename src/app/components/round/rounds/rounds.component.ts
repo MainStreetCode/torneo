@@ -51,6 +51,9 @@ export class RoundsComponent implements OnInit, OnDestroy {
     this.subscriptions.push(
       this.roundService.roundsForGame(this.game.id).subscribe({
         next: (rounds) => {
+          if (rounds.length === 0) {
+            return;
+          }
           this.rounds = rounds.sort((a, b) => a.number - b.number);
           const lastRound = this.rounds[this.rounds.length - 1];
           this.allTablesPointsConfirmed$ = this.roundMediatorService.allTablesConfirmed(lastRound.id, this.game.id);
@@ -66,7 +69,7 @@ export class RoundsComponent implements OnInit, OnDestroy {
         this.playerService.playersForGame(this.game.id).pipe(take(1))
       ]).subscribe({
         next: ([allPointsConfirmed, players]) => {
-          if (!allPointsConfirmed) {
+          if (roundNumber > 1 && !allPointsConfirmed) {
             this.showErrorDialog('Start Round', `Please confirm all points for round ${roundNumber - 1} first`);
             return;
           }

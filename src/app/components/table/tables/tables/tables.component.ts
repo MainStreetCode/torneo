@@ -1,6 +1,7 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { User } from 'firebase/auth';
+import { Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { GamePlayerService } from 'src/app/services/gamePlayer/game-player.service';
@@ -12,7 +13,7 @@ import { Table } from '../../table';
   templateUrl: './tables.component.html',
   styleUrls: ['./tables.component.css']
 })
-export class TablesComponent implements OnInit {
+export class TablesComponent implements OnInit, OnDestroy {
   @Input() tables: Table[];
   public filteredTables: Table[];
   public isDataFiltered = false;
@@ -27,6 +28,7 @@ export class TablesComponent implements OnInit {
     private authService: AuthService,
     private route: ActivatedRoute,
     private gamePlayerService: GamePlayerService) { }
+    private subscriptions: Subscription[] = [];
 
   ngOnInit(): void {
     this.currentUser = this.authService.getCurrentUser();
@@ -35,24 +37,29 @@ export class TablesComponent implements OnInit {
     this.filteredTables = this.tables;
 
     this.checkCurrentUserIsPlayer();
-    this.filterTables();
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach((subscription) => subscription.unsubscribe());
   }
 
   filterTables(): void {
     this.isDataFiltered = !this.isDataFiltered;
 
     if (this.currentUser && this.isDataFiltered) {
-      this.tableService.getTableForPlayer(this.currentUser.uid, this.roundId, this.gameId).pipe(take(1)).subscribe({
-        next: (playerTable) => {
-          if (playerTable) {
-            this.filterString = playerTable.id;
-          } else {
-            this.filterString = undefined;
-          }
+      this.subscriptions.push(
+        this.tableService.getTableForPlayer(this.currentUser.uid, this.roundId, this.gameId).pipe(take(1)).subscribe({
+          next: (playerTable) => {
+            if (playerTable) {
+              this.filterString = playerTable.id;
+            } else {
+              this.filterString = undefined;
+            }
 
-          this.filteredTables = this.tables.filter((table) => table.id === this.filterString);
-        }
-      });
+            this.filteredTables = this.tables.filter((table) => table.id === this.filterString);
+          }
+        })
+      );
     } else {
       this.filteredTables = this.tables;
     }
@@ -66,14 +73,17 @@ export class TablesComponent implements OnInit {
       return;
     }
 
-    this.gamePlayerService.getPlayer(this.currentUser.uid, this.gameId).subscribe({
-      next: (player) => {
-        if (player) {
-          this.isUserPlayer = true;
-        } else {
-          this.isUserPlayer = false;
+    this.subscriptions.push(
+      this.gamePlayerService.getPlayer(this.currentUser.uid, this.gameId).subscribe({
+        next: (player) => {
+          if (player) {
+            this.isUserPlayer = true;
+            this.filterTables();
+          } else {
+            this.isUserPlayer = false;
+          }
         }
-      }
-    });
+      })
+    );
   }
 }

@@ -3,39 +3,46 @@
 
   <app-section-header [sectionName]="sectionName"></app-section-header>
 
-  <div class="flex-box-rows justify-content-center">
-    <div class="content flex-box-rows mat-typography">
-      <div class="flex-box-columns">
-        <div class="flex-box-item">
-          <span class="mat-h3">Game Id: </span>
-          <span class="mat-h3">{{game.id}}</span>
-        </div>
-  
-        <div class="flex-box-item">
-          <mat-form-field appearance="fill">
-            <mat-label>Game name</mat-label>
-            <input id="game-name" matInput placeholder="Angela's Euchre Tournament" [(ngModel)]="game.name">
-          </mat-form-field>
+  <div class="flex-box-columns justify-content-center">
+    <div class="flex-box-rows justify-content-center">
+      <div ngClass.gt-xs="flex-box-rows content mat-typography" ngClass.lt-sm="flex-box-columns content mat-typography">
+        <div class="flex-box-columns">
+          <div class="flex-box-item">
+            <span class="mat-h3">Game Id: </span>
+            <span class="mat-h3">{{game.id}}</span>
+          </div>
+    
+          <div class="flex-box-item">
+            <mat-form-field appearance="fill" class="full-width" >
+              <mat-label>Game name</mat-label>
+              <input id="game-name" matInput placeholder="Angela's Euchre Tournament" [(ngModel)]="game.name">
+            </mat-form-field>
+          </div>
+          
+          <div class="flex-box-item">
+            <mat-form-field appearance="fill" class="full-width">
+              <mat-label>Number of rounds</mat-label>
+              <input id="game-rounds" matInput placeholder="8" [(ngModel)]="game.numberOfRounds">
+            </mat-form-field>
+          </div>
+          
+          <div class="flex-box-item">
+            <button class="full-width" mat-raised-button color="primary" aria-label="Back" title="Back" (click)="save()">
+              Save
+            </button>
+          </div>
         </div>
         
-        <div class="flex-box-item">
-          <mat-form-field appearance="fill">
-            <mat-label>Number of rounds</mat-label>
-            <input id="game-rounds" matInput placeholder="8" [(ngModel)]="game.numberOfRounds">
-          </mat-form-field>
-        </div>
-        
-        <div class="flex-box-item">
-          <button mat-raised-button color="primary" aria-label="Back" title="Back" (click)="save()">
-            Save
-          </button>
-        </div>
-      </div>
-      
-      <div>
-        <qrcode *ngIf="gameURL" [qrdata]="gameURL" [width]="256" [errorCorrectionLevel]="'M'"></qrcode>
-      </div>
+        <div>
+          <qrcode *ngIf="gameURL" [qrdata]="gameURL" [width]="256" [errorCorrectionLevel]="'M'"></qrcode>
+        </div>      
+      </div>    
     </div>
+    <!-- <div class="flex-box-rows justify-content-center">
+      <button mat-raised-button color="primary" aria-label="Back" title="Back" (click)="save()">
+        Start Game
+      </button>
+    </div> -->
   </div>
 
   <!-- Player list -->

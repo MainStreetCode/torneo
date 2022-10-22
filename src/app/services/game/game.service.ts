@@ -35,18 +35,19 @@ export class GameService {
           this.addAdmin(newGame.id, userId);
           return game;
         },
-        err =>  this.log(`addGame ${err}`)
+        err => this.log(`addGame ${err}`)
       )
     );
   }
 
-  updateGame(game: Game): void {
-    this.store.collection(Collection.Games).doc<Game>(game.id).update(game).then(
+  updateGame(game: Game): Observable<Game | void> {
+    return from(this.store.collection(Collection.Games).doc<Game>(game.id).update(game).then(
       () => {
         this.log(`updated game w/ id=${game.id}`);
+        return game;
       },
-      err =>  this.log(`updateGame ${err}`)
-    );
+      err => this.log(`updateGame ${err}`)
+    ));
   }
 
   deleteGame(id: string): void {
@@ -55,7 +56,7 @@ export class GameService {
         () => {
           this.log(`deleted game w/ id=${id}`);
         },
-        err =>  this.log(`deleteGame ${err}`)
+        err => this.log(`deleteGame ${err}`)
       );
   }
 
