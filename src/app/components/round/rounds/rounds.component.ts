@@ -52,6 +52,7 @@ export class RoundsComponent implements OnInit, OnDestroy {
       this.roundService.roundsForGame(this.game.id).subscribe({
         next: (rounds) => {
           if (rounds.length === 0) {
+            this.rounds = [];
             return;
           }
           this.rounds = rounds.sort((a, b) => a.number - b.number);

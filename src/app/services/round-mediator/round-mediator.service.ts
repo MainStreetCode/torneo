@@ -140,7 +140,13 @@ export class RoundMediatorService {
               return EMPTY;
             }
 
-            const filteredPlayers = players.filter((player) => this.byes.find((byePlayer) => byePlayer.uid !== player.uid));
+            const filteredPlayers = players.filter((player) => {
+              if (this.byes.length > 0) {
+                return this.byes.find((byePlayer) => byePlayer.uid !== player.uid);
+              } else {
+                return players;
+              }
+            });
 
             const tablesData = this.assignPlayersToTables(filteredPlayers);
 
@@ -192,68 +198,6 @@ export class RoundMediatorService {
       next: (tables) => {
         this.log(`createRound w/tables=${tables.length}`);
       }
-
-    // combineLatest([
-    //   this.gameService.getGame(gameId),
-    //   this.roundService.roundsForGame(gameId),
-    //   this.gamePlayerService.playersForGame(gameId)
-    // ]).pipe(
-    //   take(1),
-    //   switchMap(([game, rounds, players]) => {
-    //     if (!game || !rounds || !players) {
-    //       return EMPTY;
-    //     }
-
-    //     const filteredPlayers = players.filter((player) => this.byes.find((byePlayer) => byePlayer.uid !== player.uid));
-
-    //     const tablesData = this.assignPlayersToTables(filteredPlayers);
-
-    //     const newRound = {
-    //       number: rounds.length + 1,
-    //       byes: this.byes
-    //     } as Round;
-
-    //     // create round
-    //     return this.roundService.addRound(newRound, gameId).pipe(
-    //       switchMap((round) => {
-    //         if (!round) { return EMPTY; }
-
-    //         return combineLatest(
-    //           tablesData.map((tableData) => {
-
-    //             // get all the playerIds for this table
-    //             let tablePlayerIds: string[] = [];
-    //             tableData.teams.map((team) => {
-    //               tablePlayerIds = tablePlayerIds.concat(team.teamPlayers.map((teamPlayer) => teamPlayer.player.uid));
-    //             });
-
-    //             // create tables
-    //             const newTable = {
-    //               number: tableData.number,
-    //               playerIds: tablePlayerIds
-    //             } as Table;
-
-    //             return this.tableService.addTable(newTable, round.id, gameId).pipe(
-    //               switchMap((addedTable) => {
-    //                 if (!addedTable) { return EMPTY; }
-
-    //                 // create teams
-    //                 tableData.teams.forEach((team) => {
-    //                   this.teamService.addTeam(team, newTable.id, round.id, gameId);
-    //                 });
-
-    //                 return of(addedTable);
-    //               }
-    //             ));
-    //           })
-    //         );
-    //       })
-    //     );
-    //   }
-    // )).subscribe({
-    //   next: (tables) => {
-    //     this.log(`createRound w/tables=${tables.length}`);
-    //   }
     });
   }
 
