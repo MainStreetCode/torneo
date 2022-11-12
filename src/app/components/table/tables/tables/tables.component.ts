@@ -56,7 +56,7 @@ export class TablesComponent implements OnInit, OnDestroy {
               this.filterString = undefined;
             }
 
-            this.filteredTables = this.tables.filter((table) => table.id === this.filterString);
+            this.filteredTables = this.filterString ? this.tables.filter((table) => table.id === this.filterString) : this.tables;
           }
         })
       );

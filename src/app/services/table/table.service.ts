@@ -57,11 +57,16 @@ export class TableService {
 
     return tables$.pipe(
       switchMap((tables) => {
-        return tables.map((table) => {
+        let returnTable: Table;
+
+        tables.map((table) => {
+
           if (table.playerIds.find((tablePlayerId) => tablePlayerId === playerId)) {
-            return table;
+            returnTable = table;
           }
         });
+
+        return of(returnTable);
       }
     ));
   }
