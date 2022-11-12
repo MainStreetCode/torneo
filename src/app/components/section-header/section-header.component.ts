@@ -6,13 +6,10 @@ import { Location } from '@angular/common';
   templateUrl: './section-header.component.html',
   styleUrls: ['./section-header.component.css']
 })
-export class SectionHeaderComponent implements OnInit {
+export class SectionHeaderComponent {
   @Input() sectionName: string;
 
   constructor(private location: Location) { }
-
-  ngOnInit(): void {
-  }
 
   goBack(): void {
     this.location.back();

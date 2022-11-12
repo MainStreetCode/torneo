@@ -6,7 +6,7 @@
         <span (click)="goHome()">{{title}}</span>
       </div>
 
-      <div *ngIf="!(isLoggedIn$ | async)">
+      <div *ngIf="(isLoggedIn$ | async) === false">
         <button mat-raised-button color="accent" (click)="login()">Login</button>
       </div>
 

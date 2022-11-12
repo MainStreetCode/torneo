@@ -1,10 +1,14 @@
+import { Dialog } from '@angular/cdk/dialog';
 import { Location } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
+import { ActivatedRoute, Router } from '@angular/router';
 import { of } from 'rxjs';
 import { Game } from 'src/app/services/game/game';
 import { GameService } from 'src/app/services/game/game.service';
 import { environment } from 'src/environments/environment';
+import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component';
+import { ProgressDialogComponent } from '../../progress-dialog/progress-dialog.component';
 
 @Component({
   selector: 'app-game-configuration',
@@ -17,8 +21,12 @@ export class GameConfigurationComponent implements OnInit {
   public sectionName: string;
   public isAdmin$ = of(false);
 
-  constructor(private route: ActivatedRoute, private gameService: GameService, private location: Location) {
-
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute,
+    private gameService: GameService,
+    private location: Location,
+    private dialog: MatDialog) {
   }
 
   ngOnInit(): void {
@@ -32,12 +40,15 @@ export class GameConfigurationComponent implements OnInit {
       return;
     }
 
+    const dialogRef = this.dialog.open(ProgressDialogComponent, {});
+
     this.gameService.getGame(id).subscribe({
       next: (game) => {
         this.game = game;
         this.gameURL = `${environment.url}/game/${this.game.id}`;
         this.isAdmin$ = this.gameService.isCurrentUserAdmin(this.game.id);
         this.sectionName = `${game.name.toUpperCase()} Configuration`;
+        dialogRef.close();
       }
     });
   }
@@ -50,5 +61,9 @@ export class GameConfigurationComponent implements OnInit {
     if (this.game) {
       this.gameService.updateGame(this.game);
     }
+  }
+
+  startGame(): void {
+    this.router.navigateByUrl(`/game/${this.game.id}/dashboard?selectedTab=1`);
   }
 }

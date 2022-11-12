@@ -21,7 +21,7 @@
     </div>
   </div>
 
-  <div class="content" *ngIf="!(isLoggedIn$ | async)">
+  <div class="content" *ngIf="(isLoggedIn$ | async) === false">
     Login to start creating games!
   </div>
 

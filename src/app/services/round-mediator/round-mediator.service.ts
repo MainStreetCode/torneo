@@ -113,7 +113,7 @@ export class RoundMediatorService {
         // randomly select players from the bye pool
         for (let i = 0; i < numberOfByes; i++) {
           // if there are no byes in the pool, add all players to the pool
-          if (game.byePool.length === 0) {
+          if (game.byePool?.length ?? 0 === 0) {
             game.byePool = players;
           }
 

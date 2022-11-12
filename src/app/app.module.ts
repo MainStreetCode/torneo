@@ -22,6 +22,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { GameConfigurationComponent } from './components/game/game-configuration/game-configuration.component';
 import { GamesComponent } from './components/game/games/games.component';
@@ -42,6 +43,7 @@ import { RoundCardComponent } from './components/round/round-card/round-card.com
 import { PlayerCardComponent } from './components/player/player-card/player-card.component';
 import { SectionHeaderComponent } from './components/section-header/section-header.component';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { ProgressDialogComponent } from './components/progress-dialog/progress-dialog.component';
 
 @NgModule({
   declarations: [
@@ -66,7 +68,8 @@ import { FlexLayoutModule } from '@angular/flex-layout';
     TablesComponent,
     RoundCardComponent,
     PlayerCardComponent,
-    SectionHeaderComponent
+    SectionHeaderComponent,
+    ProgressDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -82,6 +85,7 @@ import { FlexLayoutModule } from '@angular/flex-layout';
     MatInputModule,
     MatTabsModule,
     MatDividerModule,
+    MatProgressSpinnerModule,
     AngularFireModule.initializeApp(environment.firebase),
     AngularFirestoreModule,
     QRCodeModule,

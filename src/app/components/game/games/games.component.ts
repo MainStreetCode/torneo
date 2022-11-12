@@ -6,6 +6,8 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 import { map, switchMap } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 import { User } from 'firebase/auth';
+import { MatDialog } from '@angular/material/dialog';
+import { ProgressDialogComponent } from '../../progress-dialog/progress-dialog.component';
 @Component({
   selector: 'app-games',
   templateUrl: './games.component.html',
@@ -17,6 +19,7 @@ export class GamesComponent implements OnInit {
   isLoggedIn$ = of(false);
 
   constructor(
+    private dialog: MatDialog,
     private gameService: GameService,
     private router: Router,
     private authService: AuthService) { }
@@ -28,12 +31,14 @@ export class GamesComponent implements OnInit {
   }
 
   getGames(): void {
+    const dialogRef = this.dialog.open(ProgressDialogComponent, {});
     this.gameService.games$.subscribe({
       next: (games) => {
         this.games = games;
         this.games.map((game) => {
           this.gameAdminMap.set(game.id, this.isGameAdmin(game));
         });
+        dialogRef.close();
       }
     });
   }

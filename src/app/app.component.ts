@@ -4,8 +4,8 @@ import { Router } from '@angular/router';
 import firebase from 'firebase/compat/app';
 import { Observable, Subscription } from 'rxjs';
 import { AuthService } from './services/auth/auth.service';
-import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
-import { DialogData, LoginDialogComponent } from './components/user/login/login-dialog/login-dialog-component';
+import {MatDialog} from '@angular/material/dialog';
+import { LoginDialogComponent } from './components/user/login/login-dialog/login-dialog-component';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',

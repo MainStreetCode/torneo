@@ -52,6 +52,7 @@ export class GameDashboardComponent implements OnInit {
         this.game = game;
         this.gameURL = `${environment.url}/game/${this.game.id}/dashboard`;
         this.sectionName = `${this.game.name.toUpperCase()} Dashboard`;
+        console.log(this.gameURL);
       }
     });
   }
