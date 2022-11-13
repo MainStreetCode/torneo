@@ -7,7 +7,8 @@ import { debounceTime, distinctUntilChanged, take } from 'rxjs/operators';
 import { TeamService } from 'src/app/services/team/team.service';
 import { Table } from '../table/table';
 import { FormControl } from '@angular/forms';
-import { Subscription } from 'rxjs';
+import { combineLatest, Subscription } from 'rxjs';
+import { RoundMediatorService } from 'src/app/services/round-mediator/round-mediator.service';
 @Component({
   selector: 'app-team',
   templateUrl: './team.component.html',
@@ -26,7 +27,11 @@ export class TeamComponent implements OnInit, OnDestroy {
   isEditable = true;
   subscriptions: Subscription[] = [];
 
-  constructor(private gameService: GameService, private route: ActivatedRoute, private teamService: TeamService) { }
+  constructor(
+    private gameService: GameService,
+    private route: ActivatedRoute,
+    private teamService: TeamService,
+    private roundMediatorService: RoundMediatorService) { }
 
   ngOnInit(): void {
     this.gameId = this.route.snapshot.paramMap.get('gameId');
@@ -52,8 +57,6 @@ export class TeamComponent implements OnInit, OnDestroy {
                 this.pointsConfirmed = true;
               }
             });
-
-            this.canEditPoints();
           }
         }
       })
@@ -76,24 +79,35 @@ export class TeamComponent implements OnInit, OnDestroy {
   }
 
   private canEditPoints(): void {
-    console.log('canEditPoints');
+    console.log('canEditPoints - table: ' + this.table.number);
 
     const currentUser = this.auth.currentUser;
 
     if (!currentUser) {
       this.isEditable = false;
+      this.teamPointsFormControl.disable();
       return;
     }
 
     this.subscriptions.push(
-      this.gameService.isUserAdmin(currentUser.uid, this.gameId).pipe(take(1)).subscribe({
-        next: (isAdmin) => {
+      combineLatest([
+        this.roundMediatorService.allTablesConfirmed(this.roundId, this.gameId),
+        this.gameService.isUserAdmin(currentUser.uid, this.gameId)
+      ])
+      .pipe(take(1)).subscribe({
+        next: ([allTablesConfirmed, isAdmin]) => {
           const isTeamPlayer = this.team.teamPlayers.find((teamPlayer) => teamPlayer.player.uid === currentUser.uid);
 
-          if ((isAdmin || isTeamPlayer) && !this.pointsConfirmed) {
+          if (allTablesConfirmed) {
+            this.isEditable = false;
+            this.teamPointsFormControl.disable();
+          }
+          else if (isAdmin || (isTeamPlayer && !this.pointsConfirmed)) {
             this.isEditable = true;
+            this.teamPointsFormControl.enable();
           } else {
             this.isEditable = false;
+            this.teamPointsFormControl.disable();
           }
         }
       })

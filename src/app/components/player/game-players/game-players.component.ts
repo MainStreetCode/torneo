@@ -19,7 +19,7 @@ export class GamePlayersComponent implements OnInit {
   @Input() game?: Game;
   players: GamePlayer[] = [];
   isAdmin$ = of(false);
-  isCurrentUserGamePlayer = false;
+  isCurrentUserGamePlayer$ = of(false);
   currentUser: User;
 
   constructor(private playerService: GamePlayerService,
@@ -44,9 +44,9 @@ export class GamePlayersComponent implements OnInit {
         this.players = players;
 
         if (this.currentUser && this.players.find((player) => player.uid === this.currentUser.uid)) {
-          this.isCurrentUserGamePlayer = true;
+          this.isCurrentUserGamePlayer$ = of(true);
         } else {
-          this.isCurrentUserGamePlayer = false;
+          this.isCurrentUserGamePlayer$ = of(false);
         }
       }
     });

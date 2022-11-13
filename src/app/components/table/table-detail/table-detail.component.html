@@ -2,12 +2,12 @@
     <div class="flex-box-item">Table {{table.number}}</div>
     <div>
         <div class="flex-box-item">
-            <button mat-raised-button color="primary" [disabled]="isDisabled" (click)="toggleConfirmPoints()" *ngIf="!pointsConfirmed">
+            <button mat-raised-button color="primary" [disabled]="isDisabled" (click)="toggleConfirmPoints(true)" *ngIf="!pointsConfirmed">
                 <mat-icon>check</mat-icon>
                 Confirm Points
             </button>
 
-            <button mat-raised-button color="primary" [disabled]="isDisabled" (click)="toggleConfirmPoints()" *ngIf="pointsConfirmed">
+            <button mat-raised-button color="primary" [disabled]="isDisabled" (click)="toggleConfirmPoints(false)" *ngIf="pointsConfirmed">
                 <mat-icon>cancel</mat-icon>
                 Change Points
             </button>
