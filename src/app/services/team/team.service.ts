@@ -58,6 +58,7 @@ export class TeamService {
   }
 
   updateTeam(team: Team, tableId: string, roundId: string, gameId: string): Observable<Team | void> {
+    this.log('updateTeam');
     return from(this.store.collection(Collection.Games)
       .doc(gameId)
       .collection(Collection.Rounds)
@@ -94,6 +95,7 @@ export class TeamService {
   }
 
   private log(message: string): void {
+    console.log(message);
     this.messageService.add(`TeamService: ${message}`);
   }
 }

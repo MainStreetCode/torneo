@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { GamePlayer } from '../game-player';
 import { GamePlayerService } from 'src/app/services/gamePlayer/game-player.service';
 import { Router } from '@angular/router';
@@ -6,7 +6,7 @@ import { Game } from 'src/app/services/game/game';
 import { GameService } from 'src/app/services/game/game.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component';
-import { of } from 'rxjs';
+import { of, Subscription } from 'rxjs';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { LoginDialogComponent } from '../../user/login/login-dialog/login-dialog-component';
 import { User } from 'firebase/auth';
@@ -15,15 +15,15 @@ import { User } from 'firebase/auth';
   templateUrl: './game-players.component.html',
   styleUrls: ['./game-players.component.css']
 })
-export class GamePlayersComponent implements OnInit {
+export class GamePlayersComponent implements OnInit, OnDestroy {
   @Input() game?: Game;
   players: GamePlayer[] = [];
   isAdmin$ = of(false);
   isCurrentUserGamePlayer$ = of(false);
   currentUser: User;
+  private subscriptions: Subscription[] = [];
 
   constructor(private playerService: GamePlayerService,
-              private router: Router,
               private gameService: GameService,
               private authService: AuthService,
               public dialog: MatDialog) { }
@@ -38,18 +38,42 @@ export class GamePlayersComponent implements OnInit {
     this.getPlayers();
   }
 
-  getPlayers(): void {
-    this.playerService.playersForGame(this.game.id).subscribe({
-      next: (players) => {
-        this.players = players;
+  ngOnDestroy(): void {
+    this.subscriptions.forEach((subscription) => subscription.unsubscribe());
+  }
 
-        if (this.currentUser && this.players.find((player) => player.uid === this.currentUser.uid)) {
-          this.isCurrentUserGamePlayer$ = of(true);
-        } else {
-          this.isCurrentUserGamePlayer$ = of(false);
+  getPlayers(): void {
+    this.subscriptions.push(
+      this.playerService.playersForGame(this.game.id).subscribe({
+        next: (players) => {
+          console.log('getPlayers');
+          this.players = players.sort((a, b) => {
+            const playerAPoints = this.calculateTotalPoints(a);
+            const playerBPoints = this.calculateTotalPoints(b);
+
+            return playerBPoints - playerAPoints;
+          });
+
+          if (this.currentUser && this.players.find((player) => player.uid === this.currentUser.uid)) {
+            this.isCurrentUserGamePlayer$ = of(true);
+          } else {
+            this.isCurrentUserGamePlayer$ = of(false);
+          }
         }
-      }
-    });
+      })
+    );
+  }
+
+  private calculateTotalPoints(player: GamePlayer): number {
+    let totalPoints = 0;
+    if (player.pointsForRound) {
+      player.pointsForRound.forEach(
+        (roundPoints) => {
+          totalPoints += roundPoints.points;
+        }
+      );
+    }
+    return totalPoints;
   }
 
   add(displayName: string): void {
@@ -67,36 +91,40 @@ export class GamePlayersComponent implements OnInit {
   }
 
   joinGame(): void {
-    this.authService.isLoggedIn$.subscribe({
-      next: (loggedIn) => {
-        // if user is logged in then add player to game
-        if (loggedIn) {
-          this.createPlayerFromCurrentUser();
-        } else {
-          this.showJoinDialog();
+    this.subscriptions.push(
+      this.authService.isLoggedIn$.subscribe({
+        next: (loggedIn) => {
+          // if user is logged in then add player to game
+          if (loggedIn) {
+            this.createPlayerFromCurrentUser();
+          } else {
+            this.showJoinDialog();
+          }
         }
-      }
-    });
+      })
+    );
   }
 
   private createPlayerFromCurrentUser(): void {
-    this.authService.currentUser$.subscribe({
-          next: (currentUser) => {
-            if (currentUser) {
-              const newPlayer = {
-                uid: currentUser.uid,
-                displayName: currentUser.displayName
-              } as unknown as GamePlayer;
+    this.subscriptions.push(
+      this.authService.currentUser$.subscribe({
+        next: (currentUser) => {
+          if (currentUser) {
+            const newPlayer = {
+              uid: currentUser.uid,
+              displayName: currentUser.displayName
+            } as unknown as GamePlayer;
 
-              this.addPlayerToGame(newPlayer);
-            }
+            this.addPlayerToGame(newPlayer);
           }
-        });
+        }
+      })
+    );
   }
 
   private showJoinDialog(): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      width: '360px',
+      panelClass: 'dialog-container',
       data: {
         title: 'Join Game',
         message: 'Before you can join a game, you must login first',
@@ -104,20 +132,24 @@ export class GamePlayersComponent implements OnInit {
     }
     });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.showLoginDialog();
-      }
-    });
+    this.subscriptions.push(
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          this.showLoginDialog();
+        }
+      })
+    );
   }
 
   private showLoginDialog(): void {
     const dialogRef = this.dialog.open(LoginDialogComponent, {
-      width: '360px'
+      panelClass: 'dialog-container',
     });
 
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
-    });
+    this.subscriptions.push(
+      dialogRef.afterClosed().subscribe(result => {
+        console.log('The dialog was closed');
+      })
+    );
   }
 }

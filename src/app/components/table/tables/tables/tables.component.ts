@@ -43,7 +43,7 @@ export class TablesComponent implements OnInit, OnDestroy {
     this.subscriptions.forEach((subscription) => subscription.unsubscribe());
   }
 
-  filterTables(): void {
+  private filterTables(): void {
     this.isDataFiltered = !this.isDataFiltered;
 
     if (this.currentUser && this.isDataFiltered) {

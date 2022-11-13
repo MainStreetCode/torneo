@@ -38,18 +38,7 @@ export class PlayerCardComponent implements OnInit {
     this.calculatePoints();
   }
 
-  calculatePoints(): void {
-    this.totalPoints = 0;
-    if (this.player.pointsForRound) {
-      this.player.pointsForRound.forEach(
-        (roundPoints) => {
-          this.totalPoints += roundPoints.points;
-        }
-      );
-    }
-  }
-
-  delete(player: GamePlayer): void {
+  public delete(player: GamePlayer): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       panelClass: 'dialog-container',
       data: {
@@ -66,7 +55,19 @@ export class PlayerCardComponent implements OnInit {
     });
   }
 
-  view(player: GamePlayer): void {
+  public view(player: GamePlayer): void {
     this.router.navigateByUrl(`/game/${this.gameId}/player/${player.uid}`);
+  }
+
+  private calculatePoints(): void {
+    console.log('calculatePoints');
+    this.totalPoints = 0;
+    if (this.player.pointsForRound) {
+      this.player.pointsForRound.forEach(
+        (roundPoints) => {
+          this.totalPoints += roundPoints.points;
+        }
+      );
+    }
   }
 }

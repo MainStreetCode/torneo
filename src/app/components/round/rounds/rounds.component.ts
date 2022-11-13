@@ -1,8 +1,8 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { combineLatest, of, Subscription } from 'rxjs';
-import { take } from 'rxjs/operators';
+import { combineLatest, EMPTY, of, Subscription } from 'rxjs';
+import { switchMap, take } from 'rxjs/operators';
 import { Game } from 'src/app/services/game/game';
 import { GameService } from 'src/app/services/game/game.service';
 import { GamePlayerService } from 'src/app/services/gamePlayer/game-player.service';
@@ -68,20 +68,27 @@ export class RoundsComponent implements OnInit, OnDestroy {
       combineLatest([
         this.allTablesPointsConfirmed$,
         this.playerService.playersForGame(this.game.id).pipe(take(1))
-      ]).subscribe({
-        next: ([allPointsConfirmed, players]) => {
+      ]).pipe(
+        switchMap(([allPointsConfirmed, players]) => {
           if (roundNumber > 1 && !allPointsConfirmed) {
             this.showErrorDialog('Start Round', `Please confirm all points for round ${roundNumber - 1} first`);
-            return;
+            return EMPTY;
           }
 
           if (players && players.length < 4) {
             this.showErrorDialog('Start Round', 'You need to have at least 4 players to start a round');
-            return;
+            return EMPTY;
           }
 
           if (roundNumber <= this.game.numberOfRounds) {
-              this.roundMediatorService.createRound(this.game.id);
+              return this.roundMediatorService.createRound(this.game.id);
+          }
+        }
+      )).subscribe({
+        next: (tables) => {
+          if (tables) {
+            const lastRoundId = this.rounds[this.rounds.length - 1].id;
+            this.router.navigateByUrl(`/game/${this.game.id}/round/${lastRoundId}`);
           }
         }
       })

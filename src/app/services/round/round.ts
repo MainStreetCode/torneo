@@ -1,6 +1,8 @@
+import { GamePlayer } from 'src/app/components/player/game-player';
+
 export interface Round {
     id: string;
     number: number;
-    byes: string[];
+    byes: GamePlayer[];
     pointsConfirmed: boolean;
 }
