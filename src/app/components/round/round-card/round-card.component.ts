@@ -1,7 +1,7 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { of } from 'rxjs';
+import { EMPTY, of, Subscription, switchMap } from 'rxjs';
 import { GameService } from 'src/app/services/game/game.service';
 import { RoundMediatorService } from 'src/app/services/round-mediator/round-mediator.service';
 import { Round } from 'src/app/services/round/round';
@@ -13,26 +13,29 @@ import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.comp
   templateUrl: './round-card.component.html',
   styleUrls: ['./round-card.component.css']
 })
-export class RoundCardComponent implements OnInit {
+export class RoundCardComponent implements OnInit, OnDestroy {
   @Input() round: Round;
   @Input() gameId: string;
   isAdmin$ = of(false);
   allTablesPointsConfirmed$ = of(false);
+  private subscriptions: Subscription[] = [];
 
   constructor(
     private gameService: GameService,
     private roundMediatorService: RoundMediatorService,
-    private roundService: RoundService,
     private dialog: MatDialog,
     private router: Router) { }
 
   ngOnInit(): void {
     this.allTablesPointsConfirmed$ = this.roundMediatorService.allTablesConfirmed(this.round.id, this.gameId);
-
     this.isAdmin$ = this.gameService.isCurrentUserAdmin(this.gameId);
   }
 
-  delete(round: Round): void {
+  ngOnDestroy(): void {
+    this.subscriptions.forEach((subscription) => subscription.unsubscribe());
+  }
+
+  public delete(round: Round): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       panelClass: 'dialog-container',
       data: {
@@ -44,16 +47,16 @@ export class RoundCardComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.roundService.deleteRound(round.id, this.gameId);
+        this.roundMediatorService.deleteRound(round.id, this.gameId);
       }
     });
   }
 
-  view(round: Round): void {
+  public view(round: Round): void {
     this.router.navigateByUrl(`/game/${this.gameId}/round/${round.id}`);
   }
 
-  configuration(): void {
+  public configuration(): void {
     this.router.navigateByUrl(`/game/${this.gameId}/configuration`);
   }
 }
