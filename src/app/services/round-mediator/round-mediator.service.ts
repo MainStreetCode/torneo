@@ -178,7 +178,10 @@ export class RoundMediatorService {
         const byePlayerIds = round.byes.map((bye) => bye.uid);
 
         if (byePlayerIds && byePlayerIds.length > 0) {
-          const lastRoundPlayers = gamePlayers.filter((gamePlayer) => byePlayerIds.find((byePlayerId) => byePlayerId !== gamePlayer.uid));
+          const lastRoundPlayers = gamePlayers.filter((gamePlayer) => {
+            const isByePlayer = byePlayerIds.find((byePlayerId) => byePlayerId === gamePlayer.uid);
+            return !isByePlayer;
+          });
 
           // get sum of all points for all players in last round
           let totalPoints = 0;
@@ -199,11 +202,18 @@ export class RoundMediatorService {
           };
 
           byePlayers.forEach((byePlayer) => {
-            if (!byePlayer.pointsForRound) {
-              byePlayer.pointsForRound = [];
+            const gamePlayer = gamePlayers.find((player) => player.uid === byePlayer.uid);
+            if (!gamePlayer.pointsForRound) {
+              gamePlayer.pointsForRound = [];
             }
-            byePlayer.pointsForRound.push(newRoundPoints);
-            this.gamePlayerService.updatePlayer(byePlayer, gameId).subscribe();
+            const roundPoints = gamePlayer.pointsForRound.find((pfr) => pfr.roundId === roundId);
+            // if roundPoints already exists, then update the points
+            if (roundPoints) {
+              roundPoints.points = averagePoints;
+            } else {
+              gamePlayer.pointsForRound.push(newRoundPoints);
+            }
+            this.gamePlayerService.updatePlayer(gamePlayer, gameId).subscribe();
           });
         }
 
@@ -229,8 +239,8 @@ export class RoundMediatorService {
         // randomly select players from the bye pool
         for (let i = 0; i < numberOfByes; i++) {
           // if there are no byes in the pool, add all players to the pool
-          if (game.byePool?.length ?? 0 === 0) {
-            game.byePool = players;
+          if (!game.byePool || game.byePool?.length === 0) {
+            game.byePool = [ ...players ];
           }
 
           const randomNumber = Math.floor(Math.random() * game.byePool.length);
@@ -241,6 +251,28 @@ export class RoundMediatorService {
         return this.gameService.updateGame(game);
       }
     ));
+  }
+
+  public deleteRound(roundId: string, gameId: string): void {
+    this.subscriptions.push(
+      this.gamePlayerService.playersForGame(gameId).pipe(take(1)).subscribe({
+        next: (gamePlayers) => {
+
+          this.log('deleteRound for roundId:' + roundId);
+
+          // delete the points for the round for each player
+          gamePlayers.forEach((gamePlayer) => {
+            if (gamePlayer.pointsForRound) {
+              const filteredRoundPoints = gamePlayer.pointsForRound.filter((round) => round.roundId !== roundId);
+              gamePlayer.pointsForRound = filteredRoundPoints;
+              this.gamePlayerService.updatePlayer(gamePlayer, gameId).subscribe();
+            }
+          });
+
+          this.roundService.deleteRound(roundId, gameId);
+        }
+      })
+    );
   }
 
   public createRound(gameId: string): Observable<Table[]> {
@@ -258,13 +290,14 @@ export class RoundMediatorService {
 
             this.log('createRound');
 
-            const filteredPlayers = players.filter((player) => {
-              if (this.byes.length > 0) {
-                return this.byes.find((byePlayer) => byePlayer.uid !== player.uid);
-              } else {
-                return players;
-              }
-            });
+            let filteredPlayers = [...players];
+
+            if (this.byes.length > 0) {
+              filteredPlayers = players.filter((player) => {
+                const isByePlayer = this.byes.find((byePlayer) => byePlayer.uid === player.uid);
+                return !isByePlayer;
+              });
+            }
 
             const tablesData = this.assignPlayersToTables(filteredPlayers);
 
@@ -366,28 +399,6 @@ export class RoundMediatorService {
     }
 
     return teams;
-  }
-
-  public deleteRound(roundId: string, gameId: string): void {
-    this.subscriptions.push(
-      this.gamePlayerService.playersForGame(gameId).pipe(take(1)).subscribe({
-        next: (gamePlayers) => {
-
-          this.log('deleteRound for roundId:' + roundId);
-
-          // delete the points for the round for each player
-          gamePlayers.forEach((gamePlayer) => {
-            if (gamePlayer.pointsForRound) {
-              const filteredRoundPoints = gamePlayer.pointsForRound.filter((round) => round.roundId !== roundId);
-              gamePlayer.pointsForRound = filteredRoundPoints;
-              this.gamePlayerService.updatePlayer(gamePlayer, gameId).subscribe();
-            }
-          });
-
-          this.roundService.deleteRound(roundId, gameId);
-        }
-      })
-    );
   }
 
   private log(message: string): void {

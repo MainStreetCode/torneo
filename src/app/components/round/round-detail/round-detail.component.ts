@@ -69,6 +69,8 @@ export class RoundDetailComponent implements OnInit, OnDestroy {
         })
       ).subscribe({
         next: () => {
+          // TODO: clean this up so updatecounter isn't needed
+          // and update byePlayerPoints is called after all player points are updated
           this.updateCounter++;
           if (this.updateCounter === this.tables.length) {
             this.roundMediatorService.updateByePlayerPoints(this.roundId, this.gameId).subscribe({
