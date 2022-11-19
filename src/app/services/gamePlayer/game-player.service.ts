@@ -48,16 +48,14 @@ export class GamePlayerService {
 
   }
 
-  updatePlayer(player: GamePlayer, gameId: string): void {
-    this.store.collection(Collection.Games)
-      .doc(gameId)
-      .collection(Collection.GamePlayers)
-      .doc(player.uid).update(player).then(
+  updatePlayer(player: GamePlayer, gameId: string): Observable<GamePlayer | void> {
+    return from(this.store.collection(Collection.Games).doc(gameId).collection(Collection.GamePlayers).doc(player.uid).update(player).then(
       () => {
         this.log(`updated player w/ id=${player.uid}`);
+        return player;
       },
-      err => this.handleError<GamePlayer>('updatePlayer')
-    );
+      err => this.log(`updatePlayer ${err}`)
+      ));
   }
 
   deletePlayer(playerId: string, gameId: string): void {
@@ -87,6 +85,7 @@ export class GamePlayerService {
   }
 
   private log(message: string): void {
+    console.log(message);
     this.messageService.add(`PlayerService: ${message}`);
   }
 

@@ -60,7 +60,6 @@ export class PlayerCardComponent implements OnInit {
   }
 
   private calculatePoints(): void {
-    console.log('calculatePoints');
     this.totalPoints = 0;
     if (this.player.pointsForRound) {
       this.player.pointsForRound.forEach(

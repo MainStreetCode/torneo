@@ -7,13 +7,13 @@ export const environment = {
   // url: 'https://torneo.com',
   url: 'http://192.168.0.44:4200',
   firebase: {
-    apiKey: "AIzaSyAjdC_lvB83Ls7JHZ5UXETE0e1dVhO_3HM",
-    authDomain: "torneo-fae63.firebaseapp.com",
-    projectId: "torneo-fae63",
-    storageBucket: "torneo-fae63.appspot.com",
-    messagingSenderId: "985732547386",
-    appId: "1:985732547386:web:e2fd98b331fc703f058603",
-    measurementId: "G-Y08FJRV2B2"
+    apiKey: "AIzaSyBXfstBvichb-xN3QAYd4Xx_03-j3FMaxA",
+    authDomain: "tourney-84ede.firebaseapp.com",
+    projectId: "tourney-84ede",
+    storageBucket: "tourney-84ede.appspot.com",
+    messagingSenderId: "720024685972",
+    appId: "1:720024685972:web:27d438c5628bc965749381",
+    measurementId: "G-DJDJLLFS6V"
   }
 };
 

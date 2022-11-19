@@ -3,9 +3,7 @@ import { Router } from '@angular/router';
 import { Game } from 'src/app/services/game/game';
 import { GameService } from 'src/app/services/game/game.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
-import { map, switchMap } from 'rxjs/operators';
-import { Observable, of, Subscription } from 'rxjs';
-import { User } from 'firebase/auth';
+import { of, Subscription } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { ProgressDialogComponent } from '../../progress-dialog/progress-dialog.component';
 @Component({

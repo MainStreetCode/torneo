@@ -131,7 +131,6 @@ export class TableDetailComponent implements OnInit, OnDestroy {
   }
 
   private checkPointsConfirmed(isAdmin: boolean): void {
-    console.log('checkPointsConfirmed - isAdmin: ' + isAdmin);
     let confirmCounter = 0;
 
     this.teams.forEach((team) => {

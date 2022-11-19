@@ -79,8 +79,6 @@ export class TeamComponent implements OnInit, OnDestroy {
   }
 
   private canEditPoints(): void {
-    console.log('canEditPoints - table: ' + this.table.number);
-
     const currentUser = this.auth.currentUser;
 
     if (!currentUser) {

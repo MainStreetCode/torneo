@@ -9,6 +9,14 @@
     </div>
 
     <div class="flex-box-item">
+      <span class="mat-h3">Byes ({{round.byes.length}}): </span>
+      <span *ngFor="let player of round.byes; let i = index">
+        <span *ngIf="i > 0">, </span>
+        <span>{{player.displayName}}</span>              
+      </span>
+    </div>
+
+    <div class="flex-box-item">
       <span class="mat-h3">Tables with unconfirmed Points ({{ (unConfirmedTables$ | async)?.length ?? 0 }}): </span>
       <span *ngFor="let table of (unConfirmedTables$ | async); let i = index">
         <span *ngIf="i > 0">, </span>
@@ -19,15 +27,12 @@
       </span>         
     </div>
     
-      
-  
-    <div class="flex-box-item">
-      <span class="mat-h3">Byes ({{round.byes.length}}): </span>
-      <span *ngFor="let player of round.byes; let i = index">
-        <span *ngIf="i > 0">, </span>
-        <span>{{player.displayName}}</span>              
-      </span>
+    <div class="flex-box-item" *ngIf="isAdmin$ | async">
+      <button mat-raised-button class="full-width" color="primary" aria-label="Back" title="Back" (click)="endRound()" [disabled]="(allTablesPointsConfirmed$ | async) === false">
+        End Round
+      </button>
     </div>
+
   </div>
 
   <app-tables [tables]="tables" *ngIf="tables"></app-tables>    

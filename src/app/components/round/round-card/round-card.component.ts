@@ -45,11 +45,13 @@ export class RoundCardComponent implements OnInit, OnDestroy {
       }
     });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.roundMediatorService.deleteRound(round.id, this.gameId);
-      }
-    });
+    this.subscriptions.push(
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          this.roundMediatorService.deleteRound(round.id, this.gameId);
+        }
+      })
+    );
   }
 
   public view(round: Round): void {
