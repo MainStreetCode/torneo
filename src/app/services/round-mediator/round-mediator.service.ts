@@ -118,50 +118,6 @@ export class RoundMediatorService {
     );
   }
 
-  // public updateGamePlayerPointsForTable(tableId: string, roundId: string, gameId: string): Observable<void | GamePlayer>[] {
-  //   this.tableService.getTable(tableId, roundId, gameId).pipe(take(1),
-  //     switchMap((table) => {
-  //       if (table && table.pointsConfirmed) {
-  //         return this.teamService.getTeamsForTable(table.id, roundId, gameId);
-  //       }
-  //       return EMPTY;
-  //     }),
-  //     switchMap((teams) => {
-  //       if (teams.length === 0) {
-  //         return EMPTY;
-  //       }
-  //       return combineLatest(teams.map((team) => {
-  //         this.log('updateGamePlayerPoints');
-
-  //         const teamPoints = team.points;
-  //         return team.teamPlayers.map((teamPlayer) => {
-  //           const gamePlayer = teamPlayer.player;
-
-  //           if (!gamePlayer.pointsForRound) {
-  //             gamePlayer.pointsForRound = [];
-  //           }
-
-  //           const gamePlayerPointsForRound = gamePlayer.pointsForRound.find((roundPoints) => roundPoints.roundId === roundId);
-
-  //           if (gamePlayerPointsForRound) {
-  //             gamePlayerPointsForRound.points = teamPoints;
-  //           } else {
-  //             const newRoundPoints: RoundPoints = {
-  //               roundId,
-  //               points: teamPoints
-  //             };
-  //             gamePlayer.pointsForRound.push(newRoundPoints);
-  //           }
-
-  //           return this.gamePlayerService.updatePlayer(gamePlayer, gameId);
-  //         });
-  //       }));
-  //     }
-  //   ));
-
-  //   return [];
-  // }
-
   public updateByePlayerPoints(roundId: string, gameId: string): Observable<never> {
     if (!roundId) {
       return EMPTY;

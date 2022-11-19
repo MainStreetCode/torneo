@@ -75,6 +75,7 @@ export class RoundDetailComponent implements OnInit, OnDestroy {
           if (this.updateCounter === this.tables.length) {
             this.roundMediatorService.updateByePlayerPoints(this.roundId, this.gameId).subscribe({
               complete: () => {
+                // TODO: add points calculated property?
                 this.router.navigateByUrl(`/game/${this.gameId}/dashboard`);
               }
             });
