@@ -124,7 +124,6 @@ export class TableDetailComponent implements OnInit, OnDestroy {
 
           } else if (this.currentTeamPlayer) {
             // else if user is a team player, then only set their points confirmed value
-            // this.currentTeamPlayer.isPointsConfirmed = confirm;
 
             // find the team to update
             this.teams.forEach((team) => {

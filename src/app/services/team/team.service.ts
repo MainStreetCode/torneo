@@ -95,7 +95,6 @@ export class TeamService {
   }
 
   private log(message: string): void {
-    console.log(message);
     this.messageService.add(`TeamService: ${message}`);
   }
 }

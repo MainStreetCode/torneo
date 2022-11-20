@@ -366,7 +366,6 @@ export class RoundMediatorService {
   }
 
   private log(message: string): void {
-    console.log(message);
     this.messageService.add(`RoundMediatorService: ${message}`);
   }
 }

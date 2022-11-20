@@ -102,7 +102,6 @@ export class TableService {
   }
 
   private log(message: string): void {
-    console.log(message);
     this.messageService.add(`TableService: ${message}`);
   }
 }

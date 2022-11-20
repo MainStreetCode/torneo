@@ -85,7 +85,6 @@ export class GamePlayerService {
   }
 
   private log(message: string): void {
-    console.log(message);
     this.messageService.add(`PlayerService: ${message}`);
   }
 
