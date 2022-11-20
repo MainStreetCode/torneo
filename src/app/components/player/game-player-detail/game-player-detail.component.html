@@ -16,7 +16,7 @@
     </div>
 
     <div class="flex-box-item">
-      <mat-slide-toggle [checked]="isAdmin" [disabled]="isDisabled || !isAdmin" (click)="toggleIsAdmin()">Admin</mat-slide-toggle>
+      <mat-slide-toggle [checked]="isAdmin" [disabled]="isDisabled && !isAdmin" (click)="toggleIsAdmin()">Admin</mat-slide-toggle>
     </div>
   
     <div class="flex-box-item">

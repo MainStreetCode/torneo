@@ -129,6 +129,7 @@ export class GameService {
   }
 
   private log(message: string): void {
+    console.log(message);
     this.messageService.add(`GameService: ${message}`);
   }
 }

@@ -77,7 +77,7 @@ export class TableDetailComponent implements OnInit, OnDestroy {
           if (teams) {
             this.teams = teams;
             teams.forEach((team) => {
-              if (currentUser) {
+              if (!this.currentTeamPlayer && currentUser) {
                 this.currentTeamPlayer = team.teamPlayers.find((teamPlayer) => teamPlayer.player.uid === currentUser.uid);
               }
             });

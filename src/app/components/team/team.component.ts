@@ -100,7 +100,7 @@ export class TeamComponent implements OnInit, OnDestroy {
             this.isEditable = false;
             this.teamPointsFormControl.disable();
           }
-          else if (isAdmin || (isTeamPlayer && !this.pointsConfirmed)) {
+          else if ((isAdmin || isTeamPlayer) && !this.pointsConfirmed) {
             this.isEditable = true;
             this.teamPointsFormControl.enable();
           } else {

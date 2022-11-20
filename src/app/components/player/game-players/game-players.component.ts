@@ -36,6 +36,16 @@ export class GamePlayersComponent implements OnInit, OnDestroy {
     this.isAdmin$ = this.gameService.isCurrentUserAdmin(this.game.id);
 
     this.getPlayers();
+
+    this.subscriptions.push(
+      this.authService.isLoggedIn$.subscribe({
+        next: (loggedIn) => {
+          if (loggedIn) {
+            this.checkCurrentUserGamePlayer();
+          }
+        }
+      })
+    );
   }
 
   ngOnDestroy(): void {
@@ -46,7 +56,6 @@ export class GamePlayersComponent implements OnInit, OnDestroy {
     this.subscriptions.push(
       this.playerService.playersForGame(this.game.id).subscribe({
         next: (players) => {
-          console.log('getPlayers');
           this.players = players.sort((a, b) => {
             const playerAPoints = this.calculateTotalPoints(a);
             const playerBPoints = this.calculateTotalPoints(b);
@@ -54,14 +63,19 @@ export class GamePlayersComponent implements OnInit, OnDestroy {
             return playerBPoints - playerAPoints;
           });
 
-          if (this.currentUser && this.players.find((player) => player.uid === this.currentUser.uid)) {
-            this.isCurrentUserGamePlayer$ = of(true);
-          } else {
-            this.isCurrentUserGamePlayer$ = of(false);
-          }
+          this.checkCurrentUserGamePlayer();
         }
       })
     );
+  }
+
+  private checkCurrentUserGamePlayer(): void {
+    this.currentUser = this.authService.getCurrentUser();
+    if (this.currentUser && this.players.find((player) => player.uid === this.currentUser.uid)) {
+      this.isCurrentUserGamePlayer$ = of(true);
+    } else {
+      this.isCurrentUserGamePlayer$ = of(false);
+    }
   }
 
   private calculateTotalPoints(player: GamePlayer): number {

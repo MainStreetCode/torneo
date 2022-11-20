@@ -34,7 +34,7 @@ export class TablesComponent implements OnInit, OnDestroy {
     this.currentUser = this.authService.getCurrentUser();
     this.gameId = this.route.snapshot.paramMap.get('gameId');
     this.roundId = this.route.snapshot.paramMap.get('roundId');
-    this.filteredTables = this.tables;
+    this.filteredTables = this.tables.sort((a, b) => a.number - b.number);
 
     this.checkCurrentUserIsPlayer();
   }
