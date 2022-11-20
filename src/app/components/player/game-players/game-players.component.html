@@ -8,9 +8,16 @@
     </mat-toolbar>  
   </div>
   
+  <mat-toolbar color="secondary">
+    <span>Player List ({{players.length}})</span>
+  </mat-toolbar>
+  <div class="player-list">      
+    <app-player-card *ngFor="let player of players" [player]="player"></app-player-card>
+  </div>
+
   <div *ngIf="this.isAdmin$ | async">
     <mat-toolbar color="secondary"><span>Add new player</span></mat-toolbar>
-
+  
     <div class="content flex-box-rows">
       <div>
         <mat-form-field class="example-full-width" appearance="fill">
@@ -18,23 +25,17 @@
           <input matInput id="new-player" #playerName placeholder="Player Name" value="">
         </mat-form-field>
       </div>
-
+  
       <div>
         <!-- (click) passes input value to add() and then clears the input -->
-        <button mat-raised-button color="primary" [disabled]="!playerName.value" (click)="add(playerName.value); playerName.value=''">
-          <mat-icon>add</mat-icon>    
-          <span class="mdc-button__label">        
+        <button mat-raised-button color="primary" [disabled]="!playerName.value"
+          (click)="add(playerName.value); playerName.value=''">
+          <mat-icon>add</mat-icon>
+          <span class="mdc-button__label">
             <span class="mdc-button__label">Add player</span>
           </span>
-        </button>    
+        </button>
       </div>
     </div>
-  </div>
-
-  <mat-toolbar color="secondary">
-    <span>Player List ({{players.length}})</span>
-  </mat-toolbar>
-  <div class="player-list">      
-    <app-player-card *ngFor="let player of players" [player]="player"></app-player-card>
   </div>
 </div>

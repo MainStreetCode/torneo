@@ -89,29 +89,37 @@ export class RoundMediatorService {
   public updatePlayerPoints(roundId: string, gameId: string): Observable<(void | GamePlayer)[]> {
     const teamPlayers$ = this.getTeamPlayersForRound(roundId, gameId);
 
-    return teamPlayers$.pipe(
-      switchMap((teamPlayers) => {
+    return combineLatest([
+        this.gamePlayerService.playersForGame(gameId),
+        teamPlayers$
+      ]).pipe(
+      switchMap(([gamePlayers, teamPlayers]) => {
         return combineLatest(
           teamPlayers.map((teamPlayer) => {
-            const gamePlayer = teamPlayer.player;
+            const teamGamePlayer = teamPlayer.player;
 
-            if (!gamePlayer.pointsForRound) {
-              gamePlayer.pointsForRound = [];
+            if (!teamGamePlayer.pointsForRound) {
+              teamGamePlayer.pointsForRound = [];
             }
 
+            const gamePlayer = gamePlayers.find((gp) => gp.uid === teamGamePlayer.uid);
             const gamePlayerPointsForRound = gamePlayer.pointsForRound.find((roundPoints) => roundPoints.roundId === roundId);
 
-            if (gamePlayerPointsForRound) {
+            // check game player points to see if they already have points to prevent extra call to update
+            if (gamePlayer && gamePlayerPointsForRound) {
+              if (gamePlayerPointsForRound.points === teamPlayer.points) {
+                return of(teamGamePlayer);
+              }
               gamePlayerPointsForRound.points = teamPlayer.points;
             } else {
               const newRoundPoints: RoundPoints = {
                 roundId,
                 points: teamPlayer.points
               };
-              gamePlayer.pointsForRound.push(newRoundPoints);
+              teamGamePlayer.pointsForRound.push(newRoundPoints);
             }
 
-            return this.gamePlayerService.updatePlayer(gamePlayer, gameId);
+            return this.gamePlayerService.updatePlayer(teamGamePlayer, gameId);
           })
         );
       })

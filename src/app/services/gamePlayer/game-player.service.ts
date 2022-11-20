@@ -51,7 +51,7 @@ export class GamePlayerService {
   updatePlayer(player: GamePlayer, gameId: string): Observable<GamePlayer | void> {
     return from(this.store.collection(Collection.Games).doc(gameId).collection(Collection.GamePlayers).doc(player.uid).update(player).then(
       () => {
-        this.log(`updated player w/ id=${player.uid}`);
+        this.log(`updatePlayer id: ${player.uid} name: ${player.displayName}`);
         return player;
       },
       err => this.log(`updatePlayer ${err}`)
