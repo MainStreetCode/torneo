@@ -26,6 +26,7 @@ export class TeamComponent implements OnInit, OnDestroy {
   pointsConfirmed = false;
   isEditable = true;
   subscriptions: Subscription[] = [];
+  teamPlayers = [];
 
   constructor(
     private gameService: GameService,
@@ -36,7 +37,7 @@ export class TeamComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.gameId = this.route.snapshot.paramMap.get('gameId');
     this.roundId = this.route.snapshot.paramMap.get('roundId');
-    this.canEditPoints();
+    // this.canEditPoints();
 
     this.subscriptions.push(
       this.teamPointsFormControl.valueChanges.pipe(
@@ -50,13 +51,19 @@ export class TeamComponent implements OnInit, OnDestroy {
       this.teamService.getTeam(this.team.id, this.table.id, this.roundId, this.gameId).subscribe({
         next: (currentTeam) => {
           if (currentTeam) {
+            this.team = currentTeam;
             this.teamPointsFormControl.setValue(currentTeam.points);
+
+            this.pointsConfirmed = false;
+            this.teamPlayers = currentTeam.teamPlayers;
 
             currentTeam.teamPlayers.forEach((teamPlayer) => {
               if (teamPlayer.isPointsConfirmed) {
                 this.pointsConfirmed = true;
               }
             });
+
+            this.canEditPoints();
           }
         }
       })

@@ -73,10 +73,23 @@ export class TableDetailComponent implements OnInit, OnDestroy {
         this.gameService.isUserAdmin(currentUser.uid, this.gameId),
         this.teamService.getTeamsForTable(this.table.id, this.roundId, this.gameId)
       ]).subscribe({
-        next: ([isAdmin, teams]) => {
-          if (teams) {
-            this.teams = teams;
-            teams.forEach((team) => {
+        next: ([isAdmin, updatedTeams]) => {
+          if (updatedTeams) {
+
+            // if teams is already defined, then update local data
+            if (this.teams) {
+              updatedTeams.forEach((updatedTeam) => {
+                const existingTeam = this.teams.find((et) => et.id === updatedTeam.id);
+                if (existingTeam) {
+                  existingTeam.points = updatedTeam.points;
+                  existingTeam.teamPlayers = updatedTeam.teamPlayers;
+                }
+              });
+            } else {
+              this.teams = updatedTeams;
+            }
+
+            updatedTeams.forEach((team) => {
               if (!this.currentTeamPlayer && currentUser) {
                 this.currentTeamPlayer = team.teamPlayers.find((teamPlayer) => teamPlayer.player.uid === currentUser.uid);
               }
@@ -111,12 +124,14 @@ export class TableDetailComponent implements OnInit, OnDestroy {
 
           } else if (this.currentTeamPlayer) {
             // else if user is a team player, then only set their points confirmed value
-            this.currentTeamPlayer.isPointsConfirmed = confirm;
+            // this.currentTeamPlayer.isPointsConfirmed = confirm;
 
             // find the team to update
             this.teams.forEach((team) => {
+              const teamPlayer = team.teamPlayers.find((tp) => tp.player.uid === currentUser.uid);
               // if current user is on this team, then update it
-              if (team.teamPlayers.find((teamPlayer) => teamPlayer.player.uid === currentUser.uid)) {
+              if (teamPlayer) {
+                teamPlayer.isPointsConfirmed = confirm;
                 this.teamService.updateTeam(team, this.table.id, this.roundId, this.gameId).subscribe({
                   next: () => {
                     this.checkPointsConfirmed(isAdmin);
