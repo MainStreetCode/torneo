@@ -177,6 +177,9 @@ export class RoundMediatorService {
             const roundPoints = gamePlayer.pointsForRound.find((pfr) => pfr.roundId === roundId);
             // if roundPoints already exists, then update the points
             if (roundPoints) {
+              if (roundPoints.points === averagePoints) {
+                return;
+              }
               roundPoints.points = averagePoints;
             } else {
               gamePlayer.pointsForRound.push(newRoundPoints);
