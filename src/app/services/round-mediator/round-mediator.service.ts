@@ -65,32 +65,36 @@ export class RoundMediatorService {
   public getTeamPlayersForRound(roundId: string, gameId: string): Observable<TeamPlayer[]> {
     const teamPlayers$ = this.tableService.getTablesForRound(roundId, gameId).pipe(
       mergeMap((tables) => {
-        const teamsForTable$ = tables.map((table) => this.teamService.getTeamsForTable(table.id, roundId, gameId))
+        const teamsForTables$ = tables.map((table) => this.teamService.getTeamsForTable(table.id, roundId, gameId));
 
-        const foo$ = combineLatest(teamsForTable$).pipe(
-          map((teams) => teams.flat())
-        ).pipe(
-          mergeMap((teams) => {
-            return teams.map((team) => {
-              return team.teamPlayers.map((teamPlayer) => {
-                teamPlayer.points = team.points;
-                return teamPlayer;
-              });
-            });
+        const teams$ = combineLatest(teamsForTables$).pipe(
+          switchMap((arrayOfTeams) => {
+            return of(arrayOfTeams.flat());
           })
         );
 
-        return foo$;
+        return teams$.pipe(
+          switchMap((teams) => {
+            const teamPlayers = teams.map((team) => {
+              return team.teamPlayers.map((teamPlayer) => {
+                teamPlayer.points = team.points;
+                return teamPlayer;
+              }).flat();
+            }).flat();
+
+            return of(teamPlayers);
+          }
+        ));
       })
     );
     return teamPlayers$;
   }
 
   public updatePlayerPoints(roundId: string, gameId: string): Observable<(void | GamePlayer)[]> {
-    const teamPlayers$ = this.getTeamPlayersForRound(roundId, gameId);
+    const teamPlayers$ = this.getTeamPlayersForRound(roundId, gameId).pipe(take(1));
 
     return combineLatest([
-        this.gamePlayerService.playersForGame(gameId),
+        this.gamePlayerService.playersForGame(gameId).pipe(take(1)),
         teamPlayers$
       ]).pipe(
       switchMap(([gamePlayers, teamPlayers]) => {

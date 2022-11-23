@@ -24,7 +24,6 @@ export class RoundDetailComponent implements OnInit, OnDestroy {
   allTablesPointsConfirmed$ = of(false);
   sectionName: string;
   isAdmin$ = of(false);
-  updateCounter = 0;
 
   private subscriptions: Subscription[] = [];
 
@@ -57,8 +56,6 @@ export class RoundDetailComponent implements OnInit, OnDestroy {
   }
 
   endRound(): void {
-    this.updateCounter = 0;
-
     this.subscriptions.push(
       this.allTablesPointsConfirmed$.pipe(
         take(1),
@@ -69,17 +66,12 @@ export class RoundDetailComponent implements OnInit, OnDestroy {
         })
       ).subscribe({
         next: () => {
-          // TODO: clean this up so updatecounter isn't needed
-          // and update byePlayerPoints is called after all player points are updated
-          this.updateCounter++;
-          if (this.updateCounter === this.tables.length) {
             this.roundMediatorService.updateByePlayerPoints(this.roundId, this.gameId).subscribe({
               complete: () => {
                 // TODO: add points calculated property?
                 this.router.navigateByUrl(`/game/${this.gameId}/dashboard`);
               }
             });
-          }
         }
       })
     );
