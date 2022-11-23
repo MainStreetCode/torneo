@@ -2,10 +2,10 @@
     <div class="flex-box-item flex-box-item-large">Tables</div>
     <div *ngIf="isUserPlayer">
       <div class="flex-box-item">
-         <button mat-raised-button color="primary" [disabled]="isDisabled" (click)="filterTables()" *ngIf="isDataFiltered">Show All Tables</button>
+         <button mat-raised-button color="primary" (click)="filterTables()" *ngIf="isDataFiltered">Show All Tables</button>
       </div>
       <div class="flex-box-item">
-        <button mat-raised-button color="primary" [disabled]="isDisabled" (click)="filterTables()" *ngIf="!isDataFiltered">Show My Table</button>
+        <button mat-raised-button color="primary" (click)="filterTables()" *ngIf="!isDataFiltered">Show My Table</button>
       </div>
     </div>
 </mat-toolbar>

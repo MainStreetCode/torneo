@@ -65,8 +65,8 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
     );
   }
 
-  selectTab(event$: Event): void {
-    this.selectedTab = event$ as unknown as GameDashboardTab;
+  selectTab(tabNumber: number): void {
+    this.selectedTab = tabNumber as unknown as GameDashboardTab;
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: {

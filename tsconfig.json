@@ -19,5 +19,8 @@
     "plugins": [
       { "name": "typescript-tslint-plugin" }
     ]
+  },
+  "angularCompilerOptions": {
+    "strictTemplates": true
   }
 }
