@@ -107,7 +107,11 @@ export class RoundMediatorService {
             }
 
             const gamePlayer = gamePlayers.find((gp) => gp.uid === teamGamePlayer.uid);
-            const gamePlayerPointsForRound = gamePlayer.pointsForRound.find((roundPoints) => roundPoints.roundId === roundId);
+            let gamePlayerPointsForRound: RoundPoints | undefined;
+
+            if (gamePlayer.pointsForRound) {
+              gamePlayerPointsForRound = gamePlayer.pointsForRound.find((roundPoints) => roundPoints.roundId === roundId);  
+            }
 
             // check game player points to see if they already have points to prevent extra call to update
             if (gamePlayer && gamePlayerPointsForRound) {
