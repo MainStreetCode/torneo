@@ -17,6 +17,7 @@ const routes: Routes = [
   { path: 'games', component: GamesComponent },
   { path: 'gamePlayers', component: GamePlayersComponent },
   { path: 'game/:gameId/player/:playerId', component: GamePlayerDetailComponent },
+  { path: 'game/:gameId', component: GameDashboardComponent },
   { path: 'game/:gameId/dashboard', component: GameDashboardComponent },
   { path: 'game/:gameId/configuration', component: GameConfigurationComponent },
   { path: 'game/:gameId/rounds', component: RoundsComponent },

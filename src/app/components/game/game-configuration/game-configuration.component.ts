@@ -1,9 +1,9 @@
 import { Dialog } from '@angular/cdk/dialog';
 import { Location } from '@angular/common';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
-import { of } from 'rxjs';
+import { of, Subscription } from 'rxjs';
 import { Game } from 'src/app/services/game/game';
 import { GameService } from 'src/app/services/game/game.service';
 import { environment } from 'src/environments/environment';
@@ -15,11 +15,13 @@ import { ProgressDialogComponent } from '../../progress-dialog/progress-dialog.c
   templateUrl: './game-configuration.component.html',
   styleUrls: ['./game-configuration.component.css']
 })
-export class GameConfigurationComponent implements OnInit {
-  @Input() game?: Game;
+export class GameConfigurationComponent implements OnInit, OnDestroy {
+  public gameId: string;
+  public game?: Game;
   public gameURL: string;
   public sectionName: string;
   public isAdmin$ = of(false);
+  private subscriptions: Subscription[] = [];
 
   constructor(
     private router: Router,
@@ -33,24 +35,30 @@ export class GameConfigurationComponent implements OnInit {
     this.getGame();
   }
 
-  getGame(): void {
-    const id = this.route.snapshot.paramMap.get('gameId');
+  ngOnDestroy(): void {
+    this.subscriptions.forEach((subscription) => subscription.unsubscribe());
+  }
 
-    if (!id) {
+  getGame(): void {
+    this.gameId = this.route.snapshot.paramMap.get('gameId');
+
+    if (!this.gameId) {
       return;
     }
 
+    this.gameURL = `${environment.url}/game/${this.gameId}`;
     const dialogRef = this.dialog.open(ProgressDialogComponent, {});
 
-    this.gameService.getGame(id).subscribe({
-      next: (game) => {
-        this.game = game;
-        this.gameURL = `${environment.url}/game/${this.game.id}`;
-        this.isAdmin$ = this.gameService.isCurrentUserAdmin(this.game.id);
-        this.sectionName = `${game.name.toUpperCase()} Configuration`;
-        dialogRef.close();
-      }
-    });
+    this.subscriptions.push(
+      this.gameService.getGame(this.gameId).subscribe({
+        next: (game) => {
+          this.game = game;
+          this.isAdmin$ = this.gameService.isCurrentUserAdmin(this.game.id);
+          this.sectionName = `${game.name.toUpperCase()} Configuration`;
+          dialogRef.close();
+        }
+      })
+    );
   }
 
   goBack(): void {
