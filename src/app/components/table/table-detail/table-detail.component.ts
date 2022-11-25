@@ -90,7 +90,7 @@ export class TableDetailComponent implements OnInit, OnDestroy {
             }
 
             updatedTeams.forEach((team) => {
-              if (!this.currentTeamPlayer && currentUser) {
+              if (currentUser) {
                 this.currentTeamPlayer = team.teamPlayers.find((teamPlayer) => teamPlayer.player.uid === currentUser.uid);
               }
             });
@@ -130,7 +130,10 @@ export class TableDetailComponent implements OnInit, OnDestroy {
               const teamPlayer = team.teamPlayers.find((tp) => tp.player.uid === currentUser.uid);
               // if current user is on this team, then update it
               if (teamPlayer) {
-                teamPlayer.isPointsConfirmed = confirm;
+                team.teamPlayers.forEach((tp) => {
+                  tp.isPointsConfirmed = confirm;
+                });
+
                 this.teamService.updateTeam(team, this.table.id, this.roundId, this.gameId).subscribe({
                   next: () => {
                     this.checkPointsConfirmed(isAdmin);
