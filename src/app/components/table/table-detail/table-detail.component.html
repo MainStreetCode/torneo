@@ -1,6 +1,6 @@
 <mat-toolbar color="secondary" class="flex-box-rows">
     <div class="flex-box-item">Table {{table.number}}</div>
-    <div>
+    <div *ngIf="isCurrentUserAdmin">
         <div class="flex-box-item">
             <button mat-raised-button color="primary" [disabled]="isDisabled" (click)="toggleConfirmPoints(true)" *ngIf="!pointsConfirmed">
                 <mat-icon>check</mat-icon>

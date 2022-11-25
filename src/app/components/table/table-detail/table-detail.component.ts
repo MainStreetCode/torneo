@@ -28,6 +28,7 @@ export class TableDetailComponent implements OnInit, OnDestroy {
   currentTeamPlayer?: TeamPlayer;
   isDisabled = false;
   subscriptions: Subscription[] = [];
+  isCurrentUserAdmin = false;
 
   constructor(
     private authService: AuthService,
@@ -49,6 +50,7 @@ export class TableDetailComponent implements OnInit, OnDestroy {
         this.roundMediatorService.allTablesConfirmed(this.roundId, this.gameId)
       ]).subscribe({
         next: ([isAdmin, confirmed]) => {
+          this.isCurrentUserAdmin = isAdmin;
           if (!isAdmin && confirmed) {
             this.isDisabled = true;
           } else {
@@ -90,8 +92,9 @@ export class TableDetailComponent implements OnInit, OnDestroy {
             }
 
             updatedTeams.forEach((team) => {
-              if (currentUser) {
-                this.currentTeamPlayer = team.teamPlayers.find((teamPlayer) => teamPlayer.player.uid === currentUser.uid);
+              const updatedCurrentPlayer = team.teamPlayers.find((teamPlayer) => teamPlayer.player.uid === currentUser.uid);
+              if (updatedCurrentPlayer) {
+                this.currentTeamPlayer = updatedCurrentPlayer;
               }
             });
 
