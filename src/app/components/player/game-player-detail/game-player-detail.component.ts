@@ -63,6 +63,7 @@ export class GamePlayerDetailComponent implements OnInit {
   }
 
   toggleIsAdmin(): void {
+    // if toggle is disabled then don't do anything
     if (this.isDisabled) {
       return;
     }
