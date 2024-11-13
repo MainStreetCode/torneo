@@ -16,6 +16,7 @@ import { MatDialog } from '@angular/material/dialog';
 })
 export class PlayerCardComponent implements OnInit {
   @Input() player: GamePlayer;
+  @Input() position: number;
   gameId: string;
   isAdmin$ = of(false);
   currentUser: User;
@@ -35,7 +36,7 @@ export class PlayerCardComponent implements OnInit {
     this.currentUser = this.authService.getCurrentUser();
     this.isAdmin$ = this.gameService.isCurrentUserAdmin(this.gameId);
 
-    this.calculatePoints();
+    this.calculatePoints();    
   }
 
   public delete(player: GamePlayer): void {

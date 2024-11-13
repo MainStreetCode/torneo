@@ -10,6 +10,10 @@
   cursor: pointer; 
 }
   
+.position {
+  flex-grow: 1;
+}
+
 .name {
   flex-grow: 9;
   flex-basis: 0;

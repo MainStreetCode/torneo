@@ -2,7 +2,7 @@
   <div class="flex-box-rows">
     <mat-toolbar color="accent">
       <div class="flex-box-item">Players</div>
-      <div *ngIf="(isCurrentUserGamePlayer$ | async) === false">
+      <div *ngIf="(isGameJoinable$ | async)">
         <button mat-raised-button color="primary" (click)="joinGame()">Join Game</button>
       </div>
     </mat-toolbar>  
@@ -12,7 +12,7 @@
     <span>Player List ({{players.length}})</span>
   </mat-toolbar>
   <div class="player-list">      
-    <app-player-card *ngFor="let player of players" [player]="player"></app-player-card>
+    <app-player-card *ngFor="let player of players; index as i" [player]="player" [position]="i+1"></app-player-card>
   </div>
 
   <div *ngIf="this.isAdmin$ | async">

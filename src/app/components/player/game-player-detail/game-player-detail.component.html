@@ -16,7 +16,7 @@
     </div>
 
     <div class="flex-box-item">
-      <mat-slide-toggle [checked]="isAdmin" [disabled]="isDisabled && !isAdmin" (click)="toggleIsAdmin()">Admin</mat-slide-toggle>
+      <mat-slide-toggle [checked]="isAdmin" [disabled]="!isCurrentUserAdmin" (click)="toggleIsAdmin()">Admin</mat-slide-toggle>
     </div>
   
     <div class="flex-box-item">
@@ -27,7 +27,7 @@
 
   <mat-toolbar color="accent"><span>Points</span></mat-toolbar>  
   <div *ngFor="let roundPoints of player.pointsForRound; let i = index" class="content">
-    <span class="mat-h3">Round: {{i+1}}</span>
+    <span class="mat-h3">Round: {{roundPoints.roundNumber}}</span>
     <span class="mat-h3"> - Points: {{roundPoints.points}}</span>
   </div>
   
