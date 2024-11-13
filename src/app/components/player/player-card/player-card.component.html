@@ -1,6 +1,7 @@
 <mat-card class="mdc-card card">
     <div class="mdc-card__primary-action details" tabindex="0" (click)="view(player)">
         <div class="flex-box-rows">
+            <div class="mdc-button__label position flex-box-item">{{position}}</div>
             <div class="mdc-button__label name flex-box-item">
                 {{player.displayName}}
                 <span *ngIf="currentUser && player.uid === currentUser.uid">(you)</span>

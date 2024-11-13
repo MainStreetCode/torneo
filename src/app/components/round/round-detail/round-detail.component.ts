@@ -61,7 +61,7 @@ export class RoundDetailComponent implements OnInit, OnDestroy {
         take(1),
         switchMap((confirmed) => {
           if (confirmed) {
-            return this.roundMediatorService.updatePlayerPoints(this.roundId, this.gameId);
+            return this.roundMediatorService.updatePlayerPoints(this.roundId, this.gameId, this.round.number);
           }
         })
       ).subscribe({

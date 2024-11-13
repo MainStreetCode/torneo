@@ -90,7 +90,7 @@ export class RoundMediatorService {
     return teamPlayers$;
   }
 
-  public updatePlayerPoints(roundId: string, gameId: string): Observable<(void | GamePlayer)[]> {
+  public updatePlayerPoints(roundId: string, gameId: string, roundNumber: number): Observable<(void | GamePlayer)[]> {
     const teamPlayers$ = this.getTeamPlayersForRound(roundId, gameId).pipe(take(1));
 
     return combineLatest([
@@ -120,8 +120,9 @@ export class RoundMediatorService {
               }
               gamePlayerPointsForRound.points = teamPlayer.points;
             } else {
-              const newRoundPoints: RoundPoints = {
+              const newRoundPoints: RoundPoints = {                
                 roundId,
+                roundNumber,                
                 points: teamPlayer.points
               };
               teamGamePlayer.pointsForRound.push(newRoundPoints);
@@ -148,6 +149,7 @@ export class RoundMediatorService {
 
         const byePlayers = round.byes;
         const byePlayerIds = round.byes.map((bye) => bye.uid);
+        const roundNumber = round.number
 
         if (byePlayerIds && byePlayerIds.length > 0) {
           const lastRoundPlayers = gamePlayers.filter((gamePlayer) => {
@@ -170,6 +172,7 @@ export class RoundMediatorService {
           const averagePoints = Math.round(totalPoints / lastRoundPlayers.length);
           const newRoundPoints: RoundPoints = {
             roundId,
+            roundNumber,
             points: averagePoints
           };
 

@@ -10,6 +10,7 @@ import { of, Subscription } from 'rxjs';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { LoginDialogComponent } from '../../user/login/login-dialog/login-dialog-component';
 import { User } from 'firebase/auth';
+import { RoundService } from 'src/app/services/round/round.service';
 @Component({
   selector: 'app-game-players',
   templateUrl: './game-players.component.html',
@@ -18,14 +19,15 @@ import { User } from 'firebase/auth';
 export class GamePlayersComponent implements OnInit, OnDestroy {
   @Input() game?: Game;
   players: GamePlayer[] = [];
-  isAdmin$ = of(false);
-  isCurrentUserGamePlayer$ = of(false);
+  isAdmin$ = of(false);  
+  isGameJoinable$ = of(true);
   currentUser: User;
   private subscriptions: Subscription[] = [];
 
   constructor(private playerService: GamePlayerService,
               private gameService: GameService,
               private authService: AuthService,
+              private roundService: RoundService,
               public dialog: MatDialog) { }
 
   ngOnInit(): void {
@@ -41,7 +43,7 @@ export class GamePlayersComponent implements OnInit, OnDestroy {
       this.authService.isLoggedIn$.subscribe({
         next: (loggedIn) => {
           if (loggedIn) {
-            this.checkCurrentUserGamePlayer();
+            this.checkIsGameJoinable();
           }
         }
       })
@@ -63,19 +65,29 @@ export class GamePlayersComponent implements OnInit, OnDestroy {
             return playerBPoints - playerAPoints;
           });
 
-          this.checkCurrentUserGamePlayer();
+          this.checkIsGameJoinable();
         }
       })
     );
   }
 
-  private checkCurrentUserGamePlayer(): void {
+  private checkIsGameJoinable(): void {
     this.currentUser = this.authService.getCurrentUser();
+    // if the current user is one of the players in the game, then disable the join button
     if (this.currentUser && this.players.find((player) => player.uid === this.currentUser.uid)) {
-      this.isCurrentUserGamePlayer$ = of(true);
-    } else {
-      this.isCurrentUserGamePlayer$ = of(false);
+      this.isGameJoinable$ = of(false);
     }
+
+    // if the game has already started, then the game is not joinable
+    this.subscriptions.push(
+      this.roundService.roundsForGame(this.game.id).subscribe({
+        next: (rounds) => {
+          if (rounds.length > 0) {
+            this.isGameJoinable$ = of(false);
+          }
+        }
+      })
+    );
   }
 
   private calculateTotalPoints(player: GamePlayer): number {

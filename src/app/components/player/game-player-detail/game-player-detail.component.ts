@@ -81,11 +81,7 @@ export class GamePlayerDetailComponent implements OnInit {
     this.gameService.isCurrentUserAdmin(this.gameId).subscribe({
       next: (isGameAdmin) => {
         const currentUser = this.authService.getCurrentUser();
-
-        // if current user is game admin or is this player then isDisabled = false
-        if (currentUser && currentUser.uid === this.player.uid || isGameAdmin) {
-          this.isDisabled = false;
-        }
+        this.isDisabled = !isGameAdmin;        
       }
     });
   }
