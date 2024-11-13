@@ -17,6 +17,7 @@ export class GamePlayerDetailComponent implements OnInit {
   sectionName: string;
   isAdmin = false;
   isDisabled = true;
+  isCurrentUserAdmin = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -62,9 +63,8 @@ export class GamePlayerDetailComponent implements OnInit {
     }
   }
 
-  toggleIsAdmin(): void {
-    // if toggle is disabled then don't do anything
-    if (this.isDisabled) {
+  toggleIsAdmin(): void {    
+    if (!this.isCurrentUserAdmin) {
       return;
     }
     
@@ -81,7 +81,12 @@ export class GamePlayerDetailComponent implements OnInit {
     this.gameService.isCurrentUserAdmin(this.gameId).subscribe({
       next: (isGameAdmin) => {
         const currentUser = this.authService.getCurrentUser();
-        this.isDisabled = !isGameAdmin;        
+        this.isCurrentUserAdmin = isGameAdmin
+        
+        // if current user is game admin or is this player then isDisabled = false
+        if (currentUser && currentUser.uid === this.player.uid || isGameAdmin) {
+          this.isDisabled = false;
+        }
       }
     });
   }
