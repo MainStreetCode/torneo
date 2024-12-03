@@ -46,7 +46,7 @@ export class GameConfigurationComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.gameURL = `${environment.url}/game/${this.gameId}`;
+    this.gameURL = `${environment.url}/#/game/${this.gameId}`;
     const dialogRef = this.dialog.open(ProgressDialogComponent, {});
 
     this.subscriptions.push(
