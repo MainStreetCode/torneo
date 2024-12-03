@@ -5,7 +5,7 @@
 export const environment = {
   production: false,
   // url: 'https://torneo.com',
-  url: 'http://192.168.0.44:4200',
+  url: 'http://192.168.0.44:4200/#',
   firebase: {
     apiKey: "AIzaSyBXfstBvichb-xN3QAYd4Xx_03-j3FMaxA",
     authDomain: "tourney-84ede.firebaseapp.com",
