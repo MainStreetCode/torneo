@@ -9,7 +9,7 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "build to docs": "ng build --base-href https://mainstreetcode.github.io/torneo/ --output-path docs --configuration production"
+    "build to docs": "ng build --base-href https://mainstreetcode.github.io/torneo/# --output-path docs --configuration production"
   },
   "private": true,
   "dependencies": {
