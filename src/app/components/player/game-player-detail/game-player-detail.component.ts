@@ -84,7 +84,7 @@ export class GamePlayerDetailComponent implements OnInit {
         this.isCurrentUserAdmin = isGameAdmin
         
         // if current user is game admin or is this player then isDisabled = false
-        if (currentUser && currentUser.uid === this.player.uid || isGameAdmin) {
+        if (currentUser && (currentUser.uid === this.player.uid || isGameAdmin)) {
           this.isDisabled = false;
         }
       }

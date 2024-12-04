@@ -40,7 +40,7 @@ export class GamesComponent implements OnInit, OnDestroy {
     this.subscriptions.push(
       this.gameService.games$.subscribe({
         next: (games) => {
-          this.games = games;
+          this.games = games.sort((a, b) => new Date(b.createdDate).getDate() - new Date(a.createdDate).getDate());;
           this.games.map((game) => {
             this.gameAdminMap.set(game.id, this.isGameAdmin(game));
           });
