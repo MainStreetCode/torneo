@@ -57,7 +57,7 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
       this.gameService.getGame(id).subscribe({
         next: (game) => {
           this.game = game;
-          this.gameURL = `${environment.url}/game/${this.game.id}/dashboard`;
+          this.gameURL = `${environment.url}/#/game/${this.game.id}/dashboard`;
           this.sectionName = `${this.game.name.toUpperCase()} Dashboard`;
           console.log(this.gameURL);
         }
