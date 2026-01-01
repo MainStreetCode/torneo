@@ -24,7 +24,7 @@
             ],
             "styles": [
               "src/styles.scss",
-              "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css"
+              "src/black-red.css"
             ],
             "scripts": [],
             "vendorChunk": true,

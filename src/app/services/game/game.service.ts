@@ -27,6 +27,7 @@ export class GameService {
   addGame(game: Game, userId: string): Observable<Game | void> {
     game.adminIds = [];
     game.byePool = [];
+    game.createdDate = new Date();
 
     return from(this.store.collection<Game>(Collection.Games)
       .add(game).then(
