@@ -310,7 +310,7 @@ export class RoundMediatorService {
 
                         // create teams
                         tableData.teams.forEach((team) => {
-                          this.teamService.addTeam(team, newTable.id, round.id, gameId);
+                          this.teamService.addTeam(team, addedTable.id, round.id, gameId);
                         });
 
                         return of(addedTable);
