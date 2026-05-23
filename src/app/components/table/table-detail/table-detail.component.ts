@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { combineLatest, Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -30,13 +30,17 @@ export class TableDetailComponent implements OnInit, OnDestroy {
   subscriptions: Subscription[] = [];
   isCurrentUserAdmin = false;
   allTablesConfirmed = false;
+  private round?: Round;
+  private hasRedirectedToDashboard = false;
 
   constructor(
     private authService: AuthService,
     private gameService: GameService,
     private route: ActivatedRoute,
+    private router: Router,
     private teamService: TeamService,
     private tableService: TableService,
+    private roundService: RoundService,
     private roundMediatorService: RoundMediatorService) { }
 
   ngOnInit(): void {
@@ -44,6 +48,7 @@ export class TableDetailComponent implements OnInit, OnDestroy {
     this.roundId = this.route.snapshot.paramMap.get('roundId');
 
     this.getTeams();
+    this.watchRoundFinalized();
 
     this.subscriptions.push(
       combineLatest([
@@ -234,5 +239,27 @@ export class TableDetailComponent implements OnInit, OnDestroy {
     this.subscriptions.push(
       this.roundMediatorService.finalizeRoundIfReady(this.roundId, this.gameId).subscribe()
     );
+  }
+
+  private watchRoundFinalized(): void {
+    this.subscriptions.push(
+      this.roundService.getRound(this.roundId, this.gameId).subscribe({
+        next: (round) => {
+          this.round = round;
+          if (round?.pointsConfirmed) {
+            this.navigateToScores();
+          }
+        }
+      })
+    );
+  }
+
+  private navigateToScores(): void {
+    if (this.hasRedirectedToDashboard || !this.gameId || !this.round) {
+      return;
+    }
+
+    this.hasRedirectedToDashboard = true;
+    this.router.navigateByUrl(`/game/${this.gameId}/dashboard?selectedTab=0&roundEnded=${this.round.number}`);
   }
 }

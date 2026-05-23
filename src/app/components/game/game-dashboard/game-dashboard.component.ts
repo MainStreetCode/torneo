@@ -1,5 +1,6 @@
 import { Location } from '@angular/common';
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { Game } from 'src/app/services/game/game';
@@ -22,7 +23,12 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
   readonly roundsTab = GameDashboardTab.Rounds;
   private subscriptions: Subscription[] = [];
 
-  constructor(private route: ActivatedRoute, private gameService: GameService, private location: Location, private router: Router) {
+  constructor(
+    private route: ActivatedRoute,
+    private gameService: GameService,
+    private location: Location,
+    private router: Router,
+    private snackBar: MatSnackBar) {
 
   }
 
@@ -36,14 +42,30 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
   }
 
   private parseURLParams(): void {
-    this.route.queryParams
-      .subscribe(params => {
-        const tab = params.selectedTab;
-        if (tab) {
-          this.selectedTab = tab;
+    this.subscriptions.push(
+      this.route.queryParams.subscribe(params => {
+        const tab = Number(params.selectedTab);
+        if (Number.isFinite(tab)) {
+          this.selectedTab = tab as GameDashboardTab;
         }
-      }
-      );
+
+        const roundEnded = params.roundEnded;
+        if (roundEnded) {
+          this.snackBar.open(`Round ${roundEnded} ended. Scores updated.`, 'Dismiss', {
+            duration: 5000
+          });
+
+          this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: {
+              roundEnded: null
+            },
+            queryParamsHandling: 'merge',
+            replaceUrl: true
+          });
+        }
+      })
+    );
   }
 
   private getGame(): void {

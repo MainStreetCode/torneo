@@ -25,6 +25,7 @@ export class RoundDetailComponent implements OnInit, OnDestroy {
   isAdmin$ = of(false);
 
   private subscriptions: Subscription[] = [];
+  private hasRedirectedToDashboard = false;
 
   constructor(
     private router: Router,
@@ -59,7 +60,7 @@ export class RoundDetailComponent implements OnInit, OnDestroy {
       this.roundMediatorService.finalizeRoundIfReady(this.roundId, this.gameId).subscribe({
         next: (finalized) => {
           if (finalized) {
-            this.router.navigateByUrl(`/game/${this.gameId}/dashboard`);
+            this.navigateToScores();
           }
         }
       })
@@ -72,6 +73,9 @@ export class RoundDetailComponent implements OnInit, OnDestroy {
         next: (round) => {
           this.round = round;
           this.sectionName = `Round ${round.number}`;
+          if (round.pointsConfirmed) {
+            this.navigateToScores();
+          }
         }
       })
     );
@@ -91,6 +95,15 @@ export class RoundDetailComponent implements OnInit, OnDestroy {
 
   goBack(): void {
     this.location.back();
+  }
+
+  private navigateToScores(): void {
+    if (this.hasRedirectedToDashboard || !this.gameId || !this.round) {
+      return;
+    }
+
+    this.hasRedirectedToDashboard = true;
+    this.router.navigateByUrl(`/game/${this.gameId}/dashboard?selectedTab=0&roundEnded=${this.round.number}`);
   }
 
 }
