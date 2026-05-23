@@ -1,4 +1,5 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 
 import { Router } from '@angular/router';
 import firebase from 'firebase/compat/app';
@@ -6,6 +7,7 @@ import { Observable, Subscription } from 'rxjs';
 import { AuthService } from './services/auth/auth.service';
 import {MatDialog} from '@angular/material/dialog';
 import { LoginDialogComponent } from './components/user/login/login-dialog/login-dialog-component';
+import { environment } from '../environments/environment';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -18,11 +20,13 @@ export class AppComponent implements OnInit, OnDestroy {
 
   constructor(private router: Router,
               private authService: AuthService,
-              public dialog: MatDialog) {
+              public dialog: MatDialog,
+              private titleService: Title) {
 
   }
 
   ngOnInit(): void {
+    this.titleService.setTitle(environment.appTitle);
     this.isLoggedIn$ = this.authService.isLoggedIn$;
   }
 

@@ -1,23 +1,128 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { ReactiveFormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import { of, Subject } from 'rxjs';
 
+import { Table } from '../table/table';
+import { Team } from './team';
 import { TeamComponent } from './team.component';
+import { GameService } from 'src/app/services/game/game.service';
+import { TeamService } from 'src/app/services/team/team.service';
 
 describe('TeamComponent', () => {
   let component: TeamComponent;
   let fixture: ComponentFixture<TeamComponent>;
+  let teamUpdates: Subject<Team>;
+  let teamService: jasmine.SpyObj<TeamService>;
+  let gameService: jasmine.SpyObj<GameService>;
+
+  const routeStub = {
+    snapshot: {
+      paramMap: {
+        get: (key: string) => key === 'gameId' ? 'game-1' : 'round-1'
+      }
+    }
+  };
 
   beforeEach(async () => {
+    teamUpdates = new Subject<Team>();
+    teamService = jasmine.createSpyObj<TeamService>('TeamService', ['getTeam']);
+    gameService = jasmine.createSpyObj<GameService>('GameService', ['isUserAdmin']);
+
+    teamService.getTeam.and.returnValue(teamUpdates.asObservable());
+    gameService.isUserAdmin.and.returnValue(of(false));
+
     await TestBed.configureTestingModule({
-      declarations: [ TeamComponent ]
-    })
-    .compileComponents();
+      declarations: [TeamComponent],
+      imports: [ReactiveFormsModule],
+      providers: [
+        { provide: ActivatedRoute, useValue: routeStub },
+        { provide: GameService, useValue: gameService },
+        { provide: TeamService, useValue: teamService }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
 
     fixture = TestBed.createComponent(TeamComponent);
     component = fixture.componentInstance;
+    component.team = createTeam(5);
+    component.table = createTable();
     fixture.detectChanges();
+  });
+
+  afterEach(() => {
+    component.ngOnDestroy();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('sets the points control from remote updates when points are not being edited', () => {
+    teamUpdates.next(createTeam(8));
+
+    expect(component.teamPointsFormControl.value).toBe(8);
+  });
+
+  it('does not overwrite the typed points value while points are being edited', () => {
+    component.onPointsInput();
+    component.teamPointsFormControl.setValue('10');
+
+    teamUpdates.next(createTeam(5));
+
+    expect(component.teamPointsFormControl.value).toBe('10');
+  });
+
+  it('emits the final numeric points value once after debounce', fakeAsync(() => {
+    spyOn(component.pointsChange, 'emit');
+
+    component.teamPointsFormControl.setValue('1');
+    tick(500);
+    component.teamPointsFormControl.setValue('10');
+    tick(1000);
+
+    expect(component.pointsChange.emit).toHaveBeenCalledTimes(1);
+    expect(component.pointsChange.emit).toHaveBeenCalledWith({ team: component.team, points: 10 });
+  }));
+
+  it('does not emit duplicate points when blur saves before debounce finishes', fakeAsync(() => {
+    spyOn(component.pointsChange, 'emit');
+
+    component.teamPointsFormControl.setValue('10');
+    component.onPointsBlur();
+    tick(1000);
+
+    expect(component.pointsChange.emit).toHaveBeenCalledTimes(1);
+    expect(component.pointsChange.emit).toHaveBeenCalledWith({ team: component.team, points: 10 });
+  }));
+
+  it('normalizes empty points to zero on blur without emitting NaN', () => {
+    spyOn(component.pointsChange, 'emit');
+
+    component.teamPointsFormControl.setValue('');
+    component.onPointsBlur();
+
+    expect(component.teamPointsFormControl.value).toBe(0);
+    expect(component.pointsChange.emit).toHaveBeenCalledWith({ team: component.team, points: 0 });
+    expect(component.pointsChange.emit).not.toHaveBeenCalledWith(jasmine.objectContaining({ points: NaN }));
+  });
 });
+
+function createTeam(points: number): Team {
+  return {
+    id: 'team-1',
+    points,
+    teamPlayers: []
+  };
+}
+
+function createTable(): Table {
+  return {
+    id: 'table-1',
+    name: 'Table 1',
+    number: 1,
+    playerIds: [],
+    pointsConfirmed: false
+  };
+}

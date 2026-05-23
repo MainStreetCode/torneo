@@ -1,12 +1,32 @@
 <mat-card class="mdc-card card team-card">
-    <div>
+    <div class="team-card-header">
         <div>Team:</div>
+        <div class="team-confirmed-status" *ngIf="pointsConfirmed">
+            <mat-icon>check</mat-icon>
+            Confirmed
+        </div>
+        <div class="team-confirmed-status unconfirmed" *ngIf="!pointsConfirmed">
+            Unconfirmed
+        </div>
+    </div>
+    <div>
         <app-team-player *ngFor="let teamPlayer of teamPlayers" [teamPlayer]="teamPlayer"></app-team-player>
     </div>
     <div>
         <mat-form-field class="full-width" appearance="fill">
             <mat-label>Points</mat-label>
-            <input matInput id="teamPoints" placeholder="0" type="number" pattern="\d*" onclick="this.select()" [formControl]="teamPointsFormControl">
+            <input matInput id="teamPoints" placeholder="0" type="number" pattern="\d*" [formControl]="teamPointsFormControl" (focus)="onPointsFocus($event)" (input)="onPointsInput()" (blur)="onPointsBlur()">
           </mat-form-field>
-    </div>          
+    </div>
+    <div>
+        <button mat-raised-button color="primary" class="full-width" [disabled]="!canConfirmPoints" (click)="toggleConfirmPoints(true)" *ngIf="!pointsConfirmed">
+            <mat-icon>check</mat-icon>
+            Confirm Points
+        </button>
+
+        <button mat-raised-button color="primary" class="full-width" [disabled]="!canConfirmPoints" (click)="toggleConfirmPoints(false)" *ngIf="pointsConfirmed">
+            <mat-icon>cancel</mat-icon>
+            Change Points
+        </button>
+    </div>
 </mat-card>

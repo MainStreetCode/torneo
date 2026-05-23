@@ -1,5 +1,6 @@
 export const environment = {
   production: true,
+  appTitle: 'Torneo',
   url: 'https://mainstreetcode.github.io/torneo',
   firebase: {
     apiKey: "AIzaSyBXfstBvichb-xN3QAYd4Xx_03-j3FMaxA",

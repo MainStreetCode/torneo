@@ -301,7 +301,8 @@ export class RoundMediatorService {
                     // create tables
                     const newTable = {
                       number: tableData.number,
-                      playerIds: tablePlayerIds
+                      playerIds: tablePlayerIds,
+                      pointsConfirmed: false
                     } as Table;
 
                     return this.tableService.addTable(newTable, round.id, gameId).pipe(
@@ -362,7 +363,8 @@ export class RoundMediatorService {
       for (let j = 0; j < 2; j++) {
         const randomIndex = Math.floor(Math.random() * players.length);
         const teamPlayer = {
-          player: players[randomIndex]
+          player: players[randomIndex],
+          isPointsConfirmed: false
         };
         players.splice(randomIndex, 1);
         teamPlayers.push(teamPlayer);
