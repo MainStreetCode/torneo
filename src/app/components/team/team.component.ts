@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
 import { GameService } from 'src/app/services/game/game.service';
 import { Team } from './team';
-import { getAuth } from "firebase/auth";
+import { Auth, getAuth } from "firebase/auth";
 import { ActivatedRoute } from '@angular/router';
 import { debounceTime, distinctUntilChanged, take } from 'rxjs/operators';
 import { TeamService } from 'src/app/services/team/team.service';
@@ -22,21 +22,25 @@ export class TeamComponent implements OnInit, OnChanges, OnDestroy {
   @Output() confirmPoints = new EventEmitter<{ team: Team, confirm: boolean }>();
   @Output() pointsChange = new EventEmitter<{ team: Team, points: number }>();
 
-  teamPointsFormControl = new FormControl({ value: 0, disabled: false});
+  teamPointsFormControl = new FormControl<number | string | null>({ value: 0, disabled: false});
   gameId: string;
   roundId: string;
-  auth = getAuth();
+  auth?: Auth;
   pointsConfirmed = false;
   isEditable = true;
   canConfirmPoints = false;
   isCurrentUserOnTeam = false;
+  isEditingPoints = false;
   subscriptions: Subscription[] = [];
   teamPlayers: TeamPlayer[] = [];
+  private lastEmittedPoints?: number;
 
   constructor(
     private gameService: GameService,
     private route: ActivatedRoute,
-    private teamService: TeamService) { }
+    private teamService: TeamService) {
+      this.auth = this.getAuth();
+    }
 
   ngOnInit(): void {
     this.gameId = this.route.snapshot.paramMap.get('gameId');
@@ -48,14 +52,25 @@ export class TeamComponent implements OnInit, OnChanges, OnDestroy {
         debounceTime(1000),
       ).subscribe({
         next: (points) => {
-          this.pointsChanged(points);
+          const normalizedPoints = this.normalizePoints(points, false);
+          if (normalizedPoints === null) { return; }
+
+          this.pointsChanged(normalizedPoints);
         }
       }),
       this.teamService.getTeam(this.team.id, this.table.id, this.roundId, this.gameId).subscribe({
         next: (currentTeam) => {
           if (currentTeam) {
+            const currentPoints = this.normalizePoints(this.teamPointsFormControl.value, false);
+            const shouldUpdatePointsInput = !this.isEditingPoints || currentPoints === currentTeam.points;
+
             this.team = currentTeam;
-            this.teamPointsFormControl.setValue(currentTeam.points, { emitEvent: false });
+            if (this.lastEmittedPoints === currentTeam.points) {
+              this.lastEmittedPoints = undefined;
+            }
+            if (shouldUpdatePointsInput) {
+              this.teamPointsFormControl.setValue(currentTeam.points, { emitEvent: false });
+            }
 
             this.updateTeamState();
           }
@@ -75,11 +90,33 @@ export class TeamComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   pointsChanged(points: number): void {
-    if (this.team.points === points) { return; }
+    if (this.team.points === points || this.lastEmittedPoints === points) { return; }
 
     console.log('pointsChanged: ' + points);
 
+    this.lastEmittedPoints = points;
     this.pointsChange.emit({ team: this.team, points });
+  }
+
+  onPointsFocus(event: FocusEvent): void {
+    this.isEditingPoints = true;
+    (event.target as HTMLInputElement)?.select();
+  }
+
+  onPointsInput(): void {
+    this.isEditingPoints = true;
+  }
+
+  onPointsBlur(): void {
+    const normalizedPoints = this.normalizePoints(this.teamPointsFormControl.value, true);
+    if (normalizedPoints === null) {
+      this.isEditingPoints = false;
+      return;
+    }
+
+    this.teamPointsFormControl.setValue(normalizedPoints, { emitEvent: false });
+    this.pointsChanged(normalizedPoints);
+    this.isEditingPoints = false;
   }
 
   toggleConfirmPoints(confirm: boolean): void {
@@ -89,7 +126,7 @@ export class TeamComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private canEditPoints(): void {
-    const currentUser = this.auth.currentUser;
+    const currentUser = this.auth?.currentUser;
 
     if (!currentUser) {
       this.isEditable = false;
@@ -114,7 +151,7 @@ export class TeamComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private updateTeamState(): void {
-    const currentUser = this.auth.currentUser;
+    const currentUser = this.auth?.currentUser;
     this.teamPlayers = this.team.teamPlayers ?? [];
     this.pointsConfirmed = this.teamPlayers.some((teamPlayer) => !!teamPlayer.isPointsConfirmed);
     this.isCurrentUserOnTeam = !!currentUser && this.teamPlayers.some((teamPlayer) => teamPlayer.player.uid === currentUser.uid);
@@ -127,5 +164,22 @@ export class TeamComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     this.canEditPoints();
+  }
+
+  private normalizePoints(points: unknown, useZeroForEmpty: boolean): number | null {
+    if (points === null || points === undefined || points === '') {
+      return useZeroForEmpty ? 0 : null;
+    }
+
+    const normalizedPoints = Number(points);
+    return Number.isFinite(normalizedPoints) ? normalizedPoints : null;
+  }
+
+  private getAuth(): Auth | undefined {
+    try {
+      return getAuth();
+    } catch {
+      return undefined;
+    }
   }
 }
