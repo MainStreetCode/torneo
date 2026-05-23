@@ -4,6 +4,7 @@
 
 export const environment = {
   production: false,
+  appTitle: 'Torneo Dev',
   // url: 'https://torneo.com',
   url: 'http://192.168.0.44:4200/#',
   firebase: {
