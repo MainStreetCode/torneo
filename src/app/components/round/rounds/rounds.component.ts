@@ -90,6 +90,9 @@ export class RoundsComponent implements OnInit, OnDestroy {
             const lastRoundId = this.rounds[this.rounds.length - 1].id;
             this.router.navigateByUrl(`/game/${this.game.id}/round/${lastRoundId}`);
           }
+        },
+        error: (error) => {
+          this.showErrorDialog('Start Round', error.message || 'Unable to start the round');
         }
       })
     );

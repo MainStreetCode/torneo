@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { combineLatest, EMPTY, forkJoin, merge, Observable, of, Subscription } from 'rxjs';
-import { last, map, mergeMap, switchMap, take } from 'rxjs/operators';
+import { combineLatest, EMPTY, Observable, of, Subscription, throwError } from 'rxjs';
+import { map, mergeMap, switchMap, take } from 'rxjs/operators';
 import { GamePlayer } from 'src/app/components/player/game-player';
 import { RoundPoints } from 'src/app/components/player/game-players/round-points';
 import { Table } from 'src/app/components/table/table';
@@ -15,6 +15,107 @@ import { RoundService } from '../round/round.service';
 import { TableService } from '../table/table.service';
 import { TeamService } from '../team/team.service';
 import { TableData } from './table-data';
+
+export class FixedTableAssignmentError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'FixedTableAssignmentError';
+  }
+}
+
+export function assignPlayersToTables(players: GamePlayer[]): TableData[] {
+  const numberOfTables = Math.floor(players.length / 4);
+  const tablePlayers: GamePlayer[][] = Array.from({ length: numberOfTables }, () => []);
+  const randomPlayers: GamePlayer[] = [];
+
+  players.forEach((player) => {
+    const fixedTableNumber = getFixedTableNumber(player);
+
+    if (fixedTableNumber === undefined) {
+      randomPlayers.push(player);
+      return;
+    }
+
+    if (!Number.isInteger(fixedTableNumber) || fixedTableNumber < 1 || fixedTableNumber > numberOfTables) {
+      throw new FixedTableAssignmentError(
+        `${player.displayName || 'A player'} is fixed to table ${fixedTableNumber}, but this round only has tables 1-${numberOfTables}.`
+      );
+    }
+
+    const targetTable = tablePlayers[fixedTableNumber - 1];
+
+    if (targetTable.length >= 4) {
+      throw new FixedTableAssignmentError(`Table ${fixedTableNumber} has more than 4 fixed players.`);
+    }
+
+    targetTable.push(player);
+  });
+
+  tablePlayers.forEach((playersForTable, index) => {
+    while (playersForTable.length < 4) {
+      const randomPlayer = takeRandomPlayer(randomPlayers);
+
+      if (!randomPlayer) {
+        throw new FixedTableAssignmentError(`Not enough available players to fill table ${index + 1}.`);
+      }
+
+      playersForTable.push(randomPlayer);
+    }
+  });
+
+  return tablePlayers.map((playersForTable, index) => ({
+    teams: assignPlayersToTeams(playersForTable, 2),
+    number: index + 1
+  }));
+}
+
+function assignPlayersToTeams(players: GamePlayer[], numberOfTeams: number): Team[] {
+  const teams = [];
+  const unassignedPlayers = [ ...players ];
+
+  for (let i = 0; i < numberOfTeams; i++) {
+    const teamPlayers = [];
+
+    for (let j = 0; j < 2; j++) {
+      const player = takeRandomPlayer(unassignedPlayers);
+      const teamPlayer = {
+        player,
+        isPointsConfirmed: false
+      };
+      teamPlayers.push(teamPlayer);
+    }
+
+    const newTeam = {
+      teamPlayers,
+      points: 0
+    };
+
+    teams.push(newTeam);
+  }
+
+  return teams;
+}
+
+function getFixedTableNumber(player: GamePlayer): number | undefined {
+  const fixedTableNumber = player.fixedTableNumber as number | string | null | undefined;
+
+  if (fixedTableNumber === undefined || fixedTableNumber === null || fixedTableNumber === '') {
+    return undefined;
+  }
+
+  return Number(fixedTableNumber);
+}
+
+function takeRandomPlayer(players: GamePlayer[]): GamePlayer | undefined {
+  if (players.length === 0) {
+    return undefined;
+  }
+
+  const randomIndex = Math.floor(Math.random() * players.length);
+  const player = players[randomIndex];
+  players.splice(randomIndex, 1);
+  return player;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -315,7 +416,14 @@ export class RoundMediatorService {
               });
             }
 
-            const tablesData = this.assignPlayersToTables(filteredPlayers);
+            let tablesData: TableData[];
+
+            try {
+              tablesData = assignPlayersToTables(filteredPlayers);
+            } catch (error) {
+              this.log(error.message);
+              return throwError(() => error);
+            }
 
             const newRound = {
               number: rounds.length + 1,
@@ -364,60 +472,6 @@ export class RoundMediatorService {
         );
       })
     );
-  }
-
-  private assignPlayersToTables(players: GamePlayer[]): TableData[] {
-    const numberOfTables = Math.floor(players.length / 4);
-    const tables = [];
-    const teams = this.assignPlayersToTeams(players, numberOfTables * 2);
-    const unassignedTeams = teams;
-
-    for (let i = 0; i < numberOfTables; i++) {
-      const tableTeams = [];
-
-      for (let j = 0; j < 2; j++) {
-        const randomIndex = Math.floor(Math.random() * unassignedTeams.length);
-        const randomTeam = teams[randomIndex];
-        unassignedTeams.splice(randomIndex, 1);
-        tableTeams.push(randomTeam);
-      }
-
-      const newTable: TableData = {
-        teams: tableTeams,
-        number: i + 1
-      };
-
-      tables.push(newTable);
-    }
-
-    return tables;
-  }
-
-  private assignPlayersToTeams(players: GamePlayer[], numberOfTeams: number): Team[] {
-    const teams = [];
-
-    for (let i = 0; i < numberOfTeams; i++) {
-      const teamPlayers = [];
-
-      for (let j = 0; j < 2; j++) {
-        const randomIndex = Math.floor(Math.random() * players.length);
-        const teamPlayer = {
-          player: players[randomIndex],
-          isPointsConfirmed: false
-        };
-        players.splice(randomIndex, 1);
-        teamPlayers.push(teamPlayer);
-      }
-
-      const newTeam = {
-        teamPlayers,
-        points: 0
-      };
-
-      teams.push(newTeam);
-    }
-
-    return teams;
   }
 
   private log(message: string): void {

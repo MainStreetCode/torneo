@@ -27,6 +27,7 @@ export class GamePlayerDetailComponent implements OnInit, OnDestroy {
   totalPoints = 0;
   roundsPlayed = 0;
   initials = '?';
+  private originalFixedTableNumber?: number | null;
   private subscriptions: Subscription[] = [];
 
   constructor(
@@ -59,6 +60,7 @@ export class GamePlayerDetailComponent implements OnInit, OnDestroy {
 
           if (player) {
             this.sectionName = `${player.displayName.toUpperCase()} Details`;
+            this.originalFixedTableNumber = player.fixedTableNumber;
             this.updatePlayerSummary();
           }
         }
@@ -83,6 +85,8 @@ export class GamePlayerDetailComponent implements OnInit, OnDestroy {
     if (!this.player || this.isSaving) {
       return;
     }
+
+    this.normalizeFixedTableNumber();
 
     this.isSaving = true;
     this.subscriptions.push(
@@ -136,6 +140,30 @@ export class GamePlayerDetailComponent implements OnInit, OnDestroy {
         this.isAdmin = true;
       })
     );
+  }
+
+  private normalizeFixedTableNumber(): void {
+    if (!this.player) {
+      return;
+    }
+
+    if (!this.isCurrentUserAdmin) {
+      if (this.originalFixedTableNumber === undefined) {
+        delete this.player.fixedTableNumber;
+      } else {
+        this.player.fixedTableNumber = this.originalFixedTableNumber;
+      }
+      return;
+    }
+
+    const fixedTableNumber = Number(this.player.fixedTableNumber);
+
+    if (!fixedTableNumber) {
+      this.player.fixedTableNumber = null;
+      return;
+    }
+
+    this.player.fixedTableNumber = Math.floor(fixedTableNumber);
   }
 
   private setDisabledState(): void {
