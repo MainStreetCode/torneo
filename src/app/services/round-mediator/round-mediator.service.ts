@@ -135,9 +135,9 @@ export class RoundMediatorService {
     );
   }
 
-  public updateByePlayerPoints(roundId: string, gameId: string): Observable<never> {
+  public updateByePlayerPoints(roundId: string, gameId: string): Observable<(void | GamePlayer | null)[] | null> {
     if (!roundId) {
-      return EMPTY;
+      return of(null);
     }
 
     return combineLatest([
@@ -151,51 +151,89 @@ export class RoundMediatorService {
         const byePlayerIds = round.byes.map((bye) => bye.uid);
         const roundNumber = round.number
 
-        if (byePlayerIds && byePlayerIds.length > 0) {
-          const lastRoundPlayers = gamePlayers.filter((gamePlayer) => {
-            const isByePlayer = byePlayerIds.find((byePlayerId) => byePlayerId === gamePlayer.uid);
-            return !isByePlayer;
-          });
+        if (!byePlayerIds || byePlayerIds.length === 0) {
+          return of(null);
+        }
 
-          // get sum of all points for all players in last round
-          let totalPoints = 0;
-          lastRoundPlayers.forEach((lastRoundPlayer) => {
-            if (lastRoundPlayer.pointsForRound) {
-              const lastRoundPoints = lastRoundPlayer.pointsForRound.find((pointsForRound) => pointsForRound.roundId === roundId);
-              if (lastRoundPoints) {
-                totalPoints += lastRoundPoints.points;
-              }
+        const lastRoundPlayers = gamePlayers.filter((gamePlayer) => {
+          const isByePlayer = byePlayerIds.find((byePlayerId) => byePlayerId === gamePlayer.uid);
+          return !isByePlayer;
+        });
+
+        // get sum of all points for all players in last round
+        let totalPoints = 0;
+        lastRoundPlayers.forEach((lastRoundPlayer) => {
+          if (lastRoundPlayer.pointsForRound) {
+            const lastRoundPoints = lastRoundPlayer.pointsForRound.find((pointsForRound) => pointsForRound.roundId === roundId);
+            if (lastRoundPoints) {
+              totalPoints += lastRoundPoints.points;
             }
-          });
+          }
+        });
 
-          // get average and update the bye players with the average
-          const averagePoints = Math.round(totalPoints / lastRoundPlayers.length);
-          const newRoundPoints: RoundPoints = {
-            roundId,
-            roundNumber,
-            points: averagePoints
-          };
+        // get average and update the bye players with the average
+        const averagePoints = Math.round(totalPoints / lastRoundPlayers.length);
+        const newRoundPoints: RoundPoints = {
+          roundId,
+          roundNumber,
+          points: averagePoints
+        };
 
-          byePlayers.forEach((byePlayer) => {
+        return combineLatest(
+          byePlayers.map((byePlayer) => {
             const gamePlayer = gamePlayers.find((player) => player.uid === byePlayer.uid);
+            if (!gamePlayer) {
+              return of(null);
+            }
+
             if (!gamePlayer.pointsForRound) {
               gamePlayer.pointsForRound = [];
             }
+
             const roundPoints = gamePlayer.pointsForRound.find((pfr) => pfr.roundId === roundId);
             // if roundPoints already exists, then update the points
             if (roundPoints) {
               if (roundPoints.points === averagePoints) {
-                return;
+                return of(gamePlayer);
               }
               roundPoints.points = averagePoints;
             } else {
               gamePlayer.pointsForRound.push(newRoundPoints);
             }
-            this.gamePlayerService.updatePlayer(gamePlayer, gameId).subscribe();
-          });
+
+            return this.gamePlayerService.updatePlayer(gamePlayer, gameId);
+          })
+        );
+      })
+    );
+  }
+
+  public finalizeRoundIfReady(roundId: string, gameId: string): Observable<boolean> {
+    if (!roundId || !gameId) {
+      return of(false);
+    }
+
+    return combineLatest([
+      this.roundService.getRound(roundId, gameId).pipe(take(1)),
+      this.allTablesConfirmed(roundId, gameId).pipe(take(1))
+    ]).pipe(
+      switchMap(([round, allTablesConfirmed]) => {
+        if (!round || round.pointsConfirmed || !allTablesConfirmed) {
+          return of(false);
         }
 
-        return EMPTY;
+        return this.updatePlayerPoints(roundId, gameId, round.number).pipe(
+          switchMap(() => this.updateByePlayerPoints(roundId, gameId)),
+          switchMap(() => {
+            const finalizedRound = {
+              ...round,
+              pointsConfirmed: true
+            };
+
+            return this.roundService.updateRound(finalizedRound, gameId);
+          }),
+          map(() => true)
+        );
       })
     );
   }
@@ -281,7 +319,8 @@ export class RoundMediatorService {
 
             const newRound = {
               number: rounds.length + 1,
-              byes: this.byes
+              byes: this.byes,
+              pointsConfirmed: false
             } as Round;
 
             // create round

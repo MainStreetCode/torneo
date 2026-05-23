@@ -43,16 +43,17 @@ export class RoundService {
     );
   }
 
-  updateRound(round: Round, gameId: string): void {
-    this.store.collection(Collection.Games)
+  updateRound(round: Round, gameId: string): Observable<Round | void> {
+    return from(this.store.collection(Collection.Games)
       .doc(gameId)
       .collection(Collection.Rounds)
       .doc(round.id).update(round).then(
         () => {
           this.log(`update round w/ game id=${gameId} roundId = ${round.id}`);
+          return round;
         },
         err =>  this.log(`Error updateRound w/ id=${gameId}`)
-      );
+      ));
   }
 
   deleteRound(roundId: string, gameId: string): void {

@@ -166,7 +166,9 @@ export class TableDetailComponent implements OnInit, OnDestroy {
 
     if (this.table.pointsConfirmed) {
       this.table.pointsConfirmed = false;
-      this.tableService.updateTable(this.table, this.roundId, this.gameId);
+      this.subscriptions.push(
+        this.tableService.updateTable(this.table, this.roundId, this.gameId).subscribe()
+      );
     }
 
     this.subscriptions.push(
@@ -192,7 +194,15 @@ export class TableDetailComponent implements OnInit, OnDestroy {
 
     if (this.table.pointsConfirmed !== allTeamsConfirmed) {
       this.table.pointsConfirmed = allTeamsConfirmed;
-      this.tableService.updateTable(this.table, this.roundId, this.gameId);
+      this.subscriptions.push(
+        this.tableService.updateTable(this.table, this.roundId, this.gameId).subscribe({
+          next: () => {
+            if (allTeamsConfirmed) {
+              this.finalizeRoundIfReady();
+            }
+          }
+        })
+      );
     }
   }
 
@@ -218,5 +228,11 @@ export class TableDetailComponent implements OnInit, OnDestroy {
     return combineLatest(
       this.teams.map((team) => this.teamService.updateTeam(team, this.table.id, this.roundId, this.gameId))
     ).pipe(take(1));
+  }
+
+  private finalizeRoundIfReady(): void {
+    this.subscriptions.push(
+      this.roundMediatorService.finalizeRoundIfReady(this.roundId, this.gameId).subscribe()
+    );
   }
 }

@@ -2,7 +2,6 @@ import { Location } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { of, Subscription } from 'rxjs';
-import { switchMap, take } from 'rxjs/operators';
 import { GameService } from 'src/app/services/game/game.service';
 import { RoundMediatorService } from 'src/app/services/round-mediator/round-mediator.service';
 import { Round } from 'src/app/services/round/round';
@@ -57,21 +56,11 @@ export class RoundDetailComponent implements OnInit, OnDestroy {
 
   endRound(): void {
     this.subscriptions.push(
-      this.allTablesPointsConfirmed$.pipe(
-        take(1),
-        switchMap((confirmed) => {
-          if (confirmed) {
-            return this.roundMediatorService.updatePlayerPoints(this.roundId, this.gameId, this.round.number);
+      this.roundMediatorService.finalizeRoundIfReady(this.roundId, this.gameId).subscribe({
+        next: (finalized) => {
+          if (finalized) {
+            this.router.navigateByUrl(`/game/${this.gameId}/dashboard`);
           }
-        })
-      ).subscribe({
-        next: () => {
-            this.roundMediatorService.updateByePlayerPoints(this.roundId, this.gameId).subscribe({
-              complete: () => {
-                // TODO: add points calculated property?
-                this.router.navigateByUrl(`/game/${this.gameId}/dashboard`);
-              }
-            });
         }
       })
     );
