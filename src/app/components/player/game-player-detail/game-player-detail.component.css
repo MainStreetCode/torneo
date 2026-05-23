@@ -1,0 +1,281 @@
+.player-detail-page {
+  background: #f5f7fb;
+  box-sizing: border-box;
+  min-height: calc(100vh - 64px);
+  padding: 1rem;
+}
+
+.player-card,
+.settings-card,
+.points-card {
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(20, 28, 43, 0.14);
+  margin: 0 auto;
+  max-width: 960px;
+  overflow: hidden;
+}
+
+.settings-card,
+.points-card {
+  margin-top: 1rem;
+  padding: 1.5rem;
+}
+
+.player-hero {
+  align-items: center;
+  background:
+    linear-gradient(135deg, rgba(63, 81, 181, 0.08), rgba(255, 64, 129, 0.08)),
+    #ffffff;
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: auto minmax(0, 1fr);
+  padding: 1.5rem;
+}
+
+.avatar {
+  align-items: center;
+  background: #eef2ff;
+  border: 1px solid #d8def5;
+  border-radius: 50%;
+  color: #3f51b5;
+  display: flex;
+  font-size: 2rem;
+  font-weight: 700;
+  height: 96px;
+  justify-content: center;
+  width: 96px;
+}
+
+.player-summary {
+  min-width: 0;
+}
+
+.player-summary h1,
+.empty-state h1 {
+  color: #1f2937;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.15;
+  margin: 1rem 0 0.5rem;
+  overflow-wrap: anywhere;
+}
+
+.player-id,
+.section-title,
+.stat-tile,
+.admin-toggle,
+.points-row,
+.empty-points {
+  align-items: center;
+  display: flex;
+}
+
+.player-id {
+  color: #4b5563;
+  gap: 0.35rem;
+  overflow-wrap: anywhere;
+}
+
+.player-id mat-icon,
+.section-title mat-icon {
+  color: #3f51b5;
+  flex: 0 0 auto;
+}
+
+.stat-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  padding: 1.5rem;
+}
+
+.stat-tile {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  gap: 0.75rem;
+  min-width: 0;
+  padding: 1rem;
+}
+
+.stat-tile mat-icon {
+  background: #eef2ff;
+  border-radius: 8px;
+  color: #3f51b5;
+  flex: 0 0 auto;
+  padding: 0.5rem;
+}
+
+.stat-value {
+  color: #111827;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.stat-label,
+.toggle-help,
+.round-id {
+  color: #6b7280;
+  font-size: 0.85rem;
+}
+
+.stat-label {
+  margin-top: 0.25rem;
+}
+
+.section-title {
+  color: #111827;
+  font-size: 1.05rem;
+  font-weight: 700;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.settings-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.admin-toggle {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  gap: 1rem;
+  justify-content: space-between;
+  padding: 1rem;
+}
+
+.toggle-label {
+  color: #111827;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.settings-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.settings-actions button mat-icon,
+.empty-state button mat-icon {
+  margin-right: 0.35rem;
+}
+
+.points-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.points-row {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  justify-content: space-between;
+  padding: 1rem;
+}
+
+.round-label {
+  color: #111827;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.round-id {
+  overflow-wrap: anywhere;
+}
+
+.round-points {
+  color: #111827;
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-left: 1rem;
+}
+
+.empty-points {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  color: #4b5563;
+  gap: 0.75rem;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.empty-points mat-icon {
+  color: #3f51b5;
+}
+
+.empty-state {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+  text-align: center;
+}
+
+.empty-state p {
+  color: #4b5563;
+  margin: 0 0 1.5rem;
+}
+
+.empty-icon {
+  align-items: center;
+  background: #eef2ff;
+  border-radius: 50%;
+  color: #3f51b5;
+  display: flex;
+  height: 88px;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+  width: 88px;
+}
+
+.empty-icon mat-icon {
+  font-size: 48px;
+  height: 48px;
+  width: 48px;
+}
+
+@media (max-width: 760px) {
+  .player-detail-page {
+    padding: 0.75rem;
+  }
+
+  .player-hero,
+  .stat-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .player-hero,
+  .stat-grid,
+  .settings-card,
+  .points-card {
+    padding: 1rem;
+  }
+
+  .avatar {
+    height: 80px;
+    width: 80px;
+  }
+
+  .player-summary h1,
+  .empty-state h1 {
+    font-size: 1.65rem;
+  }
+
+  .admin-toggle,
+  .points-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .round-points {
+    margin-left: 0;
+  }
+
+  .settings-actions button {
+    width: 100%;
+  }
+}

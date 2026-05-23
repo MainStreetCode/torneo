@@ -32,6 +32,7 @@ export class TableDetailComponent implements OnInit, OnDestroy {
   allTablesConfirmed = false;
   private round?: Round;
   private hasRedirectedToDashboard = false;
+  private previousPointsConfirmed?: boolean;
 
   constructor(
     private authService: AuthService,
@@ -245,10 +246,14 @@ export class TableDetailComponent implements OnInit, OnDestroy {
     this.subscriptions.push(
       this.roundService.getRound(this.roundId, this.gameId).subscribe({
         next: (round) => {
+          const wasPointsConfirmed = this.previousPointsConfirmed;
           this.round = round;
-          if (round?.pointsConfirmed) {
+
+          if (wasPointsConfirmed === false && round?.pointsConfirmed) {
             this.navigateToScores();
           }
+
+          this.previousPointsConfirmed = !!round?.pointsConfirmed;
         }
       })
     );

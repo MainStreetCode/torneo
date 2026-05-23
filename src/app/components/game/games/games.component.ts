@@ -6,6 +6,7 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 import { of, Subscription } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { ProgressDialogComponent } from '../../progress-dialog/progress-dialog.component';
+import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component';
 @Component({
   selector: 'app-games',
   templateUrl: './games.component.html',
@@ -68,7 +69,22 @@ export class GamesComponent implements OnInit, OnDestroy {
   }
 
   delete(game: Game): void {
-    this.gameService.deleteGame(game.id);
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      panelClass: 'dialog-container',
+      data: {
+        title: 'Delete Game',
+        message: `Delete ${game.name}? This cannot be undone.`,
+        confirmButtonText: 'Delete'
+      }
+    });
+
+    this.subscriptions.push(
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          this.gameService.deleteGame(game.id);
+        }
+      })
+    );
   }
 
   dashboard(game: Game): void {

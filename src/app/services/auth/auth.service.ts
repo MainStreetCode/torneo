@@ -3,7 +3,7 @@ import firebase from 'firebase/compat/app';
 import * as firebaseui from 'firebaseui';
 import 'firebase/auth';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import { BehaviorSubject, from, Observable, of, throwError } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { initializeApp } from 'firebase-admin/app';
 import { getAuth, User } from 'firebase/auth';
@@ -35,6 +35,16 @@ export class AuthService {
 
   getCurrentUser(): User {
     return firebase.auth().currentUser;
+  }
+
+  updateDisplayName(displayName: string): Observable<void> {
+    const currentUser = firebase.auth().currentUser;
+
+    if (!currentUser) {
+      return throwError(() => new Error('No signed in user'));
+    }
+
+    return from(currentUser.updateProfile({ displayName }));
   }
 
   showLogin(container: string): void {

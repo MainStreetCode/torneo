@@ -1,34 +1,117 @@
-<div *ngIf="player">
-
+<div *ngIf="player; else missingPlayer">
   <app-section-header [sectionName]="sectionName"></app-section-header>
-  
-  <div class="content flex-box-columns mat-typography">
-    <div class="flex-box-item">
-      <span class="mat-h3">Player Id: </span>
-      <span class="mat-h3">{{player.uid}}</span>
-    </div>
 
-    <div class="flex-box-item">
-      <mat-form-field appearance="fill">
-        <mat-label>Player Name</mat-label>
-        <input matInput placeholder="Player Name" [disabled]="isDisabled" [(ngModel)]="player.displayName">
-      </mat-form-field>
-    </div>
+  <section class="player-detail-page">
+    <mat-card class="player-card">
+      <div class="player-hero">
+        <div class="avatar" aria-hidden="true">{{initials}}</div>
 
-    <div class="flex-box-item">
-      <mat-slide-toggle [checked]="isAdmin" [disabled]="!isCurrentUserAdmin" (click)="toggleIsAdmin()">Admin</mat-slide-toggle>
-    </div>
-  
-    <div class="flex-box-item">
-      <button mat-raised-button color="primary" [disabled]="isDisabled" (click)="save()">Save</button>
-    </div>
-  </div>
+        <div class="player-summary">
+          <mat-chip-list aria-label="Player status">
+            <mat-chip color="accent" selected>{{isAdmin ? 'Admin' : 'Player'}}</mat-chip>
+          </mat-chip-list>
+          <h1>{{player.displayName || 'Unnamed player'}}</h1>
+          <div class="player-id">
+            <mat-icon aria-hidden="true">tag</mat-icon>
+            <span>{{player.uid}}</span>
+          </div>
+        </div>
+      </div>
 
+      <mat-divider></mat-divider>
 
-  <mat-toolbar color="accent"><span>Points</span></mat-toolbar>  
-  <div *ngFor="let roundPoints of player.pointsForRound; let i = index" class="content">
-    <span class="mat-h3">Round: {{roundPoints.roundNumber}}</span>
-    <span class="mat-h3"> - Points: {{roundPoints.points}}</span>
-  </div>
-  
+      <div class="stat-grid">
+        <div class="stat-tile">
+          <mat-icon aria-hidden="true">emoji_events</mat-icon>
+          <div>
+            <div class="stat-value">{{totalPoints}}</div>
+            <div class="stat-label">Total points</div>
+          </div>
+        </div>
+        <div class="stat-tile">
+          <mat-icon aria-hidden="true">table_bar</mat-icon>
+          <div>
+            <div class="stat-value">{{roundsPlayed}}</div>
+            <div class="stat-label">Rounds played</div>
+          </div>
+        </div>
+        <div class="stat-tile">
+          <mat-icon aria-hidden="true">admin_panel_settings</mat-icon>
+          <div>
+            <div class="stat-value">{{isAdmin ? 'Yes' : 'No'}}</div>
+            <div class="stat-label">Game admin</div>
+          </div>
+        </div>
+      </div>
+    </mat-card>
+
+    <mat-card class="settings-card">
+      <div class="section-title">
+        <mat-icon aria-hidden="true">manage_accounts</mat-icon>
+        <span>Player settings</span>
+      </div>
+
+      <div class="settings-grid">
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Player name</mat-label>
+          <input matInput placeholder="Player Name" [disabled]="isDisabled || isSaving" [(ngModel)]="player.displayName">
+        </mat-form-field>
+
+        <div class="admin-toggle">
+          <div>
+            <div class="toggle-label">Admin access</div>
+            <div class="toggle-help">Admins can configure games and manage players.</div>
+          </div>
+          <mat-slide-toggle [ngModel]="isAdmin" [disabled]="!isCurrentUserAdmin" (ngModelChange)="toggleIsAdmin($event)">Admin</mat-slide-toggle>
+        </div>
+      </div>
+
+      <div class="settings-actions">
+        <button mat-raised-button color="primary" [disabled]="isDisabled || isSaving" (click)="save()">
+          <mat-icon>save</mat-icon>
+          {{isSaving ? 'Saving' : 'Save'}}
+        </button>
+      </div>
+    </mat-card>
+
+    <mat-card class="points-card">
+      <div class="section-title">
+        <mat-icon aria-hidden="true">scoreboard</mat-icon>
+        <span>Points history</span>
+      </div>
+
+      <div class="points-list" *ngIf="player.pointsForRound?.length; else noPoints">
+        <div class="points-row" *ngFor="let roundPoints of player.pointsForRound">
+          <div>
+            <div class="round-label">Round {{roundPoints.roundNumber}}</div>
+            <div class="round-id">{{roundPoints.roundId}}</div>
+          </div>
+          <div class="round-points">{{roundPoints.points}}</div>
+        </div>
+      </div>
+
+      <ng-template #noPoints>
+        <div class="empty-points">
+          <mat-icon aria-hidden="true">scoreboard</mat-icon>
+          <span>No points recorded yet.</span>
+        </div>
+      </ng-template>
+    </mat-card>
+  </section>
 </div>
+
+<ng-template #missingPlayer>
+  <section class="player-detail-page" *ngIf="playerLoaded">
+    <mat-card class="player-card empty-state">
+      <div class="empty-icon">
+        <mat-icon aria-hidden="true">person_off</mat-icon>
+      </div>
+      <h1>Player not found</h1>
+      <p>This player is not available for the current game.</p>
+      <button mat-raised-button color="primary" (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+        Back
+      </button>
+    </mat-card>
+  </section>
+</ng-template>

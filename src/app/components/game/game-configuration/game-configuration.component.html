@@ -1,56 +1,89 @@
-<div *ngIf="(this.isAdmin$ | async) === false">You do not have access to this page</div>
-<div *ngIf="game && (this.isAdmin$ | async)">
+<section class="configuration-page" *ngIf="(isAdmin$ | async) === false">
+  <mat-card class="configuration-card empty-state">
+    <div class="empty-icon">
+      <mat-icon aria-hidden="true">lock</mat-icon>
+    </div>
+    <h1>Access restricted</h1>
+    <p>You do not have access to configure this game.</p>
+    <button mat-raised-button color="primary" (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+      Back
+    </button>
+  </mat-card>
+</section>
 
+<div *ngIf="game && (isAdmin$ | async)">
   <app-section-header [sectionName]="sectionName"></app-section-header>
 
-  <div class="flex-box-rows justify-content-center">
+  <section class="configuration-page">
+    <mat-card class="configuration-card">
+      <div class="configuration-hero">
+        <div class="hero-copy">
+          <mat-chip-list aria-label="Configuration status">
+            <mat-chip color="accent" selected>Configuration</mat-chip>
+          </mat-chip-list>
+          <h1>{{game.name}}</h1>
+          <div class="game-id">
+            <mat-icon aria-hidden="true">tag</mat-icon>
+            <span>{{game.id}}</span>
+          </div>
+        </div>
 
-    <div class="flex-box-columns justify-content-center">
-      <div class="flex-box-rows justify-content-center">
-        <div ngClass.gt-xs="flex-box-rows content mat-typography" ngClass.lt-sm="flex-box-columns content mat-typography">
-          <div class="flex-box-columns">
-            <div class="flex-box-item">
-              <span class="mat-h3">Game Id: </span>
-              <span class="mat-h3">{{game.id}}</span>
-            </div>
-      
-            <div class="flex-box-item">
-              <mat-form-field appearance="fill" class="full-width" >
-                <mat-label>Game name</mat-label>
-                <input id="game-name" matInput placeholder="Angela's Euchre Tournament" [(ngModel)]="game.name">
-              </mat-form-field>
-            </div>
-            
-            <div class="flex-box-item">
-              <mat-form-field appearance="fill" class="full-width">
-                <mat-label>Number of rounds</mat-label>
-                <input id="game-rounds" matInput placeholder="8" [(ngModel)]="game.numberOfRounds">
-              </mat-form-field>
-            </div>
-            
-            <div class="flex-box-item">
-              <button class="full-width" mat-raised-button color="primary" aria-label="Back" title="Back" (click)="save()">
-                Save
-              </button>
-            </div>
+        <div class="quick-actions">
+          <button mat-raised-button color="accent" (click)="save()" [disabled]="isSaving">
+            <mat-icon>save</mat-icon>
+            {{isSaving ? 'Saving' : 'Save'}}
+          </button>
+          <button mat-raised-button color="primary" (click)="startGame()">
+            <mat-icon>play_arrow</mat-icon>
+            Start Game
+          </button>
+        </div>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <div class="settings-layout">
+        <div class="settings-form">
+          <div class="section-title">
+            <mat-icon aria-hidden="true">tune</mat-icon>
+            <span>Game settings</span>
           </div>
 
-          <div>
-            <qrcode *ngIf="gameURL" [qrdata]="gameURL" [width]="256" [errorCorrectionLevel]="'M'"></qrcode>
-          </div>    
-                      
-        </div>        
-      </div>
-      
-      <div class="flex-box-item content">
-        <button class="full-width" mat-raised-button color="primary" aria-label="Back" title="Back" (click)="startGame()">
-          Start Game
-        </button>
-      </div>
+          <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Game name</mat-label>
+            <input id="game-name" matInput placeholder="Angela's Euchre Tournament" [(ngModel)]="game.name" [disabled]="isSaving">
+          </mat-form-field>
 
-    </div>
-  </div>
+          <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Number of rounds</mat-label>
+            <input id="game-rounds" matInput placeholder="8" [(ngModel)]="game.numberOfRounds" [disabled]="isSaving">
+          </mat-form-field>
+        </div>
 
-  <!-- Player list -->
-  <app-game-players [game]="game"></app-game-players>
+        <div class="share-panel">
+          <div class="share-copy">
+            <mat-icon aria-hidden="true">qr_code_2</mat-icon>
+            <div>
+              <div class="share-title">Dashboard link</div>
+              <div class="share-subtitle">Players can scan this code to open the game dashboard.</div>
+            </div>
+          </div>
+          <div class="qr-frame">
+            <qrcode *ngIf="gameURL" [qrdata]="gameURL" [width]="176" [errorCorrectionLevel]="'M'"></qrcode>
+          </div>
+        </div>
+      </div>
+    </mat-card>
+
+    <mat-card class="players-card">
+      <div class="players-card-header">
+        <div class="section-title">
+          <mat-icon aria-hidden="true">group</mat-icon>
+          <span>Players</span>
+        </div>
+      </div>
+      <app-game-players [game]="game"></app-game-players>
+    </mat-card>
+  </section>
 </div>

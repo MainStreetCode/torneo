@@ -1,34 +1,93 @@
 <div *ngIf="game">
   <app-section-header [sectionName]="sectionName"></app-section-header>
-  <div class="flex-box-rows justify-content-center">
-    <div class="flex-box-columns">
-      <div class="flex-box-item">
-        <span class="mat-h3">Game Id: </span>
-        <span class="mat-h3">{{game.id}}</span>
-      </div>
-      <div class="flex-box-item">
-        <span class="mat-h3">Rounds: </span>
-        <span class="mat-h3">{{game.numberOfRounds ?? 0}}</span>
-      </div>         
 
-      <div>
-        <qrcode *ngIf="gameURL" [qrdata]="gameURL" [width]="256" [errorCorrectionLevel]="'M'"></qrcode>
+  <section class="game-lobby">
+    <mat-card class="lobby-card">
+      <div class="lobby-hero">
+        <div class="hero-copy">
+          <mat-chip-list aria-label="Game status">
+            <mat-chip color="accent" selected>{{dashboardStatus}}</mat-chip>
+          </mat-chip-list>
+          <h1>{{game.name}}</h1>
+          <div class="game-id">
+            <mat-icon aria-hidden="true">tag</mat-icon>
+            <span>{{game.id}}</span>
+          </div>
+
+          <div class="round-progress" aria-label="Round progress">
+            <div class="progress-header">
+              <span>{{latestRoundLabel}}</span>
+              <span>{{roundCount}} / {{game.numberOfRounds ?? 0}} rounds</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill" [style.width.%]="progressPercentage"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="share-panel">
+          <div class="share-copy">
+            <mat-icon aria-hidden="true">qr_code_2</mat-icon>
+            <div>
+              <div class="share-title">Join link</div>
+              <div class="share-subtitle">Scan to open this game dashboard.</div>
+            </div>
+          </div>
+          <div class="qr-frame">
+            <qrcode *ngIf="gameURL" [qrdata]="gameURL" [width]="176" [errorCorrectionLevel]="'M'"></qrcode>
+          </div>
+        </div>
       </div>
-    </div>      
-  </div>
-  
-  <mat-tab-group mat-stretch-tabs [selectedIndex]="selectedTab" (selectedIndexChange)="selectTab($event)">
-    <mat-tab>
-      <ng-template mat-tab-label>
-        <mat-icon class="example-tab-icon">group</mat-icon> Players
-      </ng-template>
-      <app-game-players [game]="game"></app-game-players>
-    </mat-tab>
-    <mat-tab>
-      <ng-template mat-tab-label>
-        <mat-icon class="example-tab-icon">table_bar</mat-icon> Rounds
-      </ng-template>
-      <app-rounds [game]="game"></app-rounds>
-    </mat-tab>
-  </mat-tab-group>
+
+      <mat-divider></mat-divider>
+
+      <div class="stat-grid">
+        <div class="stat-tile">
+          <mat-icon aria-hidden="true">group</mat-icon>
+          <div>
+            <div class="stat-value">{{playerCount}}</div>
+            <div class="stat-label">Players</div>
+          </div>
+        </div>
+        <div class="stat-tile">
+          <mat-icon aria-hidden="true">event_available</mat-icon>
+          <div>
+            <div class="stat-value">{{completedRoundCount}}</div>
+            <div class="stat-label">Completed</div>
+          </div>
+        </div>
+        <div class="stat-tile">
+          <mat-icon aria-hidden="true">table_bar</mat-icon>
+          <div>
+            <div class="stat-value">{{roundCount}}</div>
+            <div class="stat-label">Started</div>
+          </div>
+        </div>
+        <div class="stat-tile">
+          <mat-icon aria-hidden="true">flag</mat-icon>
+          <div>
+            <div class="stat-value">{{game.numberOfRounds ?? 0}}</div>
+            <div class="stat-label">Configured</div>
+          </div>
+        </div>
+      </div>
+    </mat-card>
+
+    <mat-card class="tabs-card">
+      <mat-tab-group mat-stretch-tabs [selectedIndex]="selectedTab" (selectedIndexChange)="selectTab($event)">
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <mat-icon class="tab-icon">group</mat-icon> Players
+          </ng-template>
+          <app-game-players [game]="game"></app-game-players>
+        </mat-tab>
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <mat-icon class="tab-icon">table_bar</mat-icon> Rounds
+          </ng-template>
+          <app-rounds [game]="game"></app-rounds>
+        </mat-tab>
+      </mat-tab-group>
+    </mat-card>
+  </section>
 </div>
