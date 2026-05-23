@@ -40,8 +40,8 @@ export class RoundCardComponent implements OnInit, OnDestroy {
       panelClass: 'dialog-container',
       data: {
         title: 'Delete Round',
-        message: 'Are you sure you want to delete this round?',
-        confirmButtonText: 'Yes'
+        message: `Delete round ${round.number}? This will remove its scores from players.`,
+        confirmButtonText: 'Delete'
       }
     });
 

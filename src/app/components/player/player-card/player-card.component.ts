@@ -44,8 +44,8 @@ export class PlayerCardComponent implements OnInit {
       panelClass: 'dialog-container',
       data: {
         title: 'Delete Player',
-        message: 'Are you sure you want to delete this player?',
-        confirmButtonText: 'Yes'
+        message: `Delete ${player.displayName || 'this player'}? This cannot be undone.`,
+        confirmButtonText: 'Delete'
       }
     });
 

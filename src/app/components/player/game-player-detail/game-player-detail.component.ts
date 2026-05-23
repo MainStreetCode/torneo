@@ -1,9 +1,11 @@
 import { Location } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { GameService } from 'src/app/services/game/game.service';
 import { GamePlayerService } from 'src/app/services/gamePlayer/game-player.service';
+import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component';
 import { GamePlayer } from '../game-player';
 
 @Component({
@@ -24,7 +26,8 @@ export class GamePlayerDetailComponent implements OnInit {
     private playerService: GamePlayerService,
     private location: Location,
     private gameService: GameService,
-    private authService: AuthService) { }
+    private authService: AuthService,
+    private dialog: MatDialog) { }
 
   ngOnInit(): void {
     this.getPlayer();
@@ -63,18 +66,35 @@ export class GamePlayerDetailComponent implements OnInit {
     }
   }
 
-  toggleIsAdmin(): void {    
-    if (!this.isCurrentUserAdmin) {
+  toggleIsAdmin(isAdmin: boolean): void {
+    if (!this.isCurrentUserAdmin || !this.player) {
       return;
     }
-    
-    // if isAdmin was true, then delete player as admin
-    if (this.isAdmin) {
-      this.gameService.deleteAdmin(this.gameId, this.player.uid);
-    } else {
-      // else isAdmin was false, add player as admin
+
+    if (isAdmin) {
       this.gameService.addAdmin(this.gameId, this.player.uid);
+      this.isAdmin = true;
+      return;
     }
+
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      panelClass: 'dialog-container',
+      data: {
+        title: 'Remove Admin',
+        message: `Remove admin access for ${this.player.displayName || 'this player'}?`,
+        confirmButtonText: 'Remove'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.gameService.deleteAdmin(this.gameId, this.player.uid);
+        this.isAdmin = false;
+        return;
+      }
+
+      this.isAdmin = true;
+    });
   }
 
   private setDisabledState(): void {
