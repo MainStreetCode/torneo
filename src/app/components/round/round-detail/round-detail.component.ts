@@ -26,6 +26,7 @@ export class RoundDetailComponent implements OnInit, OnDestroy {
 
   private subscriptions: Subscription[] = [];
   private hasRedirectedToDashboard = false;
+  private previousPointsConfirmed?: boolean;
 
   constructor(
     private router: Router,
@@ -71,11 +72,15 @@ export class RoundDetailComponent implements OnInit, OnDestroy {
     this.subscriptions.push(
       this.roundService.getRound(this.roundId, this.gameId).subscribe({
         next: (round) => {
+          const wasPointsConfirmed = this.previousPointsConfirmed;
           this.round = round;
           this.sectionName = `Round ${round.number}`;
-          if (round.pointsConfirmed) {
+
+          if (wasPointsConfirmed === false && round.pointsConfirmed) {
             this.navigateToScores();
           }
+
+          this.previousPointsConfirmed = !!round.pointsConfirmed;
         }
       })
     );
