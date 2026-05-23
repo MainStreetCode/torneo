@@ -32,6 +32,7 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
   nextRoundNumber = 1;
   dashboardStatus = 'Waiting for players';
   latestRoundLabel = 'No rounds started';
+  private latestRound?: Round;
   private subscriptions: Subscription[] = [];
   private dashboardSubscriptions: Subscription[] = [];
   private dashboardGameId?: string;
@@ -137,8 +138,9 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
     this.roundCount = sortedRounds.length;
     this.completedRoundCount = sortedRounds.filter((round) => round.pointsConfirmed).length;
     this.nextRoundNumber = this.roundCount + 1;
+    this.latestRound = this.roundCount > 0 ? sortedRounds[this.roundCount - 1] : undefined;
     this.latestRoundLabel = this.roundCount > 0
-      ? `Round ${sortedRounds[this.roundCount - 1].number}`
+      ? `Round ${this.latestRound.number}`
       : 'No rounds started';
 
     this.updateProgressPercentage();
@@ -160,17 +162,19 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
       return;
     }
 
+    if (!this.latestRound) {
+      this.dashboardStatus = this.playerCount > 0 ? 'Ready for round 1' : 'Waiting for players';
+      return;
+    }
+
     if (this.roundCount >= configuredRounds) {
-      this.dashboardStatus = 'All rounds started';
+      this.dashboardStatus = this.latestRound.pointsConfirmed ? 'Game completed' : 'All rounds started';
       return;
     }
 
-    if (this.roundCount > 0) {
-      this.dashboardStatus = `Round ${this.roundCount} active`;
-      return;
-    }
-
-    this.dashboardStatus = this.playerCount > 0 ? 'Ready for round 1' : 'Waiting for players';
+    this.dashboardStatus = this.latestRound.pointsConfirmed
+      ? `Round ${this.latestRound.number} completed`
+      : `Round ${this.latestRound.number} active`;
   }
 
   selectTab(tabNumber: number): void {
