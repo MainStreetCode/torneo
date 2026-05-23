@@ -3,8 +3,12 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { GamePlayer } from 'src/app/components/player/game-player';
 import { Game } from 'src/app/services/game/game';
 import { GameService } from 'src/app/services/game/game.service';
+import { GamePlayerService } from 'src/app/services/gamePlayer/game-player.service';
+import { Round } from 'src/app/services/round/round';
+import { RoundService } from 'src/app/services/round/round.service';
 import { environment } from 'src/environments/environment';
 import { GameDashboardTab } from './game-dashboard-tab';
 
@@ -21,11 +25,22 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
   selectedTab = GameDashboardTab.Players;
   readonly playersTab = GameDashboardTab.Players;
   readonly roundsTab = GameDashboardTab.Rounds;
+  playerCount = 0;
+  roundCount = 0;
+  completedRoundCount = 0;
+  progressPercentage = 0;
+  nextRoundNumber = 1;
+  dashboardStatus = 'Waiting for players';
+  latestRoundLabel = 'No rounds started';
   private subscriptions: Subscription[] = [];
+  private dashboardSubscriptions: Subscription[] = [];
+  private dashboardGameId?: string;
 
   constructor(
     private route: ActivatedRoute,
     private gameService: GameService,
+    private gamePlayerService: GamePlayerService,
+    private roundService: RoundService,
     private location: Location,
     private router: Router,
     private snackBar: MatSnackBar) {
@@ -39,6 +54,7 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscriptions.forEach((subscription) => subscription.unsubscribe());
+    this.dashboardSubscriptions.forEach((subscription) => subscription.unsubscribe());
   }
 
   private parseURLParams(): void {
@@ -78,13 +94,83 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
     this.subscriptions.push(
       this.gameService.getGame(id).subscribe({
         next: (game) => {
+          if (!game) {
+            return;
+          }
+
           this.game = game;
           this.gameURL = `${environment.url}/#/game/${this.game.id}/dashboard`;
           this.sectionName = `${this.game.name.toUpperCase()} Dashboard`;
-          console.log(this.gameURL);
+          this.updateDashboardStatus();
+          this.updateProgressPercentage();
+          this.watchDashboardData(this.game.id);
         }
       })
     );
+  }
+
+  private watchDashboardData(gameId: string): void {
+    if (this.dashboardGameId === gameId) {
+      return;
+    }
+
+    this.dashboardGameId = gameId;
+    this.dashboardSubscriptions.forEach((subscription) => subscription.unsubscribe());
+    this.dashboardSubscriptions = [
+      this.gamePlayerService.playersForGame(gameId).subscribe({
+        next: (players) => this.updatePlayerStats(players)
+      }),
+      this.roundService.roundsForGame(gameId).subscribe({
+        next: (rounds) => this.updateRoundStats(rounds)
+      })
+    ];
+  }
+
+  private updatePlayerStats(players: GamePlayer[]): void {
+    this.playerCount = players.length;
+    this.updateDashboardStatus();
+  }
+
+  private updateRoundStats(rounds: Round[]): void {
+    const sortedRounds = [...rounds].sort((a, b) => a.number - b.number);
+
+    this.roundCount = sortedRounds.length;
+    this.completedRoundCount = sortedRounds.filter((round) => round.pointsConfirmed).length;
+    this.nextRoundNumber = this.roundCount + 1;
+    this.latestRoundLabel = this.roundCount > 0
+      ? `Round ${sortedRounds[this.roundCount - 1].number}`
+      : 'No rounds started';
+
+    this.updateProgressPercentage();
+    this.updateDashboardStatus();
+  }
+
+  private updateProgressPercentage(): void {
+    const configuredRounds = this.game?.numberOfRounds ?? 0;
+    this.progressPercentage = configuredRounds > 0
+      ? Math.min(100, Math.round((this.roundCount / configuredRounds) * 100))
+      : 0;
+  }
+
+  private updateDashboardStatus(): void {
+    const configuredRounds = this.game?.numberOfRounds ?? 0;
+
+    if (configuredRounds === 0) {
+      this.dashboardStatus = 'Setup needed';
+      return;
+    }
+
+    if (this.roundCount >= configuredRounds) {
+      this.dashboardStatus = 'All rounds started';
+      return;
+    }
+
+    if (this.roundCount > 0) {
+      this.dashboardStatus = `Round ${this.roundCount} active`;
+      return;
+    }
+
+    this.dashboardStatus = this.playerCount > 0 ? 'Ready for round 1' : 'Waiting for players';
   }
 
   selectTab(tabNumber: number): void {

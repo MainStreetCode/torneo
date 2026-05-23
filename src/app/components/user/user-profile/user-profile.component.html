@@ -1,41 +1,69 @@
-<div>
-    Display Name: {{displayName}}
-    <!-- <label class="mdc-text-field mdc-text-field--outlined">
-        <span class="mdc-notched-outline">
-            <span class="mdc-notched-outline__leading"></span>
-            <span class="mdc-notched-outline__notch">
-            <span class="mdc-floating-label" id="my-label-id" *ngIf="!displayName">Your Name</span>
-            </span>
-            <span class="mdc-notched-outline__trailing"></span>
-        </span>
-        <input type="text" class="mdc-text-field__input" aria-labelledby="my-label-id" [(ngModel)]="displayName">
-    </label> -->
-</div>
-<div>
-    Email: {{email}}
-    <!-- <label class="mdc-text-field mdc-text-field--outlined">
-        <span class="mdc-notched-outline">
-            <span class="mdc-notched-outline__leading"></span>
-            <span class="mdc-notched-outline__notch">
-            <span class="mdc-floating-label" id="my-label-id" *ngIf="!email">Your Name</span>
-            </span>
-            <span class="mdc-notched-outline__trailing"></span>
-        </span>
-        <input type="text" class="mdc-text-field__input" aria-labelledby="my-label-id" [(ngModel)]="email" disabled="true">
-    </label> -->
-</div>
-<div class="flex-box-rows">
-    <button class="mdc-button mdc-button--raised" (click)="back()">
-        <div class="mdc-button__ripple"></div>
-        <!-- <mat-icon>save</mat-icon>     -->
-        <span class="mdc-button__label">        
-        <span class="mdc-button__label">Back</span>
-        </span>
-    </button>
-    <!-- <button class="mdc-button mdc-button--raised" (click)="save()">
-        <div class="mdc-button__ripple"></div>        
-        <span class="mdc-button__label">        
-        <span class="mdc-button__label">Save</span>
-        </span>
-    </button> -->
-</div>
+<section class="profile-page">
+  <mat-card class="profile-card" *ngIf="currentUser; else signedOut">
+    <div class="profile-hero">
+      <div class="avatar" aria-hidden="true">
+        <img *ngIf="photoURL; else initialsAvatar" [src]="photoURL" alt="">
+        <ng-template #initialsAvatar>{{initials}}</ng-template>
+      </div>
+
+      <div class="profile-summary">
+        <mat-chip-list aria-label="Account status">
+          <mat-chip color="accent" selected>Signed in</mat-chip>
+        </mat-chip-list>
+        <h1>{{displayName || 'Unnamed player'}}</h1>
+        <p>{{email || 'No email on file'}}</p>
+      </div>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <div class="detail-list">
+      <div class="detail-row">
+        <mat-icon aria-hidden="true">badge</mat-icon>
+        <div class="editable-detail">
+          <mat-form-field appearance="fill" class="display-name-field">
+            <mat-label>Display name</mat-label>
+            <input matInput [(ngModel)]="editableDisplayName" [disabled]="isSaving" maxlength="80">
+            <mat-hint>Used when you join future games.</mat-hint>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <mat-icon aria-hidden="true">alternate_email</mat-icon>
+        <div>
+          <div class="detail-label">Email</div>
+          <div class="detail-value">{{email || 'Not set'}}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="profile-actions">
+      <button mat-button type="button" (click)="cancelEdit()" [disabled]="isSaving || editableDisplayName === (displayName || '')">
+        Cancel
+      </button>
+      <button mat-raised-button color="accent" type="button" (click)="save()" [disabled]="isSaveDisabled()">
+        <mat-icon>save</mat-icon>
+        {{isSaving ? 'Saving' : 'Save'}}
+      </button>
+      <button mat-raised-button color="primary" (click)="back()">
+        <mat-icon>arrow_back</mat-icon>
+        Back
+      </button>
+    </div>
+  </mat-card>
+
+  <ng-template #signedOut>
+    <mat-card class="profile-card empty-state">
+      <div class="empty-icon">
+        <mat-icon aria-hidden="true">account_circle</mat-icon>
+      </div>
+      <h1>No profile loaded</h1>
+      <p>Sign in to view your account details.</p>
+      <button mat-raised-button color="primary" (click)="back()">
+        <mat-icon>arrow_back</mat-icon>
+        Back
+      </button>
+    </mat-card>
+  </ng-template>
+</section>

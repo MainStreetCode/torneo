@@ -1,0 +1,197 @@
+.game-lobby {
+  background: #f5f7fb;
+  padding: 1rem;
+}
+
+.lobby-card,
+.tabs-card {
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(20, 28, 43, 0.14);
+  overflow: hidden;
+}
+
+.lobby-card {
+  background:
+    linear-gradient(135deg, rgba(63, 81, 181, 0.08), rgba(255, 64, 129, 0.08)),
+    #ffffff;
+}
+
+.lobby-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 1.5rem;
+  padding: 1.5rem;
+}
+
+.hero-copy {
+  min-width: 0;
+}
+
+.hero-copy h1 {
+  color: #1f2937;
+  font-size: 2.25rem;
+  font-weight: 700;
+  line-height: 1.1;
+  margin: 1rem 0 0.75rem;
+  overflow-wrap: anywhere;
+}
+
+.game-id,
+.share-copy,
+.stat-tile {
+  align-items: center;
+  display: flex;
+}
+
+.game-id {
+  color: #4b5563;
+  gap: 0.35rem;
+  overflow-wrap: anywhere;
+}
+
+.game-id mat-icon {
+  color: #3f51b5;
+  flex: 0 0 auto;
+}
+
+.round-progress {
+  margin-top: 2rem;
+  max-width: 520px;
+}
+
+.progress-header {
+  color: #374151;
+  display: flex;
+  font-weight: 600;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.progress-track {
+  background: #dfe5f2;
+  border-radius: 999px;
+  height: 10px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  background: linear-gradient(90deg, #3f51b5, #ff4081);
+  border-radius: inherit;
+  height: 100%;
+  min-width: 0;
+  transition: width 200ms ease;
+}
+
+.share-panel {
+  align-self: start;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.share-copy {
+  color: #374151;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.share-copy mat-icon {
+  color: #ff4081;
+}
+
+.share-title {
+  font-weight: 700;
+}
+
+.share-subtitle {
+  color: #6b7280;
+  font-size: 0.85rem;
+  line-height: 1.25;
+}
+
+.qr-frame {
+  align-items: center;
+  background: #f9fafb;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  padding: 0.5rem;
+}
+
+.stat-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  padding: 1rem 1.5rem 1.5rem;
+}
+
+.stat-tile {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  gap: 0.75rem;
+  min-width: 0;
+  padding: 1rem;
+}
+
+.stat-tile mat-icon {
+  background: #eef2ff;
+  border-radius: 8px;
+  color: #3f51b5;
+  flex: 0 0 auto;
+  padding: 0.5rem;
+}
+
+.stat-value {
+  color: #111827;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.stat-label {
+  color: #6b7280;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+.tabs-card {
+  margin-top: 1rem;
+}
+
+.tab-icon {
+  margin-right: 0.35rem;
+}
+
+@media (max-width: 760px) {
+  .game-lobby {
+    padding: 0.75rem;
+  }
+
+  .lobby-hero,
+  .stat-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .lobby-hero {
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .hero-copy h1 {
+    font-size: 1.75rem;
+  }
+
+  .progress-header {
+    gap: 0.75rem;
+  }
+
+  .share-panel {
+    justify-self: stretch;
+  }
+
+  .stat-grid {
+    padding: 1rem;
+  }
+}
