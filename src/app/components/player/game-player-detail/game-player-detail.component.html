@@ -57,6 +57,12 @@
           <input matInput placeholder="Player Name" [disabled]="isDisabled || isSaving" [(ngModel)]="player.displayName">
         </mat-form-field>
 
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Fixed table</mat-label>
+          <input matInput type="number" min="1" step="1" placeholder="No fixed table" [disabled]="!isCurrentUserAdmin || isSaving" [(ngModel)]="player.fixedTableNumber">
+          <mat-hint>Leave blank to keep this player randomized.</mat-hint>
+        </mat-form-field>
+
         <div class="admin-toggle">
           <div>
             <div class="toggle-label">Admin access</div>
