@@ -1,13 +1,12 @@
-import { Dialog } from '@angular/cdk/dialog';
 import { Location } from '@angular/common';
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { of, Subscription } from 'rxjs';
 import { Game } from 'src/app/services/game/game';
 import { GameService } from 'src/app/services/game/game.service';
 import { environment } from 'src/environments/environment';
-import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component';
 import { ProgressDialogComponent } from '../../progress-dialog/progress-dialog.component';
 
 @Component({
@@ -21,6 +20,7 @@ export class GameConfigurationComponent implements OnInit, OnDestroy {
   public gameURL: string;
   public sectionName: string;
   public isAdmin$ = of(false);
+  public isSaving = false;
   private subscriptions: Subscription[] = [];
 
   constructor(
@@ -28,7 +28,8 @@ export class GameConfigurationComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private gameService: GameService,
     private location: Location,
-    private dialog: MatDialog) {
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar) {
   }
 
   ngOnInit(): void {
@@ -52,6 +53,11 @@ export class GameConfigurationComponent implements OnInit, OnDestroy {
     this.subscriptions.push(
       this.gameService.getGame(this.gameId).subscribe({
         next: (game) => {
+          if (!game) {
+            dialogRef.close();
+            return;
+          }
+
           this.game = game;
           this.isAdmin$ = this.gameService.isCurrentUserAdmin(this.game.id);
           this.sectionName = `${game.name.toUpperCase()} Configuration`;
@@ -66,12 +72,33 @@ export class GameConfigurationComponent implements OnInit, OnDestroy {
   }
 
   save(): void {
-    if (this.game) {
-      this.gameService.updateGame(this.game);
+    if (!this.game || this.isSaving) {
+      return;
     }
+
+    this.isSaving = true;
+    this.subscriptions.push(
+      this.gameService.updateGame(this.game).subscribe({
+        next: () => {
+          this.isSaving = false;
+          this.sectionName = `${this.game.name.toUpperCase()} Configuration`;
+          this.snackBar.open('Game configuration saved.', 'Dismiss', {
+            duration: 4000
+          });
+        },
+        error: () => {
+          this.isSaving = false;
+          this.snackBar.open('Unable to save game configuration.', 'Dismiss', {
+            duration: 5000
+          });
+        }
+      })
+    );
   }
 
   startGame(): void {
-    this.router.navigateByUrl(`/game/${this.game.id}/dashboard?selectedTab=1`);
+    if (this.game) {
+      this.router.navigateByUrl(`/game/${this.game.id}/dashboard?selectedTab=1`);
+    }
   }
 }

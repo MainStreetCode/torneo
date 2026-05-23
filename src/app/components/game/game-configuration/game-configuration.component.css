@@ -1,0 +1,198 @@
+.configuration-page {
+  background: #f5f7fb;
+  box-sizing: border-box;
+  min-height: calc(100vh - 64px);
+  padding: 1rem;
+}
+
+.configuration-card,
+.players-card {
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(20, 28, 43, 0.14);
+  margin: 0 auto;
+  max-width: 960px;
+  overflow: hidden;
+}
+
+.configuration-hero {
+  align-items: center;
+  background:
+    linear-gradient(135deg, rgba(63, 81, 181, 0.08), rgba(255, 64, 129, 0.08)),
+    #ffffff;
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: 1.5rem;
+}
+
+.hero-copy {
+  min-width: 0;
+}
+
+.hero-copy h1,
+.empty-state h1 {
+  color: #1f2937;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.15;
+  margin: 1rem 0 0.5rem;
+  overflow-wrap: anywhere;
+}
+
+.game-id,
+.section-title,
+.share-copy,
+.quick-actions {
+  align-items: center;
+  display: flex;
+}
+
+.game-id {
+  color: #4b5563;
+  gap: 0.35rem;
+  overflow-wrap: anywhere;
+}
+
+.game-id mat-icon,
+.section-title mat-icon {
+  color: #3f51b5;
+  flex: 0 0 auto;
+}
+
+.quick-actions {
+  gap: 0.75rem;
+}
+
+.quick-actions button mat-icon,
+.empty-state button mat-icon {
+  margin-right: 0.35rem;
+}
+
+.settings-layout {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  padding: 1.5rem;
+}
+
+.settings-form {
+  min-width: 0;
+}
+
+.section-title {
+  color: #111827;
+  font-size: 1.05rem;
+  font-weight: 700;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.share-panel {
+  align-self: start;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.share-copy {
+  color: #374151;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.share-copy mat-icon {
+  color: #ff4081;
+}
+
+.share-title {
+  font-weight: 700;
+}
+
+.share-subtitle {
+  color: #6b7280;
+  font-size: 0.85rem;
+  line-height: 1.25;
+}
+
+.qr-frame {
+  align-items: center;
+  background: #f9fafb;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  padding: 0.5rem;
+}
+
+.players-card {
+  margin-top: 1rem;
+}
+
+.players-card-header {
+  padding: 1.25rem 1.5rem 0;
+}
+
+.empty-state {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+  text-align: center;
+}
+
+.empty-state p {
+  color: #4b5563;
+  margin: 0 0 1.5rem;
+}
+
+.empty-icon {
+  align-items: center;
+  background: #eef2ff;
+  border-radius: 50%;
+  color: #3f51b5;
+  display: flex;
+  height: 88px;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+  width: 88px;
+}
+
+.empty-icon mat-icon {
+  font-size: 48px;
+  height: 48px;
+  width: 48px;
+}
+
+@media (max-width: 760px) {
+  .configuration-page {
+    padding: 0.75rem;
+  }
+
+  .configuration-hero,
+  .settings-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .configuration-hero,
+  .settings-layout {
+    padding: 1rem;
+  }
+
+  .hero-copy h1,
+  .empty-state h1 {
+    font-size: 1.65rem;
+  }
+
+  .quick-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .share-panel {
+    justify-self: stretch;
+  }
+
+  .players-card-header {
+    padding: 1rem 1rem 0;
+  }
+}
