@@ -71,8 +71,8 @@ export class TableService {
     ));
   }
 
-  updateTable(table: Table, roundId: string, gameId: string): void {
-    this.store.collection(Collection.Games)
+  updateTable(table: Table, roundId: string, gameId: string): Observable<Table | void> {
+    return from(this.store.collection(Collection.Games)
     .doc(gameId)
     .collection(Collection.Rounds)
     .doc(roundId)
@@ -81,9 +81,10 @@ export class TableService {
     .update(table).then(
       () => {
         this.log(`updateTable w/ id=${gameId} ${table.id}`);
+        return table;
       },
       err =>  this.log(`ERROR updateTable w/ id=${table.id}`)
-    );
+    ));
   }
 
   deleteTable(tableId: string, roundId: string, gameId: string): void {

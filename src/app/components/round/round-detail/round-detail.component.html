@@ -26,9 +26,13 @@
         All Table's Points Confirmed
       </span>         
     </div>
+
+    <div class="flex-box-item" *ngIf="round.pointsConfirmed">
+      <span class="mat-h3">Round finalized</span>
+    </div>
     
     <div class="flex-box-item" *ngIf="isAdmin$ | async">
-      <button mat-raised-button class="full-width" color="primary" aria-label="Back" title="Back" (click)="endRound()" [disabled]="(allTablesPointsConfirmed$ | async) === false">
+      <button mat-raised-button class="full-width" color="primary" aria-label="Back" title="Back" (click)="endRound()" [disabled]="round.pointsConfirmed || (allTablesPointsConfirmed$ | async) === false">
         End Round
       </button>
     </div>
