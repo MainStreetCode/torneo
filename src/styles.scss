@@ -13,8 +13,8 @@
 // @use "@material/form-field";
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap");
 @import 'https://fonts.googleapis.com/icon?family=Material+Icons';
-@import '~@angular/material/theming';
-@import '~firebaseui/dist/firebaseui.css';
+@import '@angular/material/theming';
+@import 'firebaseui/dist/firebaseui.css';
 @include checkbox.core-styles;
 @include textfield.core-styles;
 @include dialog.core-styles;

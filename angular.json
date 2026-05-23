@@ -27,6 +27,10 @@
               "src/black-red.css"
             ],
             "scripts": [],
+            "allowedCommonJsDependencies": [
+              "@cordobo/qrcode",
+              "dialog-polyfill"
+            ],
             "vendorChunk": true,
             "extractLicenses": false,
             "buildOptimizer": false,
