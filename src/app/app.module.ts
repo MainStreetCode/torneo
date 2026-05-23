@@ -24,6 +24,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatChipsModule } from '@angular/material/chips';
 import { ReactiveFormsModule } from '@angular/forms';
 
 import { GameConfigurationComponent } from './components/game/game-configuration/game-configuration.component';
@@ -89,6 +90,7 @@ import { ProgressDialogComponent } from './components/progress-dialog/progress-d
     MatDividerModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
+    MatChipsModule,
     AngularFireModule.initializeApp(environment.firebase),
     AngularFirestoreModule,
     QRCodeModule,
