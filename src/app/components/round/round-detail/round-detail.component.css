@@ -1,0 +1,119 @@
+.round-status-panel {
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.round-status-header {
+    align-items: baseline;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.round-eyebrow {
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: uppercase;
+}
+
+.round-id {
+    color: rgba(0, 0, 0, 0.72);
+    font-size: 0.875rem;
+    overflow-wrap: anywhere;
+}
+
+.round-status-grid {
+    align-items: start;
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) auto;
+}
+
+.status-group {
+    min-width: 0;
+}
+
+.status-group-header {
+    align-items: center;
+    color: rgba(0, 0, 0, 0.72);
+    display: flex;
+    font-weight: 600;
+    gap: 0.4rem;
+    margin-bottom: 0.5rem;
+}
+
+.status-group-header mat-icon {
+    color: rgba(0, 0, 0, 0.54);
+    font-size: 1.25rem;
+    height: 1.25rem;
+    width: 1.25rem;
+}
+
+.status-count {
+    align-items: center;
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: 999px;
+    display: inline-flex;
+    font-size: 0.75rem;
+    height: 1.25rem;
+    justify-content: center;
+    min-width: 1.25rem;
+    padding: 0 0.35rem;
+}
+
+.chip-list {
+    display: block;
+}
+
+.status-chip {
+    min-height: 2rem;
+}
+
+.status-chip.bye-chip {
+    background: #eef2f7;
+    color: #263238;
+}
+
+.status-chip.table-chip {
+    background: #fff3e0;
+    color: #6d3d00;
+}
+
+.status-chip.confirmed-chip {
+    background: #e8f5e9;
+    color: #1b5e20;
+}
+
+.status-chip.confirmed-chip mat-icon {
+    font-size: 1.125rem;
+    height: 1.125rem;
+    margin-right: 0.25rem;
+    width: 1.125rem;
+}
+
+.status-chip.empty-chip {
+    background: #f5f5f5;
+    color: rgba(0, 0, 0, 0.54);
+}
+
+.round-action {
+    align-self: center;
+}
+
+.round-action button {
+    min-width: 9rem;
+}
+
+@media (max-width: 840px) {
+    .round-status-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .round-action button {
+        width: 100%;
+    }
+}
