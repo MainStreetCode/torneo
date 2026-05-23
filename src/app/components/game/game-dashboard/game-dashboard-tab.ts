@@ -1,4 +1,4 @@
 export enum GameDashboardTab {
-    Players = 'players',
-    Rounds = 'rounds'
+    Players = 0,
+    Rounds = 1
 }

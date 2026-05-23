@@ -46,10 +46,17 @@
               All points confirmed
             </mat-chip>
           </mat-chip-list>
+
+          <mat-chip-list aria-label="Round finalized" class="chip-list" *ngIf="round.pointsConfirmed">
+            <mat-chip class="status-chip confirmed-chip">
+              <mat-icon>emoji_events</mat-icon>
+              Round finalized
+            </mat-chip>
+          </mat-chip-list>
         </section>
 
         <div class="round-action" *ngIf="isAdmin$ | async">
-          <button mat-raised-button color="primary" aria-label="End Round" title="End Round" (click)="endRound()" [disabled]="(allTablesPointsConfirmed$ | async) === false">
+          <button mat-raised-button color="primary" aria-label="End Round" title="End Round" (click)="endRound()" [disabled]="round.pointsConfirmed || (allTablesPointsConfirmed$ | async) === false">
             End Round
           </button>
         </div>
