@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { User } from 'firebase/auth';
 import { Subscription } from 'rxjs';
@@ -13,7 +13,7 @@ import { Table } from '../../table';
   templateUrl: './tables.component.html',
   styleUrls: ['./tables.component.css']
 })
-export class TablesComponent implements OnInit, OnDestroy {
+export class TablesComponent implements OnInit, OnChanges, OnDestroy {
   @Input() tables: Table[];
   public filteredTables: Table[];
   public isDataFiltered = false;
@@ -34,9 +34,20 @@ export class TablesComponent implements OnInit, OnDestroy {
     this.currentUser = this.authService.getCurrentUser();
     this.gameId = this.route.snapshot.paramMap.get('gameId');
     this.roundId = this.route.snapshot.paramMap.get('roundId');
-    this.filteredTables = this.tables.sort((a, b) => a.number - b.number);
+    this.filteredTables = this.sortTables(this.tables);
 
     this.checkCurrentUserIsPlayer();
+  }
+
+  ngOnChanges(): void {
+    if (!this.tables) {
+      return;
+    }
+
+    this.filteredTables = this.isDataFiltered && this.filterString
+      ? this.tables.filter((table) => table.id === this.filterString)
+      : this.tables;
+    this.filteredTables = this.sortTables(this.filteredTables);
   }
 
   ngOnDestroy(): void {
@@ -57,14 +68,18 @@ export class TablesComponent implements OnInit, OnDestroy {
             }
 
             this.filteredTables = this.filterString ? this.tables.filter((table) => table.id === this.filterString) : this.tables;
+            this.filteredTables = this.sortTables(this.filteredTables);
           }
         })
       );
     } else {
       this.filteredTables = this.tables;
+      this.filteredTables = this.sortTables(this.filteredTables);
     }
+  }
 
-    this.filteredTables.sort((a, b) => a.number - b.number);
+  public trackByTableId(index: number, table: Table): string {
+    return table.id;
   }
 
   private checkCurrentUserIsPlayer(): void {
@@ -85,5 +100,9 @@ export class TablesComponent implements OnInit, OnDestroy {
         }
       })
     );
+  }
+
+  private sortTables(tables: Table[]): Table[] {
+    return [...tables].sort((a, b) => a.number - b.number);
   }
 }

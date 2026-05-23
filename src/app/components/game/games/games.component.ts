@@ -40,7 +40,7 @@ export class GamesComponent implements OnInit, OnDestroy {
     this.subscriptions.push(
       this.gameService.games$.subscribe({
         next: (games) => {
-          this.games = games.sort((a, b) => new Date(b.createdDate).getDate() - new Date(a.createdDate).getDate());;
+          this.games = games.sort((a, b) => this.compareGamesByCreatedDateDesc(a, b));
           this.games.map((game) => {
             this.gameAdminMap.set(game.id, this.isGameAdmin(game));
           });
@@ -79,6 +79,12 @@ export class GamesComponent implements OnInit, OnDestroy {
     this.router.navigateByUrl(`/game/${game.id}/configuration`);
   }
 
+  getCreatedDate(game: Game): Date | null {
+    const time = this.getCreatedDateTime(game);
+
+    return time === Number.NEGATIVE_INFINITY ? null : new Date(time);
+  }
+
   private isGameAdmin(game: Game): boolean {
     const currentUser = this.authService.getCurrentUser();
 
@@ -87,5 +93,32 @@ export class GamesComponent implements OnInit, OnDestroy {
     }
 
     return false;
+  }
+
+  private compareGamesByCreatedDateDesc(a: Game, b: Game): number {
+    const dateComparison = this.getCreatedDateTime(b) - this.getCreatedDateTime(a);
+
+    if (dateComparison !== 0) {
+      return dateComparison;
+    }
+
+    return a.name.localeCompare(b.name) || a.id.localeCompare(b.id);
+  }
+
+  private getCreatedDateTime(game: Game): number {
+    const createdDate = game.createdDate as Date | string | number | { toDate: () => Date } | undefined;
+
+    if (!createdDate) {
+      return Number.NEGATIVE_INFINITY;
+    }
+
+    const date: Date | string | number = this.hasToDate(createdDate) ? createdDate.toDate() : createdDate;
+    const time = date ? new Date(date).getTime() : Number.NEGATIVE_INFINITY;
+
+    return Number.isNaN(time) ? Number.NEGATIVE_INFINITY : time;
+  }
+
+  private hasToDate(value: Date | string | number | { toDate: () => Date }): value is { toDate: () => Date } {
+    return typeof value === 'object' && 'toDate' in value;
   }
 }

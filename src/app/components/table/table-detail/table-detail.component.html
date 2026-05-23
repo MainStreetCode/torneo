@@ -17,5 +17,5 @@
 
 <div [ngClass.gt-xs]="'flex-box-rows'"
     [ngClass.lt-sm]="'flex-box-columns'">
-    <app-team [team]="team" [table]="table" *ngFor="let team of teams" class="flex-box-item"></app-team>
+    <app-team [team]="team" [table]="table" *ngFor="let team of teams; trackBy: trackByTeamId" class="flex-box-item"></app-team>
 </div>

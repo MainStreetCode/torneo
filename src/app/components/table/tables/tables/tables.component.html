@@ -10,4 +10,4 @@
     </div>
 </mat-toolbar>
 
-<app-table-detail [table]="table" *ngFor="let table of filteredTables"></app-table-detail>
+<app-table-detail [table]="table" *ngFor="let table of filteredTables; trackBy: trackByTableId"></app-table-detail>
