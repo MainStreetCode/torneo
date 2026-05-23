@@ -30,6 +30,7 @@
     <mat-card class="mdc-card card" *ngFor="let game of games">
       <div class="mdc-card__primary-action details" tabindex="0" (click)="dashboard(game)">        
         <button mat-button (click)="dashboard(game)">{{game.name}}</button>
+        <div class="game-subtitle" *ngIf="getCreatedDate(game) as createdDate">Created {{ createdDate | date:'shortDate' }}</div>
       </div>
       
       <div *ngIf="gameAdminMap.get(game.id)">

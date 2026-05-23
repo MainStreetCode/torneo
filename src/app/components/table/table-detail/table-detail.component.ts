@@ -78,18 +78,7 @@ export class TableDetailComponent implements OnInit, OnDestroy {
         next: ([isAdmin, updatedTeams]) => {
           if (updatedTeams) {
 
-            // if teams is already defined, then update local data
-            if (this.teams) {
-              updatedTeams.forEach((updatedTeam) => {
-                const existingTeam = this.teams.find((et) => et.id === updatedTeam.id);
-                if (existingTeam) {
-                  existingTeam.points = updatedTeam.points;
-                  existingTeam.teamPlayers = updatedTeam.teamPlayers;
-                }
-              });
-            } else {
-              this.teams = updatedTeams;
-            }
+            this.teams = updatedTeams;
 
             updatedTeams.forEach((team) => {
               const updatedCurrentPlayer = team.teamPlayers.find((teamPlayer) => teamPlayer.player.uid === currentUser.uid);
@@ -148,6 +137,10 @@ export class TableDetailComponent implements OnInit, OnDestroy {
         }
       })
     );
+  }
+
+  trackByTeamId(index: number, team: Team): string {
+    return team.id;
   }
 
   private checkPointsConfirmed(isAdmin: boolean): void {

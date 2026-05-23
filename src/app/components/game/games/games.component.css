@@ -12,6 +12,13 @@
   flex-grow: 10;
 }
 
+.games .game-subtitle {
+  color: rgba(0, 0, 0, 0.54);
+  font-size: 0.85rem;
+  line-height: 1.25rem;
+  margin-left: 16px;
+}
+
 .games .badge {
   display: inline-block;
   font-size: small;
