@@ -1,3 +1,22 @@
 .team-card {
     margin: 1rem 0;
 }
+
+.team-card-header,
+.team-confirmed-status {
+    align-items: center;
+    display: flex;
+}
+
+.team-card-header {
+    justify-content: space-between;
+}
+
+.team-confirmed-status {
+    color: #2e7d32;
+    gap: 0.25rem;
+}
+
+.team-confirmed-status.unconfirmed {
+    color: rgba(0, 0, 0, 0.54);
+}

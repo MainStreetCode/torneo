@@ -29,6 +29,7 @@ export class TableDetailComponent implements OnInit, OnDestroy {
   isDisabled = false;
   subscriptions: Subscription[] = [];
   isCurrentUserAdmin = false;
+  allTablesConfirmed = false;
 
   constructor(
     private authService: AuthService,
@@ -51,6 +52,7 @@ export class TableDetailComponent implements OnInit, OnDestroy {
       ]).subscribe({
         next: ([isAdmin, confirmed]) => {
           this.isCurrentUserAdmin = isAdmin;
+          this.allTablesConfirmed = confirmed;
           if (!isAdmin && confirmed) {
             this.isDisabled = true;
           } else {
@@ -87,7 +89,7 @@ export class TableDetailComponent implements OnInit, OnDestroy {
               }
             });
 
-            this.checkPointsConfirmed(isAdmin);
+            this.checkPointsConfirmed();
           }
         }
       })
@@ -97,43 +99,80 @@ export class TableDetailComponent implements OnInit, OnDestroy {
   toggleConfirmPoints(confirm: boolean): void {
     const currentUser = this.authService.getCurrentUser();
 
+    if (!currentUser) { return; }
+
     this.subscriptions.push(
       this.gameService.isUserAdmin(currentUser.uid, this.gameId).pipe(take(1)).subscribe({
         next: (isAdmin) => {
 
-          // if current user is admin, then set all team players points confirmed
           if (isAdmin) {
             this.teams.forEach((team) => {
-              team.teamPlayers.forEach((teamPlayer) => {
-                teamPlayer.isPointsConfirmed = confirm;
-              });
-              this.teamService.updateTeam(team, this.table.id, this.roundId, this.gameId).subscribe({
-                next: () => {
-                  this.checkPointsConfirmed(isAdmin);
-                }
-              });
+              this.setTeamPointsConfirmed(team, confirm);
             });
 
           } else if (this.currentTeamPlayer) {
-            // else if user is a team player, then only set their points confirmed value
-
-            // find the team to update
             this.teams.forEach((team) => {
               const teamPlayer = team.teamPlayers.find((tp) => tp.player.uid === currentUser.uid);
-              // if current user is on this team, then update it
               if (teamPlayer) {
-                team.teamPlayers.forEach((tp) => {
-                  tp.isPointsConfirmed = confirm;
-                });
-
-                this.teamService.updateTeam(team, this.table.id, this.roundId, this.gameId).subscribe({
-                  next: () => {
-                    this.checkPointsConfirmed(isAdmin);
-                  }
-                });
+                this.setTeamPointsConfirmed(team, confirm);
               }
             });
           }
+
+          this.updateTeams().subscribe({
+            next: () => {
+              this.checkPointsConfirmed();
+            }
+          });
+        }
+      })
+    );
+  }
+
+  toggleTeamConfirmPoints(team: Team, confirm: boolean): void {
+    const currentUser = this.authService.getCurrentUser();
+
+    if (!currentUser || this.allTablesConfirmed) { return; }
+
+    const teamToUpdate = this.teams.find((t) => t.id === team.id);
+    const isCurrentUsersTeam = teamToUpdate?.teamPlayers.some((teamPlayer) => teamPlayer.player.uid === currentUser.uid);
+
+    if (!teamToUpdate || !isCurrentUsersTeam) { return; }
+
+    if (confirm) {
+      this.setCurrentPlayerPointsConfirmed(teamToUpdate, currentUser.uid);
+    } else {
+      this.setTeamPointsConfirmed(teamToUpdate, false);
+    }
+
+    this.subscriptions.push(
+      this.teamService.updateTeam(teamToUpdate, this.table.id, this.roundId, this.gameId).subscribe({
+        next: () => {
+          this.checkPointsConfirmed();
+        }
+      })
+    );
+  }
+
+  updateTeamPoints(team: Team, points: number): void {
+    if (this.allTablesConfirmed) { return; }
+
+    const teamToUpdate = this.teams.find((t) => t.id === team.id);
+
+    if (!teamToUpdate || teamToUpdate.points === points) { return; }
+
+    teamToUpdate.points = points;
+    this.clearAllTeamConfirmations();
+
+    if (this.table.pointsConfirmed) {
+      this.table.pointsConfirmed = false;
+      this.tableService.updateTable(this.table, this.roundId, this.gameId);
+    }
+
+    this.subscriptions.push(
+      this.updateTeams().subscribe({
+        next: () => {
+          this.checkPointsConfirmed();
         }
       })
     );
@@ -143,27 +182,41 @@ export class TableDetailComponent implements OnInit, OnDestroy {
     return team.id;
   }
 
-  private checkPointsConfirmed(isAdmin: boolean): void {
-    let confirmCounter = 0;
+  isTeamConfirmed(team: Team): boolean {
+    return (team.teamPlayers ?? []).some((teamPlayer) => !!teamPlayer.isPointsConfirmed);
+  }
 
-    this.teams.forEach((team) => {
-      team.teamPlayers.forEach((teamPlayer) => {
-        if (teamPlayer.isPointsConfirmed) {
-          confirmCounter++;
-        }
-      });
-    });
+  private checkPointsConfirmed(): void {
+    const allTeamsConfirmed = this.teams?.length > 0 && this.teams.every((team) => this.isTeamConfirmed(team));
+    this.pointsConfirmed = allTeamsConfirmed;
 
-    const allPlayersConfirmed = confirmCounter === 4;
-    if (isAdmin) {
-      this.pointsConfirmed = allPlayersConfirmed;
-    } else {
-      this.pointsConfirmed = confirmCounter > 0;
-    }
-
-    if (this.table.pointsConfirmed !== allPlayersConfirmed) {
-      this.table.pointsConfirmed = allPlayersConfirmed;
+    if (this.table.pointsConfirmed !== allTeamsConfirmed) {
+      this.table.pointsConfirmed = allTeamsConfirmed;
       this.tableService.updateTable(this.table, this.roundId, this.gameId);
     }
+  }
+
+  private setTeamPointsConfirmed(team: Team, confirm: boolean): void {
+    team.teamPlayers = (team.teamPlayers ?? []).map((teamPlayer) => ({
+      ...teamPlayer,
+      isPointsConfirmed: confirm
+    }));
+  }
+
+  private setCurrentPlayerPointsConfirmed(team: Team, playerId: string): void {
+    team.teamPlayers = (team.teamPlayers ?? []).map((teamPlayer) => ({
+      ...teamPlayer,
+      isPointsConfirmed: teamPlayer.player.uid === playerId ? true : !!teamPlayer.isPointsConfirmed
+    }));
+  }
+
+  private clearAllTeamConfirmations(): void {
+    this.teams.forEach((team) => this.setTeamPointsConfirmed(team, false));
+  }
+
+  private updateTeams() {
+    return combineLatest(
+      this.teams.map((team) => this.teamService.updateTeam(team, this.table.id, this.roundId, this.gameId))
+    ).pipe(take(1));
   }
 }
