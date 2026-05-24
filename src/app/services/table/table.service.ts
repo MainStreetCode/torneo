@@ -28,8 +28,7 @@ export class TableService {
         this.log(`addTable w/ id=${gameId} ${docRef.id}`);
         table.id = docRef.id;
         return table;
-      },
-      err =>  this.log(`ERROR addTable w/ id=${table.id}`)
+      }
     ));
   }
 

@@ -37,8 +37,7 @@ export class RoundService {
           this.log(`add round to game w/ id=${gameId} ${docRef.id}`);
           round.id = docRef.id;
           return round;
-        },
-        err =>  this.log(`Error addRound w/ id=${gameId}`)
+        }
       )
     );
   }
@@ -48,12 +47,38 @@ export class RoundService {
       .doc(gameId)
       .collection(Collection.Rounds)
       .doc(round.id).update(round).then(
-        () => {
-          this.log(`update round w/ game id=${gameId} roundId = ${round.id}`);
-          return round;
-        },
-        err =>  this.log(`Error updateRound w/ id=${gameId}`)
+      () => {
+        this.log(`update round w/ game id=${gameId} roundId = ${round.id}`);
+        return round;
+      }
       ));
+  }
+
+  claimNextRoundStarted(roundId: string, gameId: string): Observable<boolean> {
+    const roundRef = this.store.collection(Collection.Games)
+      .doc(gameId)
+      .collection(Collection.Rounds)
+      .doc(roundId).ref;
+
+    return from(this.store.firestore.runTransaction(async (transaction) => {
+      const snapshot = await transaction.get(roundRef);
+      const round = snapshot.data() as Round | undefined;
+
+      if (!round || round.nextRoundStarted) {
+        return false;
+      }
+
+      transaction.update(roundRef, { nextRoundStarted: true });
+      return true;
+    }));
+  }
+
+  releaseNextRoundStarted(roundId: string, gameId: string): Observable<void> {
+    return from(this.store.collection(Collection.Games)
+      .doc(gameId)
+      .collection(Collection.Rounds)
+      .doc(roundId)
+      .update({ nextRoundStarted: false }));
   }
 
   deleteRound(roundId: string, gameId: string): void {

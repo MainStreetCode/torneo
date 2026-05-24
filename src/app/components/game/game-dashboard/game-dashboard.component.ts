@@ -7,6 +7,7 @@ import { GamePlayer } from 'src/app/components/player/game-player';
 import { Game } from 'src/app/services/game/game';
 import { GameService } from 'src/app/services/game/game.service';
 import { GamePlayerService } from 'src/app/services/gamePlayer/game-player.service';
+import { RoundMediatorService } from 'src/app/services/round-mediator/round-mediator.service';
 import { Round } from 'src/app/services/round/round';
 import { RoundService } from 'src/app/services/round/round.service';
 import { environment } from 'src/environments/environment';
@@ -36,12 +37,14 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
   private subscriptions: Subscription[] = [];
   private dashboardSubscriptions: Subscription[] = [];
   private dashboardGameId?: string;
+  private ensuringNextRoundForRoundId?: string;
 
   constructor(
     private route: ActivatedRoute,
     private gameService: GameService,
     private gamePlayerService: GamePlayerService,
     private roundService: RoundService,
+    private roundMediatorService: RoundMediatorService,
     private location: Location,
     private router: Router,
     private snackBar: MatSnackBar) {
@@ -145,6 +148,39 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
 
     this.updateProgressPercentage();
     this.updateDashboardStatus();
+    this.ensureNextRoundStarted();
+  }
+
+  private ensureNextRoundStarted(): void {
+    if (!this.game || !this.latestRound?.id || !this.latestRound.pointsConfirmed) {
+      return;
+    }
+
+    if (this.roundCount >= this.game.numberOfRounds) {
+      return;
+    }
+
+    if (this.ensuringNextRoundForRoundId === this.latestRound.id) {
+      return;
+    }
+
+    this.ensuringNextRoundForRoundId = this.latestRound.id;
+    const subscription = this.roundMediatorService.ensureNextRoundStartedForLatestRound(this.game.id).subscribe({
+      next: (result) => {
+        if (!result.nextRoundStarted) {
+          this.ensuringNextRoundForRoundId = undefined;
+        }
+      },
+      error: (error) => {
+        const message = error?.message || 'Unable to start the next round automatically.';
+        this.snackBar.open(message, 'Dismiss', {
+          duration: 8000
+        });
+        this.ensuringNextRoundForRoundId = undefined;
+      }
+    });
+
+    this.dashboardSubscriptions.push(subscription);
   }
 
   private updateProgressPercentage(): void {
@@ -168,13 +204,13 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
     }
 
     if (this.roundCount >= configuredRounds) {
-      this.dashboardStatus = this.latestRound.pointsConfirmed ? 'Game completed' : 'All rounds started';
+      this.dashboardStatus = this.latestRound.pointsConfirmed ? 'Game completed' : `Round ${this.latestRound.number} started`;
       return;
     }
 
     this.dashboardStatus = this.latestRound.pointsConfirmed
       ? `Round ${this.latestRound.number} completed`
-      : `Round ${this.latestRound.number} active`;
+      : `Round ${this.latestRound.number} started`;
   }
 
   selectTab(tabNumber: number): void {

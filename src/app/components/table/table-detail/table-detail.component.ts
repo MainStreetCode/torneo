@@ -4,6 +4,7 @@ import { combineLatest, Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { GameService } from 'src/app/services/game/game.service';
+import { MessageService } from 'src/app/services/message/message.service';
 import { RoundMediatorService } from 'src/app/services/round-mediator/round-mediator.service';
 import { Round } from 'src/app/services/round/round';
 import { RoundService } from 'src/app/services/round/round.service';
@@ -34,6 +35,9 @@ export class TableDetailComponent implements OnInit, OnDestroy {
   private round?: Round;
   private hasRedirectedToDashboard = false;
   private previousPointsConfirmed?: boolean;
+  private previousAllTablesConfirmed?: boolean;
+  private isFinalizingRound = false;
+  private isEndingRound = false;
 
   constructor(
     private authService: AuthService,
@@ -43,7 +47,8 @@ export class TableDetailComponent implements OnInit, OnDestroy {
     private teamService: TeamService,
     private tableService: TableService,
     private roundService: RoundService,
-    private roundMediatorService: RoundMediatorService) { }
+    private roundMediatorService: RoundMediatorService,
+    private messageService: MessageService) { }
 
   ngOnInit(): void {
     this.gameId = this.route.snapshot.paramMap.get('gameId');
@@ -60,6 +65,7 @@ export class TableDetailComponent implements OnInit, OnDestroy {
         next: ([isAdmin, confirmed]) => {
           this.isCurrentUserAdmin = isAdmin;
           this.allTablesConfirmed = confirmed;
+          this.handleAllTablesConfirmedChange(confirmed);
           if (!isAdmin && confirmed) {
             this.isDisabled = true;
           } else {
@@ -204,11 +210,7 @@ export class TableDetailComponent implements OnInit, OnDestroy {
       this.table.pointsConfirmed = allTeamsConfirmed;
       this.subscriptions.push(
         this.tableService.updateTable(this.table, this.roundId, this.gameId).subscribe({
-          next: () => {
-            if (allTeamsConfirmed) {
-              this.finalizeRoundIfReady();
-            }
-          }
+          next: () => undefined
         })
       );
     }
@@ -262,9 +264,39 @@ export class TableDetailComponent implements OnInit, OnDestroy {
   }
 
   private finalizeRoundIfReady(): void {
+    if (this.isFinalizingRound) {
+      return;
+    }
+
+    this.isFinalizingRound = true;
+    this.isEndingRound = true;
     this.subscriptions.push(
-      this.roundMediatorService.finalizeRoundIfReady(this.roundId, this.gameId).subscribe()
+      this.roundMediatorService.finalizeRoundAndStartNextIfReady(this.roundId, this.gameId).subscribe({
+        next: (result) => {
+          if (result.finalized) {
+            this.navigateToScores();
+          }
+        },
+        error: (error) => {
+          this.messageService.add(`TableDetailComponent: ${error.message || 'Unable to start the next round'}`);
+          this.isFinalizingRound = false;
+          this.isEndingRound = false;
+        },
+        complete: () => {
+          this.isFinalizingRound = false;
+          this.isEndingRound = false;
+        }
+      })
     );
+  }
+
+  private handleAllTablesConfirmedChange(confirmed: boolean): void {
+    const shouldFinalize = confirmed && this.previousAllTablesConfirmed !== true;
+    this.previousAllTablesConfirmed = confirmed;
+
+    if (shouldFinalize) {
+      this.finalizeRoundIfReady();
+    }
   }
 
   private watchRoundFinalized(): void {
@@ -274,7 +306,7 @@ export class TableDetailComponent implements OnInit, OnDestroy {
           const wasPointsConfirmed = this.previousPointsConfirmed;
           this.round = round;
 
-          if (wasPointsConfirmed === false && round?.pointsConfirmed) {
+          if (!this.isEndingRound && wasPointsConfirmed === false && round?.pointsConfirmed) {
             this.navigateToScores();
           }
 
