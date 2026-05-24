@@ -21,6 +21,8 @@
         [team]="team"
         [table]="table"
         [allTablesConfirmed]="allTablesConfirmed"
+        [currentUserTeamId]="currentUserTeamId"
+        [pointsConfirmed]="isTeamConfirmed(team)"
         (confirmPoints)="toggleTeamConfirmPoints($event.team, $event.confirm)"
         (pointsChange)="updateTeamPoints($event.team, $event.points)"
         *ngFor="let team of teams; trackBy: trackByTeamId"
