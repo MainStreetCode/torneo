@@ -29,6 +29,11 @@ export interface RoundFinalizationResult {
   roundAlreadyFinalized?: boolean;
 }
 
+export interface RoundCreationResult {
+  round: Round;
+  tables: Table[];
+}
+
 interface FinalizedRoundResult {
   finalized: boolean;
   round?: Round;
@@ -36,6 +41,10 @@ interface FinalizedRoundResult {
 }
 
 export function assignPlayersToTables(players: GamePlayer[]): TableData[] {
+  if (players.length % 4 !== 0) {
+    throw new FixedTableAssignmentError(`${players.length} players cannot be evenly assigned to tables of 4.`);
+  }
+
   const numberOfTables = Math.floor(players.length / 4);
   const tablePlayers: GamePlayer[][] = Array.from({ length: numberOfTables }, () => []);
   const randomPlayers: GamePlayer[] = [];
@@ -133,7 +142,7 @@ function takeRandomPlayer(players: GamePlayer[]): GamePlayer | undefined {
   providedIn: 'root'
 })
 export class RoundMediatorService {
-  private byes = [];
+  private byes: GamePlayer[] = [];
 
   constructor(
     private gameService: GameService,
@@ -147,6 +156,10 @@ export class RoundMediatorService {
   allTablesConfirmed(roundId: string, gameId: string): Observable<boolean> {
     return this.tableService.getTablesForRound(roundId, gameId).pipe(
       map((tables) => {
+        if (!tables || tables.length === 0) {
+          return false;
+        }
+
         let confirmCounter = 0;
         tables.map((table) => {
           if (table.pointsConfirmed) {
@@ -214,12 +227,16 @@ export class RoundMediatorService {
         return combineLatest(
           teamPlayers.map((teamPlayer) => {
             const teamGamePlayer = teamPlayer.player;
+            const gamePlayer = gamePlayers.find((gp) => gp.uid === teamGamePlayer.uid);
 
-            if (!teamGamePlayer.pointsForRound) {
-              teamGamePlayer.pointsForRound = [];
+            if (!gamePlayer) {
+              return throwError(() => new Error(`Unable to update points for missing player ${teamGamePlayer.uid}.`));
             }
 
-            const gamePlayer = gamePlayers.find((gp) => gp.uid === teamGamePlayer.uid);
+            if (!gamePlayer.pointsForRound) {
+              gamePlayer.pointsForRound = [];
+            }
+
             let gamePlayerPointsForRound: RoundPoints | undefined;
 
             if (gamePlayer.pointsForRound) {
@@ -229,7 +246,7 @@ export class RoundMediatorService {
             // check game player points to see if they already have points to prevent extra call to update
             if (gamePlayer && gamePlayerPointsForRound) {
               if (gamePlayerPointsForRound.points === teamPlayer.points) {
-                return of(teamGamePlayer);
+                return of(gamePlayer);
               }
               gamePlayerPointsForRound.points = teamPlayer.points;
             } else {
@@ -238,10 +255,10 @@ export class RoundMediatorService {
                 roundNumber,                
                 points: teamPlayer.points
               };
-              teamGamePlayer.pointsForRound.push(newRoundPoints);
+              gamePlayer.pointsForRound.push(newRoundPoints);
             }
 
-            return this.gamePlayerService.updatePlayer(teamGamePlayer, gameId);
+            return this.gamePlayerService.updatePlayer(gamePlayer, gameId);
           })
         );
       })
@@ -258,6 +275,10 @@ export class RoundMediatorService {
       this.roundService.getRound(roundId, gameId).pipe(take(1))
     ]).pipe(
       switchMap(([gamePlayers, round]) => {
+        if (!round) {
+          return of(null);
+        }
+
         this.log('updateByePlayerPoints');
 
         const byePlayers = round.byes;
@@ -467,16 +488,28 @@ export class RoundMediatorService {
       this.gamePlayerService.playersForGame(gameId)
     ]).pipe(take(1),
       switchMap(([game, players]) => {
+        if (!game || !players) {
+          return throwError(() => new Error('Unable to load game data for bye selection.'));
+        }
 
         this.log('selectByes');
 
         const numberOfByes = players.length % 4;
+        const activePlayerIds = new Set(players.map((player) => player.uid));
 
         // randomly select players from the bye pool
         for (let i = 0; i < numberOfByes; i++) {
           // if there are no byes in the pool, add all players to the pool
           if (!game.byePool || game.byePool?.length === 0) {
-            game.byePool = [ ...players ];
+            game.byePool = players.filter((player) => !this.byes.some((bye) => bye.uid === player.uid));
+          } else {
+            game.byePool = game.byePool.filter((player) =>
+              activePlayerIds.has(player.uid) && !this.byes.some((bye) => bye.uid === player.uid)
+            );
+          }
+
+          if (game.byePool.length === 0) {
+            return throwError(() => new Error('Unable to select unique bye players for the round.'));
           }
 
           const randomNumber = Math.floor(Math.random() * game.byePool.length);
@@ -511,7 +544,7 @@ export class RoundMediatorService {
     );
   }
 
-  public createRound(gameId: string, expectedRoundNumber?: number): Observable<Table[]> {
+  public createRound(gameId: string, expectedRoundNumber?: number): Observable<RoundCreationResult> {
     return this.selectByes(gameId).pipe(
       switchMap((game) => {
         return combineLatest([
@@ -533,6 +566,14 @@ export class RoundMediatorService {
                 const isByePlayer = this.byes.find((byePlayer) => byePlayer.uid === player.uid);
                 return !isByePlayer;
               });
+            }
+
+            if (filteredPlayers.length < 4) {
+              return throwError(() => new Error('At least 4 active players are required to create a round.'));
+            }
+
+            if (filteredPlayers.length % 4 !== 0) {
+              return throwError(() => new Error(`${filteredPlayers.length} players remain after byes; tables require groups of 4.`));
             }
 
             let tablesData: TableData[];
@@ -588,6 +629,8 @@ export class RoundMediatorService {
                       }
                     ));
                   })
+                ).pipe(
+                  map((tables) => ({ round, tables }))
                 );
               })
             );

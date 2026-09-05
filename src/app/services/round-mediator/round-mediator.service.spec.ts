@@ -1,5 +1,6 @@
 import { GamePlayer } from 'src/app/components/player/game-player';
 import { Table } from 'src/app/components/table/table';
+import { Team } from 'src/app/components/team/team';
 import { Game } from '../game/game';
 import { GameService } from '../game/game.service';
 import { GamePlayerService } from '../gamePlayer/game-player.service';
@@ -151,10 +152,10 @@ describe('RoundMediatorService', () => {
       'claimNextRoundStarted',
       'releaseNextRoundStarted'
     ]);
-    gamePlayerService = jasmine.createSpyObj<GamePlayerService>('GamePlayerService', ['playersForGame']);
+    gamePlayerService = jasmine.createSpyObj<GamePlayerService>('GamePlayerService', ['playersForGame', 'updatePlayer']);
     messageService = jasmine.createSpyObj<MessageService>('MessageService', ['add']);
     tableService = jasmine.createSpyObj<TableService>('TableService', ['getTablesForRound', 'addTable']);
-    teamService = jasmine.createSpyObj<TeamService>('TeamService', ['addTeam']);
+    teamService = jasmine.createSpyObj<TeamService>('TeamService', ['addTeam', 'getTeamsForTable']);
 
     service = new RoundMediatorService(
       gameService,
@@ -167,11 +168,12 @@ describe('RoundMediatorService', () => {
 
     spyOn(service, 'updatePlayerPoints').and.returnValue(of([]));
     spyOn(service, 'updateByePlayerPoints').and.returnValue(of([]));
-    spyOn(service, 'createRound').and.returnValue(of([] as Table[]));
+    spyOn(service, 'createRound').and.returnValue(of({ round: round(1), tables: [] as Table[] }));
     roundService.updateRound.and.callFake((roundToUpdate) => of(roundToUpdate));
     roundService.addRound.and.callFake((roundToAdd) => of({ ...roundToAdd, id: 'new-round' }));
     roundService.releaseNextRoundStarted.and.returnValue(of(undefined));
     gameService.updateGame.and.callFake((gameToUpdate) => of(gameToUpdate));
+    gamePlayerService.updatePlayer.and.callFake((playerToUpdate) => of(playerToUpdate));
     tableService.addTable.and.callFake((tableToAdd) => of({ ...tableToAdd, id: `table-${tableToAdd.number}` }));
     teamService.addTeam.and.callFake((teamToAdd) => of(teamToAdd));
     tableService.getTablesForRound.and.returnValue(of([table(true)]));
@@ -379,6 +381,90 @@ describe('RoundMediatorService', () => {
         done();
       }
     });
+  });
+
+  it('updates the current player document instead of the stale table snapshot', (done) => {
+    (service.updatePlayerPoints as jasmine.Spy).and.callThrough();
+    const currentPlayer = {
+      uid: 'player-1',
+      displayName: 'Edited Name',
+      fixedTableNumber: 2,
+      pointsForRound: []
+    } as GamePlayer;
+    const tableSnapshotPlayer = {
+      uid: 'player-1',
+      displayName: 'Old Name',
+      pointsForRound: []
+    } as GamePlayer;
+
+    gamePlayerService.playersForGame.and.returnValue(of([currentPlayer]));
+    tableService.getTablesForRound.and.returnValue(of([{ ...table(true), id: 'table-1' }]));
+    teamService.getTeamsForTable.and.returnValue(of([{
+      id: 'team-1',
+      points: 12,
+      teamPlayers: [{
+        player: tableSnapshotPlayer,
+        points: 12,
+        isPointsConfirmed: false
+      }]
+    } as Team]));
+
+    service.updatePlayerPoints('round-1', 'game-1', 1).subscribe({
+      next: () => {
+        expect(gamePlayerService.updatePlayer).toHaveBeenCalledWith(jasmine.objectContaining({
+          uid: 'player-1',
+          displayName: 'Edited Name',
+          fixedTableNumber: 2,
+          pointsForRound: jasmine.arrayContaining([jasmine.objectContaining({ roundId: 'round-1', points: 12 })])
+        }), 'game-1');
+        done();
+      }
+    });
+  });
+
+  it('returns the created round with its tables', (done) => {
+    (service.createRound as jasmine.Spy).and.callThrough();
+    gameService.getGame.and.returnValue(of(game(3)));
+    gamePlayerService.playersForGame.and.returnValue(of(players(4)));
+    roundService.roundsForGame.and.returnValue(of([]));
+
+    service.createRound('game-1', 1).subscribe({
+      next: (result) => {
+        expect(result.round.id).toBe('new-round');
+        expect(result.tables.length).toBe(1);
+        expect(result.tables[0].id).toBe('table-1');
+        done();
+      }
+    });
+  });
+
+  it('does not select the same bye player twice when the bye pool refills mid-round', (done) => {
+    (service.createRound as jasmine.Spy).and.callThrough();
+    spyOn(Math, 'random').and.returnValue(0);
+    const gamePlayers = players(6);
+    const currentGame = {
+      ...game(3),
+      byePool: [gamePlayers[0]]
+    };
+    gameService.getGame.and.returnValue(of(currentGame));
+    gamePlayerService.playersForGame.and.returnValue(of(gamePlayers));
+    roundService.roundsForGame.and.returnValue(of([]));
+
+    service.createRound('game-1', 1).subscribe({
+      next: (result) => {
+        const byeIds = result.round.byes.map((bye) => bye.uid);
+        const uniqueByeIds = new Set(byeIds);
+
+        expect(byeIds.length).toBe(2);
+        expect(uniqueByeIds.size).toBe(2);
+        expect(result.tables[0].playerIds.length).toBe(4);
+        done();
+      }
+    });
+  });
+
+  it('throws when active players cannot be evenly assigned to tables', () => {
+    expect(() => assignPlayersToTables(players(5))).toThrowError(FixedTableAssignmentError);
   });
 
   function arrangeNextRoundCheck(currentRound: Round, rounds: Round[], currentGame: Game, gamePlayers: GamePlayer[]): void {

@@ -1,16 +1,22 @@
-import { TestBed } from '@angular/core/testing';
-
 import { GamePlayerService } from './game-player.service';
 
 describe('GamePlayerService', () => {
   let service: GamePlayerService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
-    service = TestBed.inject(GamePlayerService);
+    service = new GamePlayerService({ add: () => undefined } as any, {} as any);
   });
 
   it('should be created', () => {
     expect(service).toBeTruthy();
+  });
+
+  it('returns an empty observable for non-empty search terms until search is implemented', (done) => {
+    service.searchPlayers('alice').subscribe({
+      next: (players) => {
+        expect(players).toEqual([]);
+        done();
+      }
+    });
   });
 });
