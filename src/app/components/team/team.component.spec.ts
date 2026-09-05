@@ -109,7 +109,7 @@ describe('TeamComponent', () => {
     expect(component.pointsChange.emit).not.toHaveBeenCalledWith(jasmine.objectContaining({ points: NaN }));
   });
 
-  it('enables point confirmation for an opposing team', () => {
+  it('enables score confirmation for an opposing team', () => {
     component.auth = { currentUser: { uid: 'player-a' } } as any;
     component.team = createTeam(5, 'team-b', ['player-b']);
     component.currentUserTeamId = 'team-a';
@@ -122,7 +122,7 @@ describe('TeamComponent', () => {
     expect(component.canConfirmPoints).toBeTrue();
   });
 
-  it('disables point confirmation for the current user team', () => {
+  it('enables score submission for the current user team', () => {
     component.auth = { currentUser: { uid: 'player-a' } } as any;
     component.team = createTeam(5, 'team-a', ['player-a']);
     component.currentUserTeamId = 'team-a';
@@ -132,7 +132,7 @@ describe('TeamComponent', () => {
       currentUserTeamId: new SimpleChange(null, component.currentUserTeamId, false)
     });
 
-    expect(component.canConfirmPoints).toBeFalse();
+    expect(component.canConfirmPoints).toBeTrue();
   });
 
   it('keeps the current user team points editable until confirmed or finalized', () => {

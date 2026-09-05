@@ -19,14 +19,14 @@
           </mat-form-field>
     </div>
     <div>
-        <button mat-raised-button color="primary" class="full-width" [disabled]="!canConfirmPoints" (click)="toggleConfirmPoints(true)" *ngIf="!pointsConfirmed">
+        <button mat-raised-button color="primary" class="full-width" (click)="toggleConfirmPoints(true)" *ngIf="!currentUserTeamConfirmed && canConfirmPoints">
             <mat-icon>check</mat-icon>
-            Confirm Points
+            {{isCurrentUserOnTeam ? 'Submit Score' : 'Confirm Score'}}
         </button>
 
-        <button mat-raised-button color="primary" class="full-width" [disabled]="!canConfirmPoints" (click)="toggleConfirmPoints(false)" *ngIf="pointsConfirmed">
+        <button mat-raised-button color="accent" class="full-width" (click)="toggleConfirmPoints(false)" *ngIf="currentUserTeamConfirmed && canConfirmPoints">
             <mat-icon>cancel</mat-icon>
-            Change Points
+            {{isCurrentUserOnTeam ? 'Change Score' : 'Change Confirmation'}}
         </button>
     </div>
 </mat-card>

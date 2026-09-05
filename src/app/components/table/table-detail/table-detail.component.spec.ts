@@ -80,24 +80,30 @@ describe('TableDetailComponent', () => {
     expect(component.pointsConfirmed).toBeFalse();
   });
 
-  it('does not allow a player to confirm their own team points', () => {
+  it('allows a player to submit their own team points', () => {
     component.toggleTeamConfirmPoints(component.teams[0], true);
 
-    expect(component.teams[0].pointConfirmations).toBeUndefined();
-    expect(teamService.updateTeam).not.toHaveBeenCalled();
+    expect(component.teams[0].pointConfirmations).toEqual([
+      { teamId: 'team-a', playerId: 'player-a' }
+    ]);
+    expect(teamService.updateTeam).toHaveBeenCalledWith(component.teams[0], 'table-1', 'round-1', 'game-1');
   });
 
-  it('confirms the table only after every team has an opponent confirmation', () => {
+  it('confirms the table only after every team has self and opponent confirmations', () => {
+    component.toggleTeamConfirmPoints(component.teams[0], true);
     component.toggleTeamConfirmPoints(component.teams[1], true);
     currentUserId = 'player-b';
+    component.toggleTeamConfirmPoints(component.teams[1], true);
 
     component.toggleTeamConfirmPoints(component.teams[0], true);
 
     expect(component.teams[0].pointConfirmations).toEqual([
+      { teamId: 'team-a', playerId: 'player-a' },
       { teamId: 'team-b', playerId: 'player-b' }
     ]);
     expect(component.teams[1].pointConfirmations).toEqual([
-      { teamId: 'team-a', playerId: 'player-a' }
+      { teamId: 'team-a', playerId: 'player-a' },
+      { teamId: 'team-b', playerId: 'player-b' }
     ]);
     expect(component.pointsConfirmed).toBeTrue();
     expect(component.table.pointsConfirmed).toBeTrue();
@@ -153,8 +159,10 @@ describe('TableDetailComponent', () => {
   });
 
   it('does not let a stale unconfirmed table update permanently block auto-finalization', () => {
+    component.toggleTeamConfirmPoints(component.teams[0], true);
     component.toggleTeamConfirmPoints(component.teams[1], true);
     currentUserId = 'player-b';
+    component.toggleTeamConfirmPoints(component.teams[1], true);
 
     component.toggleTeamConfirmPoints(component.teams[0], true);
 
@@ -166,17 +174,34 @@ describe('TableDetailComponent', () => {
     expect(roundMediatorService.finalizeRoundAndStartNextIfReady).toHaveBeenCalledWith('round-1', 'game-1');
   });
 
-  it('clears all confirmations and table confirmation when team points change', () => {
+  it('detects whether the current user team has confirmed a team score', () => {
+    component.currentUserTeamId = 'team-a';
+    component.teams[1].pointConfirmations = [{ teamId: 'team-a', playerId: 'player-a' }];
+
+    expect(component.hasCurrentUserTeamConfirmed(component.teams[1])).toBeTrue();
+    expect(component.hasCurrentUserTeamConfirmed(component.teams[0])).toBeFalse();
+  });
+
+  it('clears only the changed team confirmations and table confirmation when team points change', () => {
     component.table = createTable(true);
     component.teams = [
-      createTeam('team-a', ['player-a'], [{ teamId: 'team-b', playerId: 'player-b' }]),
-      createTeam('team-b', ['player-b'], [{ teamId: 'team-a', playerId: 'player-a' }])
+      createTeam('team-a', ['player-a'], [
+        { teamId: 'team-a', playerId: 'player-a' },
+        { teamId: 'team-b', playerId: 'player-b' }
+      ]),
+      createTeam('team-b', ['player-b'], [
+        { teamId: 'team-a', playerId: 'player-a' },
+        { teamId: 'team-b', playerId: 'player-b' }
+      ])
     ];
 
-    component.updateTeamPoints(component.teams[0], 12);
+    component.updateTeamPoints(component.teams[1], 12);
 
-    expect(component.teams[0].points).toBe(12);
-    expect(component.teams[0].pointConfirmations).toEqual([]);
+    expect(component.teams[1].points).toBe(12);
+    expect(component.teams[0].pointConfirmations).toEqual([
+      { teamId: 'team-a', playerId: 'player-a' },
+      { teamId: 'team-b', playerId: 'player-b' }
+    ]);
     expect(component.teams[1].pointConfirmations).toEqual([]);
     expect(component.table.pointsConfirmed).toBeFalse();
     expect(component.pointsConfirmed).toBeFalse();
