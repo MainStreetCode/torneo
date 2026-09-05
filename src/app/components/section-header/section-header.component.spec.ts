@@ -1,3 +1,5 @@
+import { Location } from '@angular/common';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SectionHeaderComponent } from './section-header.component';
@@ -8,7 +10,11 @@ describe('SectionHeaderComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SectionHeaderComponent ]
+      declarations: [ SectionHeaderComponent ],
+      providers: [
+        { provide: Location, useValue: jasmine.createSpyObj<Location>('Location', ['back']) }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
     })
     .compileComponents();
 

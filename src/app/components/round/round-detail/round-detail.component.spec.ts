@@ -9,11 +9,13 @@ import { TableService } from 'src/app/services/table/table.service';
 describe('RoundDetailComponent', () => {
   let component: RoundDetailComponent;
   let router: jasmine.SpyObj<any>;
+  let roundService: jasmine.SpyObj<RoundService>;
   let roundMediatorService: jasmine.SpyObj<RoundMediatorService>;
   let dialog: jasmine.SpyObj<any>;
 
   beforeEach(() => {
     router = jasmine.createSpyObj('Router', ['navigateByUrl']);
+    roundService = jasmine.createSpyObj<RoundService>('RoundService', ['getRound']);
     dialog = jasmine.createSpyObj('MatDialog', ['open']);
     dialog.open.and.returnValue({
       afterClosed: () => of(undefined)
@@ -27,7 +29,7 @@ describe('RoundDetailComponent', () => {
     component = new RoundDetailComponent(
       router,
       {} as any,
-      {} as RoundService,
+      roundService,
       {} as TableService,
       roundMediatorService,
       {} as GameService,
@@ -88,6 +90,15 @@ describe('RoundDetailComponent', () => {
     emitRoundFinalized(component);
 
     expect(router.navigateByUrl).toHaveBeenCalledWith('/game/game-1/dashboard?selectedTab=0&roundEnded=1');
+  });
+
+  it('handles a missing round without throwing', () => {
+    component.gameId = 'game-1';
+    component.roundId = 'missing-round';
+    roundService.getRound.and.returnValue(of(undefined));
+
+    expect(() => component.getRound()).not.toThrow();
+    expect(component.round).toBeUndefined();
   });
 });
 

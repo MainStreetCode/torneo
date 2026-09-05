@@ -123,7 +123,7 @@ export class GameService {
       take(1)
     ).pipe(
       map((game) => {
-          return !!game.adminIds.find((adminId) => adminId === playerId);
+          return !!game?.adminIds?.find((adminId) => adminId === playerId);
       })
     );
   }

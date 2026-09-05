@@ -84,6 +84,11 @@ export class RoundDetailComponent implements OnInit, OnDestroy {
     this.subscriptions.push(
       this.roundService.getRound(this.roundId, this.gameId).subscribe({
         next: (round) => {
+          if (!round) {
+            this.round = undefined;
+            return;
+          }
+
           const wasPointsConfirmed = this.previousPointsConfirmed;
           this.round = round;
           this.sectionName = `Round ${round.number}`;

@@ -1,23 +1,108 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { of } from 'rxjs';
+import { GamePlayer } from 'src/app/components/player/game-player';
+import { Game } from 'src/app/services/game/game';
+import { GameService } from 'src/app/services/game/game.service';
+import { GamePlayerService } from 'src/app/services/gamePlayer/game-player.service';
+import { RoundMediatorService } from 'src/app/services/round-mediator/round-mediator.service';
+import { Round } from 'src/app/services/round/round';
+import { RoundService } from 'src/app/services/round/round.service';
 
 import { RoundsComponent } from './rounds.component';
 
 describe('RoundsComponent', () => {
   let component: RoundsComponent;
-  let fixture: ComponentFixture<RoundsComponent>;
+  let roundService: jasmine.SpyObj<RoundService>;
+  let roundMediatorService: jasmine.SpyObj<RoundMediatorService>;
+  let gameService: jasmine.SpyObj<GameService>;
+  let router: jasmine.SpyObj<any>;
+  let dialog: jasmine.SpyObj<any>;
+  let playerService: jasmine.SpyObj<GamePlayerService>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [ RoundsComponent ]
-    })
-    .compileComponents();
+  beforeEach(() => {
+    roundService = jasmine.createSpyObj<RoundService>('RoundService', ['roundsForGame']);
+    roundMediatorService = jasmine.createSpyObj<RoundMediatorService>('RoundMediatorService', [
+      'allTablesConfirmed',
+      'createRound'
+    ]);
+    gameService = jasmine.createSpyObj<GameService>('GameService', ['isCurrentUserAdmin']);
+    router = jasmine.createSpyObj('Router', ['navigateByUrl']);
+    dialog = jasmine.createSpyObj('MatDialog', ['open']);
+    playerService = jasmine.createSpyObj<GamePlayerService>('GamePlayerService', ['playersForGame']);
 
-    fixture = TestBed.createComponent(RoundsComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    dialog.open.and.returnValue({ afterClosed: () => of(undefined) });
+    gameService.isCurrentUserAdmin.and.returnValue(of(true));
+    roundService.roundsForGame.and.returnValue(of([]));
+    roundMediatorService.allTablesConfirmed.and.returnValue(of(true));
+    roundMediatorService.createRound.and.returnValue(of({
+      round: round(1),
+      tables: []
+    }));
+    playerService.playersForGame.and.returnValue(of(players(4)));
+
+    component = new RoundsComponent(
+      roundService,
+      roundMediatorService,
+      gameService,
+      router,
+      dialog,
+      playerService
+    );
+    component.game = game(3);
+    component.allTablesPointsConfirmed$ = of(true);
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('navigates to the newly created first round', () => {
+    roundMediatorService.createRound.and.returnValue(of({
+      round: round(1),
+      tables: []
+    }));
+
+    component.startRound(1);
+
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/game/game-1/round/round-1');
+  });
+
+  it('does not navigate to a stale cached round after creating the next round', () => {
+    component.rounds = [round(1)];
+    roundMediatorService.createRound.and.returnValue(of({
+      round: round(2),
+      tables: []
+    }));
+
+    component.startRound(2);
+
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/game/game-1/round/round-2');
+  });
+
+  function round(number: number): Round {
+    return {
+      id: `round-${number}`,
+      number,
+      byes: [],
+      pointsConfirmed: number < 2
+    };
+  }
+
+  function game(numberOfRounds: number): Game {
+    return {
+      id: 'game-1',
+      name: 'Game',
+      adminIds: [],
+      numberOfRounds,
+      createdDate: new Date(),
+      byePool: []
+    };
+  }
+
+  function players(count: number): GamePlayer[] {
+    return Array.from({ length: count }, (_, index) => ({
+      uid: `player-${index + 1}`,
+      displayName: `Player ${index + 1}`,
+      pointsForRound: []
+    } as GamePlayer));
+  }
 });

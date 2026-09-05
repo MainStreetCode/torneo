@@ -82,6 +82,7 @@ export class GamePlayerService {
     //     this.log(`no Players matching "${term}"`)),
     //   catchError(this.handleError<Player[]>('searchPlayers', []))
     // );
+    return of([]);
   }
 
   private log(message: string): void {

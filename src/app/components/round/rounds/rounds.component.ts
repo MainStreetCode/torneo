@@ -85,10 +85,9 @@ export class RoundsComponent implements OnInit, OnDestroy {
           }
         }
       )).subscribe({
-        next: (tables) => {
-          if (tables) {
-            const lastRoundId = this.rounds[this.rounds.length - 1].id;
-            this.router.navigateByUrl(`/game/${this.game.id}/round/${lastRoundId}`);
+        next: (result) => {
+          if (result?.round?.id) {
+            this.router.navigateByUrl(`/game/${this.game.id}/round/${result.round.id}`);
           }
         },
         error: (error) => {
