@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { of } from 'rxjs';
+import { GamePlayerService } from 'src/app/services/gamePlayer/game-player.service';
 
 import { PlayerSearchComponent } from './player-search.component';
 
@@ -8,7 +10,10 @@ describe('PlayerSearchComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ PlayerSearchComponent ]
+      declarations: [ PlayerSearchComponent ],
+      providers: [
+        { provide: GamePlayerService, useValue: { searchPlayers: () => of([]) } }
+      ]
     })
     .compileComponents();
   });
