@@ -47,8 +47,7 @@ export class GameService {
       () => {
         this.log(`updated game w/ id=${game.id}`);
         return game;
-      },
-      err => this.log(`updateGame ${err}`)
+      }
     ));
   }
 

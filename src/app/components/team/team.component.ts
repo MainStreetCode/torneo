@@ -19,6 +19,9 @@ export class TeamComponent implements OnInit, OnChanges, OnDestroy {
   @Input() team: Team;
   @Input() table: Table;
   @Input() allTablesConfirmed = false;
+  @Input() currentUserTeamId?: string;
+  @Input() pointsConfirmed = false;
+  @Input() currentUserTeamConfirmed = false;
   @Output() confirmPoints = new EventEmitter<{ team: Team, confirm: boolean }>();
   @Output() pointsChange = new EventEmitter<{ team: Team, points: number }>();
 
@@ -26,7 +29,6 @@ export class TeamComponent implements OnInit, OnChanges, OnDestroy {
   gameId: string;
   roundId: string;
   auth?: Auth;
-  pointsConfirmed = false;
   isEditable = true;
   canConfirmPoints = false;
   isCurrentUserOnTeam = false;
@@ -84,7 +86,7 @@ export class TeamComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if ((changes.team || changes.allTablesConfirmed) && this.team) {
+    if ((changes.team || changes.allTablesConfirmed || changes.currentUserTeamId || changes.pointsConfirmed || changes.currentUserTeamConfirmed) && this.team) {
       this.updateTeamState();
     }
   }
@@ -153,9 +155,8 @@ export class TeamComponent implements OnInit, OnChanges, OnDestroy {
   private updateTeamState(): void {
     const currentUser = this.auth?.currentUser;
     this.teamPlayers = this.team.teamPlayers ?? [];
-    this.pointsConfirmed = this.teamPlayers.some((teamPlayer) => !!teamPlayer.isPointsConfirmed);
     this.isCurrentUserOnTeam = !!currentUser && this.teamPlayers.some((teamPlayer) => teamPlayer.player.uid === currentUser.uid);
-    this.canConfirmPoints = !!currentUser && this.isCurrentUserOnTeam && !this.allTablesConfirmed;
+    this.canConfirmPoints = !!currentUser && !!this.currentUserTeamId && !this.allTablesConfirmed;
 
     if (!this.gameId || !this.roundId) {
       this.isEditable = false;

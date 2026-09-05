@@ -4,6 +4,7 @@ import { combineLatest, Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { GameService } from 'src/app/services/game/game.service';
+import { MessageService } from 'src/app/services/message/message.service';
 import { RoundMediatorService } from 'src/app/services/round-mediator/round-mediator.service';
 import { Round } from 'src/app/services/round/round';
 import { RoundService } from 'src/app/services/round/round.service';
@@ -26,6 +27,7 @@ export class TableDetailComponent implements OnInit, OnDestroy {
   roundId: string;
   pointsConfirmed = false;
   currentTeamPlayer?: TeamPlayer;
+  currentUserTeamId?: string;
   isDisabled = false;
   subscriptions: Subscription[] = [];
   isCurrentUserAdmin = false;
@@ -33,6 +35,9 @@ export class TableDetailComponent implements OnInit, OnDestroy {
   private round?: Round;
   private hasRedirectedToDashboard = false;
   private previousPointsConfirmed?: boolean;
+  private previousAllTablesConfirmed?: boolean;
+  private isFinalizingRound = false;
+  private isEndingRound = false;
 
   constructor(
     private authService: AuthService,
@@ -42,7 +47,8 @@ export class TableDetailComponent implements OnInit, OnDestroy {
     private teamService: TeamService,
     private tableService: TableService,
     private roundService: RoundService,
-    private roundMediatorService: RoundMediatorService) { }
+    private roundMediatorService: RoundMediatorService,
+    private messageService: MessageService) { }
 
   ngOnInit(): void {
     this.gameId = this.route.snapshot.paramMap.get('gameId');
@@ -59,6 +65,7 @@ export class TableDetailComponent implements OnInit, OnDestroy {
         next: ([isAdmin, confirmed]) => {
           this.isCurrentUserAdmin = isAdmin;
           this.allTablesConfirmed = confirmed;
+          this.handleAllTablesConfirmedChange(confirmed);
           if (!isAdmin && confirmed) {
             this.isDisabled = true;
           } else {
@@ -80,18 +87,20 @@ export class TableDetailComponent implements OnInit, OnDestroy {
 
     this.subscriptions.push(
       combineLatest([
-        this.gameService.isUserAdmin(currentUser.uid, this.gameId),
         this.teamService.getTeamsForTable(this.table.id, this.roundId, this.gameId)
       ]).subscribe({
-        next: ([isAdmin, updatedTeams]) => {
+        next: ([updatedTeams]) => {
           if (updatedTeams) {
 
             this.teams = updatedTeams;
+            this.currentTeamPlayer = undefined;
+            this.currentUserTeamId = undefined;
 
             updatedTeams.forEach((team) => {
               const updatedCurrentPlayer = team.teamPlayers.find((teamPlayer) => teamPlayer.player.uid === currentUser.uid);
               if (updatedCurrentPlayer) {
                 this.currentTeamPlayer = updatedCurrentPlayer;
+                this.currentUserTeamId = team.id;
               }
             });
 
@@ -113,16 +122,12 @@ export class TableDetailComponent implements OnInit, OnDestroy {
 
           if (isAdmin) {
             this.teams.forEach((team) => {
-              this.setTeamPointsConfirmed(team, confirm);
+              this.setAdminTeamPointsConfirmed(team, confirm, currentUser.uid);
             });
 
           } else if (this.currentTeamPlayer) {
-            this.teams.forEach((team) => {
-              const teamPlayer = team.teamPlayers.find((tp) => tp.player.uid === currentUser.uid);
-              if (teamPlayer) {
-                this.setTeamPointsConfirmed(team, confirm);
-              }
-            });
+            const currentUsersTeam = this.getCurrentUsersTeam(currentUser.uid);
+            this.teams.forEach((team) => this.setTeamPointsConfirmed(team, currentUsersTeam, currentUser.uid, confirm));
           }
 
           this.updateTeams().subscribe({
@@ -141,15 +146,11 @@ export class TableDetailComponent implements OnInit, OnDestroy {
     if (!currentUser || this.allTablesConfirmed) { return; }
 
     const teamToUpdate = this.teams.find((t) => t.id === team.id);
-    const isCurrentUsersTeam = teamToUpdate?.teamPlayers.some((teamPlayer) => teamPlayer.player.uid === currentUser.uid);
+    const currentUsersTeam = this.getCurrentUsersTeam(currentUser.uid);
 
-    if (!teamToUpdate || !isCurrentUsersTeam) { return; }
+    if (!teamToUpdate || !currentUsersTeam) { return; }
 
-    if (confirm) {
-      this.setCurrentPlayerPointsConfirmed(teamToUpdate, currentUser.uid);
-    } else {
-      this.setTeamPointsConfirmed(teamToUpdate, false);
-    }
+    this.setTeamPointsConfirmed(teamToUpdate, currentUsersTeam, currentUser.uid, confirm);
 
     this.subscriptions.push(
       this.teamService.updateTeam(teamToUpdate, this.table.id, this.roundId, this.gameId).subscribe({
@@ -168,7 +169,7 @@ export class TableDetailComponent implements OnInit, OnDestroy {
     if (!teamToUpdate || teamToUpdate.points === points) { return; }
 
     teamToUpdate.points = points;
-    this.clearAllTeamConfirmations();
+    this.clearTeamConfirmations(teamToUpdate);
 
     if (this.table.pointsConfirmed) {
       this.table.pointsConfirmed = false;
@@ -191,7 +192,16 @@ export class TableDetailComponent implements OnInit, OnDestroy {
   }
 
   isTeamConfirmed(team: Team): boolean {
-    return (team.teamPlayers ?? []).some((teamPlayer) => !!teamPlayer.isPointsConfirmed);
+    const requiredTeamIds = (this.teams ?? []).map((tableTeam) => tableTeam.id);
+
+    return requiredTeamIds.length > 0 && requiredTeamIds.every((teamId) =>
+      (team.pointConfirmations ?? []).some((confirmation) => confirmation.teamId === teamId)
+    );
+  }
+
+  hasCurrentUserTeamConfirmed(team: Team): boolean {
+    return !!this.currentUserTeamId && (team.pointConfirmations ?? [])
+      .some((confirmation) => confirmation.teamId === this.currentUserTeamId);
   }
 
   private checkPointsConfirmed(): void {
@@ -202,32 +212,49 @@ export class TableDetailComponent implements OnInit, OnDestroy {
       this.table.pointsConfirmed = allTeamsConfirmed;
       this.subscriptions.push(
         this.tableService.updateTable(this.table, this.roundId, this.gameId).subscribe({
-          next: () => {
-            if (allTeamsConfirmed) {
-              this.finalizeRoundIfReady();
-            }
-          }
+          next: () => undefined
         })
       );
     }
   }
 
-  private setTeamPointsConfirmed(team: Team, confirm: boolean): void {
-    team.teamPlayers = (team.teamPlayers ?? []).map((teamPlayer) => ({
-      ...teamPlayer,
-      isPointsConfirmed: confirm
-    }));
+  private setAdminTeamPointsConfirmed(team: Team, confirm: boolean, adminPlayerId: string): void {
+    if (!confirm) {
+      team.pointConfirmations = [];
+      return;
+    }
+
+    team.pointConfirmations = (this.teams ?? []).map((tableTeam) => ({
+        teamId: tableTeam.id,
+        playerId: adminPlayerId
+      }));
   }
 
-  private setCurrentPlayerPointsConfirmed(team: Team, playerId: string): void {
-    team.teamPlayers = (team.teamPlayers ?? []).map((teamPlayer) => ({
-      ...teamPlayer,
-      isPointsConfirmed: teamPlayer.player.uid === playerId ? true : !!teamPlayer.isPointsConfirmed
-    }));
+  private setTeamPointsConfirmed(team: Team, confirmingTeam: Team | undefined, playerId: string, confirm: boolean): void {
+    if (!confirmingTeam) { return; }
+
+    const existingConfirmations = (team.pointConfirmations ?? [])
+      .filter((confirmation) => confirmation.teamId !== confirmingTeam.id);
+
+    team.pointConfirmations = confirm
+      ? [
+          ...existingConfirmations,
+          {
+            teamId: confirmingTeam.id,
+            playerId
+          }
+        ]
+      : existingConfirmations;
   }
 
-  private clearAllTeamConfirmations(): void {
-    this.teams.forEach((team) => this.setTeamPointsConfirmed(team, false));
+  private clearTeamConfirmations(team: Team): void {
+    team.pointConfirmations = [];
+  }
+
+  private getCurrentUsersTeam(playerId: string): Team | undefined {
+    return this.teams?.find((team) =>
+      (team.teamPlayers ?? []).some((teamPlayer) => teamPlayer.player.uid === playerId)
+    );
   }
 
   private updateTeams() {
@@ -237,9 +264,39 @@ export class TableDetailComponent implements OnInit, OnDestroy {
   }
 
   private finalizeRoundIfReady(): void {
+    if (this.isFinalizingRound) {
+      return;
+    }
+
+    this.isFinalizingRound = true;
+    this.isEndingRound = true;
     this.subscriptions.push(
-      this.roundMediatorService.finalizeRoundIfReady(this.roundId, this.gameId).subscribe()
+      this.roundMediatorService.finalizeRoundAndStartNextIfReady(this.roundId, this.gameId).subscribe({
+        next: (result) => {
+          if (result.finalized) {
+            this.navigateToScores();
+          }
+        },
+        error: (error) => {
+          this.messageService.add(`TableDetailComponent: ${error.message || 'Unable to start the next round'}`);
+          this.isFinalizingRound = false;
+          this.isEndingRound = false;
+        },
+        complete: () => {
+          this.isFinalizingRound = false;
+          this.isEndingRound = false;
+        }
+      })
     );
+  }
+
+  private handleAllTablesConfirmedChange(confirmed: boolean): void {
+    const shouldFinalize = confirmed && this.previousAllTablesConfirmed !== true;
+    this.previousAllTablesConfirmed = confirmed;
+
+    if (shouldFinalize) {
+      this.finalizeRoundIfReady();
+    }
   }
 
   private watchRoundFinalized(): void {
@@ -249,7 +306,7 @@ export class TableDetailComponent implements OnInit, OnDestroy {
           const wasPointsConfirmed = this.previousPointsConfirmed;
           this.round = round;
 
-          if (wasPointsConfirmed === false && round?.pointsConfirmed) {
+          if (!this.isEndingRound && wasPointsConfirmed === false && round?.pointsConfirmed) {
             this.navigateToScores();
           }
 

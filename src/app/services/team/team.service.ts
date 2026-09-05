@@ -16,8 +16,8 @@ export class TeamService {
 
   constructor(private messageService: MessageService, private store: AngularFirestore) { }
 
-  addTeam(team: Team, tableId: string, roundId: string, gameId: string): void {
-    this.store.collection(Collection.Games)
+  addTeam(team: Team, tableId: string, roundId: string, gameId: string): Observable<Team> {
+    return from(this.store.collection(Collection.Games)
       .doc(gameId)
       .collection(Collection.Rounds)
       .doc(roundId)
@@ -29,9 +29,8 @@ export class TeamService {
         this.log(`addTeam w/ id=${gameId} ${docRef.id}`);
         team.id = docRef.id;
         return team;
-      },
-      err =>  this.log(`ERROR addTeam w/ id=${team.id}`)
-    );
+      }
+    ));
   }
 
   getTeam(teamId: string, tableId: string, roundId: string, gameId: string): Observable<Team | undefined> {

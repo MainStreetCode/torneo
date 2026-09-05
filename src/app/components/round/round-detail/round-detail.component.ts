@@ -1,5 +1,6 @@
 import { Location } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { of, Subscription } from 'rxjs';
 import { GameService } from 'src/app/services/game/game.service';
@@ -7,6 +8,7 @@ import { RoundMediatorService } from 'src/app/services/round-mediator/round-medi
 import { Round } from 'src/app/services/round/round';
 import { RoundService } from 'src/app/services/round/round.service';
 import { TableService } from 'src/app/services/table/table.service';
+import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component';
 import { Table } from '../../table/table';
 
 @Component({
@@ -27,6 +29,7 @@ export class RoundDetailComponent implements OnInit, OnDestroy {
   private subscriptions: Subscription[] = [];
   private hasRedirectedToDashboard = false;
   private previousPointsConfirmed?: boolean;
+  private isEndingRound = false;
 
   constructor(
     private router: Router,
@@ -35,7 +38,8 @@ export class RoundDetailComponent implements OnInit, OnDestroy {
     private tableService: TableService,
     private roundMediatorService: RoundMediatorService,
     private gameService: GameService,
-    private location: Location) { }
+    private location: Location,
+    private dialog: MatDialog) { }
 
   ngOnInit(): void {
     this.gameId = this.route.snapshot.paramMap.get('gameId');
@@ -57,12 +61,20 @@ export class RoundDetailComponent implements OnInit, OnDestroy {
   }
 
   endRound(): void {
+    this.isEndingRound = true;
     this.subscriptions.push(
-      this.roundMediatorService.finalizeRoundIfReady(this.roundId, this.gameId).subscribe({
-        next: (finalized) => {
-          if (finalized) {
+      this.roundMediatorService.finalizeRoundAndStartNextIfReady(this.roundId, this.gameId).subscribe({
+        next: (result) => {
+          if (result.finalized) {
             this.navigateToScores();
           }
+        },
+        error: (error) => {
+          this.isEndingRound = false;
+          this.showErrorDialog('Start Next Round', error.message || 'The round ended, but the next round could not be started.');
+        },
+        complete: () => {
+          this.isEndingRound = false;
         }
       })
     );
@@ -76,7 +88,7 @@ export class RoundDetailComponent implements OnInit, OnDestroy {
           this.round = round;
           this.sectionName = `Round ${round.number}`;
 
-          if (wasPointsConfirmed === false && round.pointsConfirmed) {
+          if (!this.isEndingRound && wasPointsConfirmed === false && round.pointsConfirmed) {
             this.navigateToScores();
           }
 
@@ -109,6 +121,21 @@ export class RoundDetailComponent implements OnInit, OnDestroy {
 
     this.hasRedirectedToDashboard = true;
     this.router.navigateByUrl(`/game/${this.gameId}/dashboard?selectedTab=0&roundEnded=${this.round.number}`);
+  }
+
+  private showErrorDialog(title: string, message: string): void {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      panelClass: 'dialog-container',
+      data: {
+        title,
+        message,
+        showActionButtons: false
+      }
+    });
+
+    this.subscriptions.push(
+      dialogRef.afterClosed().subscribe()
+    );
   }
 
 }
