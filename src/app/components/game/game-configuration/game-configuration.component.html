@@ -43,6 +43,44 @@
 
       <mat-divider></mat-divider>
 
+      <div class="setup-guide">
+        <div class="next-step-panel">
+          <div class="next-step-icon">
+            <mat-icon aria-hidden="true">{{nextStepIcon}}</mat-icon>
+          </div>
+          <div class="next-step-copy">
+            <div class="next-step-eyebrow">Next step</div>
+            <h2>{{nextStepTitle}}</h2>
+            <p>{{nextStepDescription}}</p>
+          </div>
+          <button mat-raised-button color="primary" class="next-step-action" (click)="takeNextStep()" [disabled]="isSaving || (nextStepCanSave && !game.name)">
+            <mat-icon>{{nextStepIcon}}</mat-icon>
+            {{nextStepButtonText}}
+          </button>
+        </div>
+
+        <div class="setup-checklist" aria-label="Tournament setup checklist">
+          <div class="checklist-item complete">
+            <mat-icon aria-hidden="true">check_circle</mat-icon>
+            <span>Tournament created</span>
+          </div>
+          <div class="checklist-item" [class.complete]="isRoundCountConfigured">
+            <mat-icon aria-hidden="true">{{isRoundCountConfigured ? 'check_circle' : 'radio_button_unchecked'}}</mat-icon>
+            <span>Rounds set</span>
+          </div>
+          <div class="checklist-item" [class.complete]="hasEnoughPlayers">
+            <mat-icon aria-hidden="true">{{hasEnoughPlayers ? 'check_circle' : 'radio_button_unchecked'}}</mat-icon>
+            <span>{{playerCount}} / 4 players needed</span>
+          </div>
+          <div class="checklist-item" [class.complete]="hasStartedRounds">
+            <mat-icon aria-hidden="true">{{hasStartedRounds ? 'check_circle' : 'radio_button_unchecked'}}</mat-icon>
+            <span>First round started</span>
+          </div>
+        </div>
+      </div>
+
+      <mat-divider></mat-divider>
+
       <div class="settings-layout">
         <div class="settings-form">
           <div class="section-title">
@@ -76,7 +114,7 @@
       </div>
     </mat-card>
 
-    <mat-card class="players-card">
+    <mat-card class="players-card" id="players-setup">
       <div class="players-card-header">
         <div class="section-title">
           <mat-icon aria-hidden="true">group</mat-icon>

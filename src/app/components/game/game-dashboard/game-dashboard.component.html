@@ -41,6 +41,23 @@
 
       <mat-divider></mat-divider>
 
+      <div class="next-step-panel">
+        <div class="next-step-icon">
+          <mat-icon aria-hidden="true">{{nextStepIcon}}</mat-icon>
+        </div>
+        <div class="next-step-copy">
+          <div class="next-step-eyebrow">Next step</div>
+          <h2>{{nextStepTitle}}</h2>
+          <p>{{nextStepDescription}}</p>
+        </div>
+        <button mat-raised-button color="primary" class="next-step-action" (click)="takeNextStep()">
+          <mat-icon>{{nextStepIcon}}</mat-icon>
+          {{nextStepButtonText}}
+        </button>
+      </div>
+
+      <mat-divider></mat-divider>
+
       <div class="stat-grid">
         <div class="stat-tile">
           <mat-icon aria-hidden="true">group</mat-icon>
@@ -79,7 +96,9 @@
           <ng-template mat-tab-label>
             <mat-icon class="tab-icon">group</mat-icon> Players
           </ng-template>
-          <app-game-players [game]="game"></app-game-players>
+          <div id="players-standings">
+            <app-game-players [game]="game"></app-game-players>
+          </div>
         </mat-tab>
         <mat-tab>
           <ng-template mat-tab-label>

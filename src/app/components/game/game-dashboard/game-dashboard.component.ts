@@ -1,5 +1,5 @@
 import { Location } from '@angular/common';
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -10,6 +10,7 @@ import { GamePlayerService } from 'src/app/services/gamePlayer/game-player.servi
 import { Round } from 'src/app/services/round/round';
 import { RoundService } from 'src/app/services/round/round.service';
 import { environment } from 'src/environments/environment';
+import { RoundsComponent } from '../../round/rounds/rounds.component';
 import { GameDashboardTab } from './game-dashboard-tab';
 
 @Component({
@@ -20,6 +21,7 @@ import { GameDashboardTab } from './game-dashboard-tab';
 
 export class GameDashboardComponent implements OnInit, OnDestroy {
   @Input() game?: Game;
+  @ViewChild(RoundsComponent) roundsComponent?: RoundsComponent;
   sectionName: string;
   gameURL: string;
   selectedTab = GameDashboardTab.Players;
@@ -32,6 +34,11 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
   nextRoundNumber = 1;
   dashboardStatus = 'Waiting for players';
   latestRoundLabel = 'No rounds started';
+  nextStepIcon = 'person_add';
+  nextStepTitle = 'Add players';
+  nextStepDescription = 'Add at least 4 players before starting the first round.';
+  nextStepButtonText = 'Go to players';
+  private nextStepAction: 'players' | 'rounds' | 'configuration' | 'currentRound' = 'players';
   private latestRound?: Round;
   private subscriptions: Subscription[] = [];
   private dashboardSubscriptions: Subscription[] = [];
@@ -104,6 +111,7 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
           this.sectionName = `${this.game.name.toUpperCase()} Dashboard`;
           this.updateDashboardStatus();
           this.updateProgressPercentage();
+          this.updateNextStep();
           this.watchDashboardData(this.game.id);
         }
       })
@@ -130,6 +138,7 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
   private updatePlayerStats(players: GamePlayer[]): void {
     this.playerCount = players.length;
     this.updateDashboardStatus();
+    this.updateNextStep();
   }
 
   private updateRoundStats(rounds: Round[]): void {
@@ -145,6 +154,7 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
 
     this.updateProgressPercentage();
     this.updateDashboardStatus();
+    this.updateNextStep();
   }
 
   private updateProgressPercentage(): void {
@@ -191,8 +201,99 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
     });
   }
 
+  takeNextStep(): void {
+    switch (this.nextStepAction) {
+      case 'configuration':
+        this.router.navigateByUrl(`/game/${this.game?.id}/configuration`);
+        break;
+      case 'rounds':
+        this.startNextRound();
+        break;
+      case 'currentRound':
+        if (this.game?.id && this.latestRound?.id) {
+          this.router.navigateByUrl(`/game/${this.game.id}/round/${this.latestRound.id}`);
+        }
+        break;
+      case 'players':
+      default:
+        this.showPlayersSection();
+        break;
+    }
+  }
+
   goBack(): void {
     this.location.back();
+  }
+
+  private updateNextStep(): void {
+    const configuredRounds = this.game?.numberOfRounds ?? 0;
+
+    if (configuredRounds === 0) {
+      this.nextStepIcon = 'tune';
+      this.nextStepTitle = 'Finish tournament setup';
+      this.nextStepDescription = 'Set the number of rounds before players can start competing.';
+      this.nextStepButtonText = 'Open setup';
+      this.nextStepAction = 'configuration';
+      return;
+    }
+
+    if (this.playerCount < 4) {
+      this.nextStepIcon = 'person_add';
+      this.nextStepTitle = 'Add players';
+      this.nextStepDescription = 'You need at least 4 players to create the first table.';
+      this.nextStepButtonText = 'Go to players';
+      this.nextStepAction = 'players';
+      return;
+    }
+
+    if (!this.latestRound) {
+      this.nextStepIcon = 'play_arrow';
+      this.nextStepTitle = 'Start round 1';
+      this.nextStepDescription = 'Players are ready. Start the first round to create tables.';
+      this.nextStepButtonText = 'Start round 1';
+      this.nextStepAction = 'rounds';
+      return;
+    }
+
+    if (!this.latestRound.pointsConfirmed) {
+      this.nextStepIcon = 'edit_note';
+      this.nextStepTitle = `Enter scores for round ${this.latestRound.number}`;
+      this.nextStepDescription = 'Open the active round, enter table scores, and confirm them.';
+      this.nextStepButtonText = 'Open current round';
+      this.nextStepAction = 'currentRound';
+      return;
+    }
+
+    if (this.roundCount < configuredRounds) {
+      this.nextStepIcon = 'play_arrow';
+      this.nextStepTitle = `Start round ${this.nextRoundNumber}`;
+      this.nextStepDescription = `Round ${this.latestRound.number} is complete. Start the next round when everyone is ready.`;
+      this.nextStepButtonText = `Start round ${this.nextRoundNumber}`;
+      this.nextStepAction = 'rounds';
+      return;
+    }
+
+    this.nextStepIcon = 'leaderboard';
+    this.nextStepTitle = 'Review final standings';
+    this.nextStepDescription = 'All configured rounds are complete. Check the player standings and point totals.';
+    this.nextStepButtonText = 'View standings';
+    this.nextStepAction = 'players';
+  }
+
+  private startNextRound(): void {
+    if (this.roundsComponent) {
+      this.roundsComponent.startRound(this.nextRoundNumber);
+      return;
+    }
+
+    this.selectTab(this.roundsTab);
+  }
+
+  private showPlayersSection(): void {
+    this.selectTab(this.playersTab);
+    window.setTimeout(() => {
+      document.getElementById('players-standings')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
   }
 }
 

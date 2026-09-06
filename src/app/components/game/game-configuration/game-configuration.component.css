@@ -42,7 +42,10 @@
 .game-id,
 .section-title,
 .share-copy,
-.quick-actions {
+.quick-actions,
+.next-step-panel,
+.setup-checklist,
+.checklist-item {
   align-items: center;
   display: flex;
 }
@@ -73,6 +76,96 @@
   gap: 1.5rem;
   grid-template-columns: minmax(0, 1fr) 240px;
   padding: 1.5rem;
+}
+
+.setup-guide {
+  background: #ffffff;
+}
+
+.next-step-panel {
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+}
+
+.next-step-icon {
+  align-items: center;
+  background: #eef2ff;
+  border-radius: 8px;
+  color: #3f51b5;
+  display: flex;
+  flex: 0 0 auto;
+  height: 48px;
+  justify-content: center;
+  width: 48px;
+}
+
+.next-step-copy {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.next-step-eyebrow {
+  color: #6b7280;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.next-step-copy h2 {
+  color: #111827;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 0.2rem 0;
+}
+
+.next-step-copy p {
+  color: #4b5563;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.next-step-action {
+  flex: 0 0 auto;
+}
+
+.next-step-action mat-icon {
+  margin-right: 0.35rem;
+}
+
+.setup-checklist {
+  border-top: 1px solid #e5e7eb;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+}
+
+.checklist-item {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  color: #4b5563;
+  flex: 1 1 0;
+  font-size: 0.9rem;
+  gap: 0.4rem;
+  min-height: 40px;
+  min-width: 0;
+  padding: 0.6rem 0.75rem;
+}
+
+.checklist-item mat-icon {
+  color: #9ca3af;
+  flex: 0 0 auto;
+}
+
+.checklist-item.complete {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+  color: #166534;
+}
+
+.checklist-item.complete mat-icon {
+  color: #16a34a;
 }
 
 .settings-form {
@@ -186,6 +279,21 @@
   .quick-actions {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .next-step-panel,
+  .setup-checklist {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 1rem;
+  }
+
+  .next-step-action {
+    width: 100%;
+  }
+
+  .checklist-item {
+    flex: 1 1 auto;
   }
 
   .share-panel {
