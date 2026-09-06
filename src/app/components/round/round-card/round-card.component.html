@@ -7,7 +7,7 @@
     </div>   
   </div>
   
-  <mat-icon color="accent" *ngIf="allTablesPointsConfirmed$ | async" title="All Points Confirmed">checkmark</mat-icon>
+  <mat-icon color="accent" *ngIf="allTablesPointsConfirmed$ | async" title="All table scores confirmed">checkmark</mat-icon>
   
   <div *ngIf="this.isAdmin$ | async">
     <button mat-icon-button color="primary" aria-label="delete round" title="delete round" (click)="delete(round)">

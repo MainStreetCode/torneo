@@ -86,12 +86,12 @@ export class RoundsComponent implements OnInit, OnDestroy {
       ]).pipe(
         switchMap(([allPointsConfirmed, players]) => {
           if (roundNumber > 1 && !allPointsConfirmed) {
-            this.showErrorDialog('Start Round', `Please confirm all points for round ${roundNumber - 1} first`);
+            this.showErrorDialog('Start round', `Confirm all table scores for round ${roundNumber - 1} first.`);
             return EMPTY;
           }
 
           if (players && players.length < 4) {
-            this.showErrorDialog('Start Round', 'You need to have at least 4 players to start a round');
+            this.showErrorDialog('Start round', 'Add at least 4 players to start a round.');
             return EMPTY;
           }
 
@@ -111,7 +111,7 @@ export class RoundsComponent implements OnInit, OnDestroy {
           }
         },
         error: (error) => {
-          this.showErrorDialog('Start Round', error.message || 'Unable to start the round');
+          this.showErrorDialog('Start round', error.message || 'Unable to start the round.');
         }
       })
     );

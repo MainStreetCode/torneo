@@ -39,7 +39,7 @@
           <mat-icon aria-hidden="true">admin_panel_settings</mat-icon>
           <div>
             <div class="stat-value">{{isAdmin ? 'Yes' : 'No'}}</div>
-            <div class="stat-label">Game admin</div>
+            <div class="stat-label">Tournament admin</div>
           </div>
         </div>
       </div>
@@ -66,7 +66,7 @@
         <div class="admin-toggle">
           <div>
             <div class="toggle-label">Admin access</div>
-            <div class="toggle-help">Admins can configure games and manage players.</div>
+            <div class="toggle-help">Admins can set up tournaments and manage players.</div>
           </div>
           <mat-slide-toggle [ngModel]="isAdmin" [disabled]="!isCurrentUserAdmin" (ngModelChange)="toggleIsAdmin($event)">Admin</mat-slide-toggle>
         </div>
@@ -113,7 +113,7 @@
         <mat-icon aria-hidden="true">person_off</mat-icon>
       </div>
       <h1>Player not found</h1>
-      <p>This player is not available for the current game.</p>
+      <p>This player is not available for the current tournament.</p>
       <button mat-raised-button color="primary" (click)="goBack()">
         <mat-icon>arrow_back</mat-icon>
         Back

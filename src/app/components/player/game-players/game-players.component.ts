@@ -15,6 +15,7 @@ export class GamePlayersComponent implements OnInit, OnDestroy {
   players: GamePlayer[] = [];
   isAdmin$ = of(false);  
   hasRoundsStarted = false;
+  hasScores = false;
   private subscriptions: Subscription[] = [];
 
   constructor(private playerService: GamePlayerService,
@@ -45,6 +46,7 @@ export class GamePlayersComponent implements OnInit, OnDestroy {
 
             return playerBPoints - playerAPoints;
           });
+          this.hasScores = players.some((player) => (player.pointsForRound?.length ?? 0) > 0);
         }
       })
     );

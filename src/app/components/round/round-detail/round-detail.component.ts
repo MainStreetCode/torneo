@@ -71,7 +71,7 @@ export class RoundDetailComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           this.isEndingRound = false;
-          this.showErrorDialog('End Round', error.message || 'The round could not be ended.');
+          this.showErrorDialog('Finalize round', error.message || 'The round could not be finalized.');
         },
         complete: () => {
           this.isEndingRound = false;

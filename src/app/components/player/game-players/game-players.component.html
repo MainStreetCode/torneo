@@ -6,7 +6,7 @@
   </div>
   
   <mat-toolbar color="secondary">
-    <span>Player List ({{players.length}})</span>
+    <span>{{hasScores ? 'Standings' : 'Players'}} ({{players.length}})</span>
   </mat-toolbar>
   <div class="player-list">      
     <app-player-card *ngFor="let player of players; index as i" [player]="player" [position]="i+1"></app-player-card>

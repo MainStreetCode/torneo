@@ -79,7 +79,7 @@ export class GameConfigurationComponent implements OnInit, OnDestroy {
 
           this.game = game;
           this.isAdmin$ = this.gameService.isCurrentUserAdmin(this.game.id);
-          this.sectionName = `${game.name.toUpperCase()} Configuration`;
+          this.sectionName = `${game.name.toUpperCase()} Setup`;
           this.updateNextStep();
           this.watchSetupData(game.id);
           dialogRef.close();
@@ -102,15 +102,15 @@ export class GameConfigurationComponent implements OnInit, OnDestroy {
       this.gameService.updateGame(this.game).subscribe({
         next: () => {
           this.isSaving = false;
-          this.sectionName = `${this.game.name.toUpperCase()} Configuration`;
+          this.sectionName = `${this.game.name.toUpperCase()} Setup`;
           this.updateNextStep();
-          this.snackBar.open('Game configuration saved.', 'Dismiss', {
+          this.snackBar.open('Tournament setup saved.', 'Dismiss', {
             duration: 4000
           });
         },
         error: () => {
           this.isSaving = false;
-          this.snackBar.open('Unable to save game configuration.', 'Dismiss', {
+          this.snackBar.open('Unable to save tournament setup.', 'Dismiss', {
             duration: 5000
           });
         }

@@ -1,6 +1,7 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BehaviorSubject, of } from 'rxjs';
+import { GamePlayer } from 'src/app/components/player/game-player';
 import { Game } from 'src/app/services/game/game';
 import { GameService } from 'src/app/services/game/game.service';
 import { GamePlayerService } from 'src/app/services/gamePlayer/game-player.service';
@@ -69,5 +70,20 @@ describe('PlayersComponent', () => {
 
     const content = fixture.nativeElement.textContent as string;
     expect(content).toContain('Players cannot be added after round 1 starts.');
+  });
+
+  it('labels the player list as standings after scores exist', () => {
+    component.players = [
+      {
+        uid: 'player-1',
+        displayName: 'Angela',
+        pointsForRound: [{ roundId: 'round-1', roundNumber: 1, points: 10 }]
+      } as GamePlayer
+    ];
+    component.hasScores = true;
+    fixture.detectChanges();
+
+    const content = fixture.nativeElement.textContent as string;
+    expect(content).toContain('Standings (1)');
   });
 });

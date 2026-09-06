@@ -92,10 +92,10 @@ describe('GameDashboardComponent', () => {
     expect(component.dashboardStatus).not.toBe('All rounds started');
   });
 
-  it('keeps game completed after the final round is finalized', () => {
+  it('keeps tournament completed after the final round is finalized', () => {
     rounds$.next([round(1, true), round(2, true), round(3, true)]);
 
-    expect(component.dashboardStatus).toBe('Game completed');
+    expect(component.dashboardStatus).toBe('Tournament completed');
   });
 
   it('shows a non-final active round as started', () => {

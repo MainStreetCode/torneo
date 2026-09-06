@@ -27,23 +27,23 @@
           </mat-chip-list>
         </section>
 
-        <section class="status-group" aria-label="Unconfirmed points" *ngIf="unConfirmedTables$ | async as unConfirmedTables">
+        <section class="status-group" aria-label="Unconfirmed table scores" *ngIf="unConfirmedTables$ | async as unConfirmedTables">
           <div class="status-group-header">
             <mat-icon>pending_actions</mat-icon>
-            <span>Unconfirmed Points</span>
+            <span>Unconfirmed table scores</span>
             <span class="status-count">{{unConfirmedTables.length}}</span>
           </div>
 
-          <mat-chip-list aria-label="Tables with unconfirmed points" class="chip-list" *ngIf="(allTablesPointsConfirmed$ | async) === false">
+          <mat-chip-list aria-label="Tables with unconfirmed scores" class="chip-list" *ngIf="(allTablesPointsConfirmed$ | async) === false">
             <mat-chip class="status-chip table-chip" *ngFor="let table of unConfirmedTables">
               Table {{ table.number }}
             </mat-chip>
           </mat-chip-list>
 
-          <mat-chip-list aria-label="All table points confirmed" class="chip-list" *ngIf="allTablesPointsConfirmed$ | async">
+          <mat-chip-list aria-label="All table scores confirmed" class="chip-list" *ngIf="allTablesPointsConfirmed$ | async">
             <mat-chip class="status-chip confirmed-chip">
               <mat-icon>check_circle</mat-icon>
-              All points confirmed
+              All table scores confirmed
             </mat-chip>
           </mat-chip-list>
 
@@ -56,8 +56,8 @@
         </section>
 
         <div class="round-action" *ngIf="isAdmin$ | async">
-          <button mat-raised-button color="primary" aria-label="End Round" title="End Round" (click)="endRound()" [disabled]="round.pointsConfirmed || (allTablesPointsConfirmed$ | async) === false">
-            End Round
+          <button mat-raised-button color="primary" aria-label="Finalize round" title="Finalize round" (click)="endRound()" [disabled]="round.pointsConfirmed || (allTablesPointsConfirmed$ | async) === false">
+            Finalize round
           </button>
         </div>
       </div>

@@ -11,10 +11,10 @@
     </div>
 
     <div *ngIf="this.isAdmin$ | async">
-        <button mat-icon-button color="primary" aria-label="game details" title="player details" (click)="view(player)">
+        <button mat-icon-button color="primary" aria-label="player details" title="player details" (click)="view(player)">
             <mat-icon>edit</mat-icon>
         </button>
-        <button mat-icon-button color="primary" aria-label="delete game" title="delete player" (click)="delete(player)">
+        <button mat-icon-button color="primary" aria-label="delete player" title="delete player" (click)="delete(player)">
             <mat-icon>delete</mat-icon>
         </button>
     </div>            

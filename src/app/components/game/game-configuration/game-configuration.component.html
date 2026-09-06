@@ -4,7 +4,7 @@
       <mat-icon aria-hidden="true">lock</mat-icon>
     </div>
     <h1>Access restricted</h1>
-    <p>You do not have access to configure this game.</p>
+    <p>You do not have access to set up this tournament.</p>
     <button mat-raised-button color="primary" (click)="goBack()">
       <mat-icon>arrow_back</mat-icon>
       Back
@@ -19,8 +19,8 @@
     <mat-card class="configuration-card">
       <div class="configuration-hero">
         <div class="hero-copy">
-          <mat-chip-list aria-label="Configuration status">
-            <mat-chip color="accent" selected>Configuration</mat-chip>
+          <mat-chip-list aria-label="Setup status">
+            <mat-chip color="accent" selected>Setup</mat-chip>
           </mat-chip-list>
           <h1>{{game.name}}</h1>
           <div class="game-id">
@@ -36,7 +36,7 @@
           </button>
           <button mat-raised-button color="primary" (click)="startGame()">
             <mat-icon>play_arrow</mat-icon>
-            Start Game
+            Go to rounds
           </button>
         </div>
       </div>
@@ -85,11 +85,11 @@
         <div class="settings-form">
           <div class="section-title">
             <mat-icon aria-hidden="true">tune</mat-icon>
-            <span>Game settings</span>
+            <span>Tournament setup</span>
           </div>
 
           <mat-form-field appearance="fill" class="full-width">
-            <mat-label>Game name</mat-label>
+            <mat-label>Tournament name</mat-label>
             <input id="game-name" matInput placeholder="Angela's Euchre Tournament" [(ngModel)]="game.name" [disabled]="isSaving">
           </mat-form-field>
 
@@ -104,7 +104,7 @@
             <mat-icon aria-hidden="true">qr_code_2</mat-icon>
             <div>
               <div class="share-title">Dashboard link</div>
-              <div class="share-subtitle">Players can scan this code to open the game dashboard.</div>
+              <div class="share-subtitle">Players can scan this code to open the tournament dashboard.</div>
             </div>
           </div>
           <div class="qr-frame">

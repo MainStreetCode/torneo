@@ -72,7 +72,7 @@ export class GamesComponent implements OnInit, OnDestroy {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       panelClass: 'dialog-container',
       data: {
-        title: 'Delete Game',
+        title: 'Delete tournament',
         message: `Delete ${game.name}? This cannot be undone.`,
         confirmButtonText: 'Delete'
       }

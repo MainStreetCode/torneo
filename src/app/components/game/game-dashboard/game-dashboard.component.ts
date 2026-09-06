@@ -47,6 +47,7 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
   showStandingsAction = false;
   canCurrentUserJoin = false;
   hasCurrentUserJoined = false;
+  hasScores = false;
   private nextStepAction: 'players' | 'rounds' | 'configuration' | 'currentRound' = 'players';
   private latestRound?: Round;
   private currentUser?: User;
@@ -153,6 +154,7 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
   private updatePlayerStats(players: GamePlayer[]): void {
     this.players = players;
     this.playerCount = players.length;
+    this.hasScores = players.some((player) => (player.pointsForRound?.length ?? 0) > 0);
     this.updateJoinState();
     this.updateDashboardStatus();
     this.updateNextStep();
@@ -197,7 +199,7 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
     }
 
     if (this.roundCount >= configuredRounds) {
-      this.dashboardStatus = this.latestRound.pointsConfirmed ? 'Game completed' : `Round ${this.latestRound.number} started`;
+      this.dashboardStatus = this.latestRound.pointsConfirmed ? 'Tournament completed' : `Round ${this.latestRound.number} started`;
       return;
     }
 

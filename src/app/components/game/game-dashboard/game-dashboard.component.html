@@ -5,7 +5,7 @@
     <mat-card class="lobby-card">
       <div class="lobby-hero">
         <div class="hero-copy">
-          <mat-chip-list aria-label="Game status">
+          <mat-chip-list aria-label="Tournament status">
             <mat-chip color="accent" selected>{{dashboardStatus}}</mat-chip>
           </mat-chip-list>
           <h1>{{game.name}}</h1>
@@ -37,7 +37,7 @@
             <mat-icon aria-hidden="true">qr_code_2</mat-icon>
             <div>
               <div class="share-title">Join link</div>
-              <div class="share-subtitle">Scan to open this game dashboard.</div>
+              <div class="share-subtitle">Scan to open this tournament dashboard.</div>
             </div>
           </div>
           <div class="qr-frame">
@@ -107,7 +107,7 @@
       <mat-tab-group mat-stretch-tabs [selectedIndex]="selectedTab" (selectedIndexChange)="selectTab($event)">
         <mat-tab>
           <ng-template mat-tab-label>
-            <mat-icon class="tab-icon">group</mat-icon> Players
+            <mat-icon class="tab-icon">group</mat-icon> {{hasScores ? 'Standings' : 'Players'}}
           </ng-template>
           <div id="players-standings">
             <app-game-players [game]="game"></app-game-players>

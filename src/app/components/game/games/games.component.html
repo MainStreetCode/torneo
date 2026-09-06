@@ -1,12 +1,12 @@
 <div>
-  <mat-toolbar class="mat-h1" color="secondary">Games</mat-toolbar>
+  <mat-toolbar class="mat-h1" color="secondary">Tournaments</mat-toolbar>
 
-  <mat-toolbar color="accent"><span>Add new game</span></mat-toolbar>
+  <mat-toolbar color="accent"><span>Add new tournament</span></mat-toolbar>
 
   <div class="content flex-box-rows" *ngIf="isLoggedIn$ | async">
     <div>
       <mat-form-field class="example-full-width" appearance="fill">
-        <mat-label>Game name</mat-label>
+        <mat-label>Tournament name</mat-label>
         <input matInput id="new-game" #gameName placeholder="Angela's Euchre Tournament" value="">
       </mat-form-field>
     </div>
@@ -15,17 +15,17 @@
       <button mat-raised-button color="primary" [disabled]="!gameName.value" (click)="add(gameName.value); gameName.value=''">
         <mat-icon>add</mat-icon>    
         <span class="mdc-button__label">        
-          <span class="mdc-button__label">Create game</span>
+          <span class="mdc-button__label">Create tournament</span>
         </span>
       </button>    
     </div>
   </div>
 
   <div class="content" *ngIf="(isLoggedIn$ | async) === false">
-    Login to start creating games!
+    Log in to start creating tournaments.
   </div>
 
-  <mat-toolbar color="accent"><span>Game List</span></mat-toolbar>
+  <mat-toolbar color="accent"><span>Tournaments</span></mat-toolbar>
   <div class="games">      
     <mat-card class="mdc-card card" *ngFor="let game of games">
       <div class="mdc-card__primary-action details" tabindex="0" (click)="dashboard(game)">        
@@ -34,10 +34,10 @@
       </div>
       
       <div *ngIf="gameAdminMap.get(game.id)">
-        <button mat-icon-button color="primary" aria-label="game details" title="game details" (click)="configuration(game)">
+        <button mat-icon-button color="primary" aria-label="tournament setup" title="tournament setup" (click)="configuration(game)">
           <mat-icon>edit</mat-icon>
         </button>
-        <button mat-icon-button color="primary" aria-label="delete game" title="delete game" (click)="delete(game)">
+        <button mat-icon-button color="primary" aria-label="delete tournament" title="delete tournament" (click)="delete(game)">
           <mat-icon>delete</mat-icon>
         </button>
       </div>
