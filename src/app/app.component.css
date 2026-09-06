@@ -39,15 +39,19 @@
 .breadcrumbs {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
-  padding: 0.6rem 1rem 0;
-  color: #56616b;
-  font-size: 0.9rem;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0.75rem 1rem 0.85rem;
+  border-bottom: 1px solid #e6ebf2;
+  background: #f7f9fc;
+  color: #5f6b76;
+  font-size: 0.85rem;
   line-height: 1.4;
 }
 
 .breadcrumbs a {
-  color: #2f5f8f;
+  color: #315d87;
+  font-weight: 600;
   text-decoration: none;
 }
 
@@ -55,11 +59,17 @@
   text-decoration: underline;
 }
 
+.breadcrumbs span[aria-current='page'] {
+  color: #202a33;
+  font-weight: 700;
+}
+
 .breadcrumbs mat-icon {
-  width: 18px;
-  height: 18px;
-  font-size: 18px;
-  color: #8b949e;
+  width: 16px;
+  height: 16px;
+  font-size: 16px;
+  color: #9aa5af;
+  flex: 0 0 auto;
 }
 
 @media (max-width: 599px) {
