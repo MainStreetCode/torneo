@@ -1,0 +1,59 @@
+.rounds-empty-state {
+  align-items: center;
+  border-radius: 8px;
+  box-shadow: none;
+  display: flex;
+  gap: 1rem;
+  margin: 1rem;
+  padding: 1.25rem;
+}
+
+.empty-icon {
+  align-items: center;
+  background: #eef2ff;
+  border-radius: 8px;
+  color: #3f51b5;
+  display: flex;
+  flex: 0 0 auto;
+  height: 48px;
+  justify-content: center;
+  width: 48px;
+}
+
+.empty-copy {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.empty-copy h2 {
+  color: #111827;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 0 0 0.25rem;
+}
+
+.empty-copy p {
+  color: #4b5563;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.rounds-empty-state button {
+  flex: 0 0 auto;
+}
+
+.rounds-empty-state button mat-icon {
+  margin-right: 0.35rem;
+}
+
+@media (max-width: 760px) {
+  .rounds-empty-state {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .rounds-empty-state button {
+    width: 100%;
+  }
+}

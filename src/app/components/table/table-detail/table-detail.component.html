@@ -1,19 +1,39 @@
 <mat-toolbar color="secondary" class="flex-box-rows">
-    <div class="flex-box-item">Table {{table.number}}</div>
+    <div class="flex-box-item">{{tableHeaderLabel}}</div>
     <div *ngIf="isCurrentUserAdmin">
         <div class="flex-box-item">
             <button mat-raised-button color="primary" [disabled]="isDisabled" (click)="toggleConfirmPoints(true)" *ngIf="!pointsConfirmed">
                 <mat-icon>check</mat-icon>
-                Confirm Points
+                Confirm table scores
             </button>
 
             <button mat-raised-button color="primary" [disabled]="isDisabled" (click)="toggleConfirmPoints(false)" *ngIf="pointsConfirmed">
                 <mat-icon>cancel</mat-icon>
-                Change Points
+                Change table scores
             </button>
         </div>    
     </div>
 </mat-toolbar>
+
+<section class="table-task-panel">
+    <div class="task-summary">
+        <div class="task-pill" *ngIf="currentUserTeamLabel">
+            <mat-icon aria-hidden="true">groups</mat-icon>
+            <span>Your team</span>
+            <strong>{{currentUserTeamLabel}}</strong>
+        </div>
+        <div class="task-pill" *ngIf="opponentTeamLabel">
+            <mat-icon aria-hidden="true">sports_kabaddi</mat-icon>
+            <span>Opponent</span>
+            <strong>{{opponentTeamLabel}}</strong>
+        </div>
+    </div>
+
+    <div class="score-task-status" [class.waiting]="isWaitingForOtherConfirmations" [class.confirmed]="pointsConfirmed">
+        <mat-icon aria-hidden="true">{{scoreTaskStatusIcon}}</mat-icon>
+        <span>{{scoreTaskStatusMessage}}</span>
+    </div>
+</section>
 
 <div [ngClass.gt-xs]="'flex-box-rows'"
     [ngClass.lt-sm]="'flex-box-columns'">

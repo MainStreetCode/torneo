@@ -4,16 +4,19 @@
     </mat-toolbar>
 </div>
 
-<div *ngIf="rounds.length === 0">
-    There are no rounds.
-</div>
-
-<div *ngIf="(!game.numberOfRounds || game.numberOfRounds === 0) && isUserAdmin">
-    Number of rounds is set to 0. Edit the game configuration.
-    <button mat-raised-button color="primary" aria-label="Configuration" title="Configuration" (click)="configuration()">
-        Configuration
+<mat-card class="rounds-empty-state" *ngIf="rounds.length === 0">
+    <div class="empty-icon">
+        <mat-icon aria-hidden="true">{{emptyRoundsIcon}}</mat-icon>
+    </div>
+    <div class="empty-copy">
+        <h2>{{emptyRoundsTitle}}</h2>
+        <p>{{emptyRoundsMessage}}</p>
+    </div>
+    <button mat-raised-button color="primary" *ngIf="showEmptyRoundsAction" (click)="takeEmptyRoundsAction()">
+        <mat-icon>{{emptyRoundsActionIcon}}</mat-icon>
+        {{emptyRoundsActionText}}
     </button>
-</div>
+</mat-card>
 
 <div *ngIf="rounds.length > 0" class="rounds">
   <app-round-card *ngFor="let round of rounds" [round]="round" [gameId]="game.id"></app-round-card>

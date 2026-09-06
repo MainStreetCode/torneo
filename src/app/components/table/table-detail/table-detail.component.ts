@@ -204,6 +204,76 @@ export class TableDetailComponent implements OnInit, OnDestroy {
       .some((confirmation) => confirmation.teamId === this.currentUserTeamId);
   }
 
+  get tableHeaderLabel(): string {
+    const tableLabel = `Table ${this.table?.number}`;
+    return this.currentUserTeamId ? `Your table: ${tableLabel}` : tableLabel;
+  }
+
+  get currentUserTeamLabel(): string {
+    const currentUserTeam = this.teams?.find((team) => team.id === this.currentUserTeamId);
+    return currentUserTeam ? this.formatTeamPlayers(currentUserTeam) : '';
+  }
+
+  get opponentTeamLabel(): string {
+    if (!this.currentUserTeamId) {
+      return '';
+    }
+
+    const opponentTeams = (this.teams ?? []).filter((team) => team.id !== this.currentUserTeamId);
+    return opponentTeams.map((team) => this.formatTeamPlayers(team)).join(' / ');
+  }
+
+  get isWaitingForOtherConfirmations(): boolean {
+    return !!this.currentUserTeamId
+      && !this.pointsConfirmed
+      && (this.teams ?? []).length > 0
+      && this.teams.every((team) => this.hasCurrentUserTeamConfirmed(team));
+  }
+
+  get scoreTaskStatusIcon(): string {
+    if (this.allTablesConfirmed) {
+      return 'verified';
+    }
+
+    if (this.pointsConfirmed) {
+      return 'check_circle';
+    }
+
+    if (this.isWaitingForOtherConfirmations) {
+      return 'hourglass_top';
+    }
+
+    if (this.currentUserTeamId) {
+      return 'edit_note';
+    }
+
+    return this.isCurrentUserAdmin ? 'fact_check' : 'hourglass_empty';
+  }
+
+  get scoreTaskStatusMessage(): string {
+    if (this.allTablesConfirmed) {
+      return 'Round scores are finalized.';
+    }
+
+    if (this.pointsConfirmed) {
+      return 'Table scores are confirmed. Waiting for remaining tables.';
+    }
+
+    if (this.isWaitingForOtherConfirmations) {
+      return 'Waiting for other team/admin.';
+    }
+
+    if (this.currentUserTeamId) {
+      return 'Enter score, then submit score when both teams agree.';
+    }
+
+    if (this.isCurrentUserAdmin) {
+      return 'Review the table scores, then confirm table scores.';
+    }
+
+    return 'Waiting for players at this table to enter scores.';
+  }
+
   private checkPointsConfirmed(): void {
     const allTeamsConfirmed = this.teams?.length > 0 && this.teams.every((team) => this.isTeamConfirmed(team));
     this.pointsConfirmed = allTeamsConfirmed;
@@ -255,6 +325,14 @@ export class TableDetailComponent implements OnInit, OnDestroy {
     return this.teams?.find((team) =>
       (team.teamPlayers ?? []).some((teamPlayer) => teamPlayer.player.uid === playerId)
     );
+  }
+
+  private formatTeamPlayers(team: Team): string {
+    const playerNames = (team.teamPlayers ?? [])
+      .map((teamPlayer) => teamPlayer.player?.displayName)
+      .filter(Boolean);
+
+    return playerNames.length > 0 ? playerNames.join(' & ') : 'Team';
   }
 
   private updateTeams() {

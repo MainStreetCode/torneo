@@ -23,7 +23,7 @@ describe('PlayersComponent', () => {
       declarations: [ GamePlayersComponent ],
       providers: [
         { provide: GamePlayerService, useValue: { playersForGame: () => of([]), addPlayer: addPlayerSpy } },
-        { provide: GameService, useValue: { isCurrentUserAdmin: () => of(false) } },
+        { provide: GameService, useValue: { isCurrentUserAdmin: () => of(true) } },
         { provide: RoundService, useValue: { roundsForGame: () => rounds$.asObservable() } }
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -61,5 +61,13 @@ describe('PlayersComponent', () => {
     component.add('Late Player');
 
     expect(addPlayerSpy).not.toHaveBeenCalled();
+  });
+
+  it('explains why admins cannot add players after rounds start', () => {
+    rounds$.next([{ id: 'round-1', number: 1, byes: [], pointsConfirmed: false } as Round]);
+    fixture.detectChanges();
+
+    const content = fixture.nativeElement.textContent as string;
+    expect(content).toContain('Players cannot be added after round 1 starts.');
   });
 });

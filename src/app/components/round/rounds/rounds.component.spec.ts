@@ -99,6 +99,45 @@ describe('RoundsComponent', () => {
     expect(component.isStartingRound).toBeFalse();
   });
 
+  it('explains that rounds are blocked by missing setup', () => {
+    component.game = game(0);
+    component.playerCount = 2;
+
+    expect(component.emptyRoundsTitle).toBe('No rounds yet');
+    expect(component.emptyRoundsMessage).toBe('Set the number of rounds before starting round 1.');
+    expect(component.emptyRoundsActionText).toBe('Open setup');
+  });
+
+  it('points admins to players when the first round needs more players', () => {
+    component.playerCount = 3;
+    component.isUserAdmin = true;
+
+    expect(component.emptyRoundsMessage).toBe('Add 1 more player, then start round 1.');
+
+    component.takeEmptyRoundsAction();
+
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/game/game-1/dashboard?selectedTab=0');
+  });
+
+  it('starts round 1 from the empty rounds action when setup is ready', () => {
+    component.playerCount = 4;
+    component.isUserAdmin = true;
+
+    expect(component.emptyRoundsActionText).toBe('Start round 1');
+
+    component.takeEmptyRoundsAction();
+
+    expect(roundMediatorService.createRound).toHaveBeenCalledWith('game-1', 1);
+  });
+
+  it('tells players they are waiting for an admin when setup is ready', () => {
+    component.playerCount = 4;
+    component.isUserAdmin = false;
+
+    expect(component.showEmptyRoundsAction).toBeFalse();
+    expect(component.emptyRoundsMessage).toBe('Setup is ready. Waiting for an admin to start round 1.');
+  });
+
   function round(number: number): Round {
     return {
       id: `round-${number}`,

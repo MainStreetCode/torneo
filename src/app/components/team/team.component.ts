@@ -33,6 +33,7 @@ export class TeamComponent implements OnInit, OnChanges, OnDestroy {
   canConfirmPoints = false;
   isCurrentUserOnTeam = false;
   isEditingPoints = false;
+  scoreSaveStatus: 'saved' | 'unsaved' | 'saving' = 'saved';
   subscriptions: Subscription[] = [];
   teamPlayers: TeamPlayer[] = [];
   private lastEmittedPoints?: number;
@@ -69,9 +70,11 @@ export class TeamComponent implements OnInit, OnChanges, OnDestroy {
             this.team = currentTeam;
             if (this.lastEmittedPoints === currentTeam.points) {
               this.lastEmittedPoints = undefined;
+              this.scoreSaveStatus = 'saved';
             }
             if (shouldUpdatePointsInput) {
               this.teamPointsFormControl.setValue(currentTeam.points, { emitEvent: false });
+              this.scoreSaveStatus = 'saved';
             }
 
             this.updateTeamState();
@@ -92,11 +95,18 @@ export class TeamComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   pointsChanged(points: number): void {
-    if (this.team.points === points || this.lastEmittedPoints === points) { return; }
+    if (this.team.points === points) {
+      this.lastEmittedPoints = undefined;
+      this.scoreSaveStatus = 'saved';
+      return;
+    }
+
+    if (this.lastEmittedPoints === points) { return; }
 
     console.log('pointsChanged: ' + points);
 
     this.lastEmittedPoints = points;
+    this.scoreSaveStatus = 'saving';
     this.pointsChange.emit({ team: this.team, points });
   }
 
@@ -107,6 +117,7 @@ export class TeamComponent implements OnInit, OnChanges, OnDestroy {
 
   onPointsInput(): void {
     this.isEditingPoints = true;
+    this.scoreSaveStatus = 'unsaved';
   }
 
   onPointsBlur(): void {
@@ -125,6 +136,38 @@ export class TeamComponent implements OnInit, OnChanges, OnDestroy {
     if (!this.canConfirmPoints) { return; }
 
     this.confirmPoints.emit({ team: this.team, confirm });
+  }
+
+  get teamRoleLabel(): string {
+    if (!this.currentUserTeamId) {
+      return 'Team';
+    }
+
+    return this.team.id === this.currentUserTeamId ? 'Your team' : 'Opponent';
+  }
+
+  get scoreSaveStatusIcon(): string {
+    if (this.scoreSaveStatus === 'unsaved') {
+      return 'edit';
+    }
+
+    if (this.scoreSaveStatus === 'saving') {
+      return 'sync';
+    }
+
+    return 'check_circle';
+  }
+
+  get scoreSaveStatusLabel(): string {
+    if (this.scoreSaveStatus === 'unsaved') {
+      return 'Unsaved changes';
+    }
+
+    if (this.scoreSaveStatus === 'saving') {
+      return 'Saving';
+    }
+
+    return 'Saved';
   }
 
   private canEditPoints(): void {

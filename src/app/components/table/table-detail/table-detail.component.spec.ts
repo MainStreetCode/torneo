@@ -204,6 +204,47 @@ describe('TableDetailComponent', () => {
     expect(component.pointsConfirmed).toBeFalse();
     expect(tableService.updateTable).toHaveBeenCalledWith(component.table, 'round-1', 'game-1');
   });
+
+  it('labels the current user team and opponent teams for score entry', () => {
+    component.teams = [
+      createTeam('team-a', ['player-a', 'player-c']),
+      createTeam('team-b', ['player-b', 'player-d'])
+    ];
+    component.currentUserTeamId = 'team-a';
+
+    expect(component.currentUserTeamLabel).toBe('player-a & player-c');
+    expect(component.opponentTeamLabel).toBe('player-b & player-d');
+  });
+
+  it('labels only the current user table as your table', () => {
+    component.currentUserTeamId = 'team-a';
+
+    expect(component.tableHeaderLabel).toBe('Your table: Table 1');
+
+    component.currentUserTeamId = undefined;
+
+    expect(component.tableHeaderLabel).toBe('Table 1');
+  });
+
+  it('shows a waiting status after the current user team submits every table score', () => {
+    component.currentUserTeamId = 'team-a';
+    component.teams[0].pointConfirmations = [{ teamId: 'team-a', playerId: 'player-a' }];
+    component.teams[1].pointConfirmations = [{ teamId: 'team-a', playerId: 'player-a' }];
+    component.pointsConfirmed = false;
+
+    expect(component.isWaitingForOtherConfirmations).toBeTrue();
+    expect(component.scoreTaskStatusMessage).toBe('Waiting for other team/admin.');
+    expect(component.scoreTaskStatusIcon).toBe('hourglass_top');
+  });
+
+  it('does not show opponent labels for admins outside a team', () => {
+    component.currentUserTeamId = undefined;
+    component.isCurrentUserAdmin = true;
+
+    expect(component.currentUserTeamLabel).toBe('');
+    expect(component.opponentTeamLabel).toBe('');
+    expect(component.scoreTaskStatusMessage).toBe('Review the table scores, then confirm table scores.');
+  });
 });
 
 function createTable(pointsConfirmed: boolean): Table {

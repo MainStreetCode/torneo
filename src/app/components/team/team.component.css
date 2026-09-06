@@ -12,6 +12,11 @@
     justify-content: space-between;
 }
 
+.team-role span {
+    color: #111827;
+    font-weight: 700;
+}
+
 .team-confirmed-status {
     color: #2e7d32;
     gap: 0.25rem;
@@ -19,4 +24,32 @@
 
 .team-confirmed-status.unconfirmed {
     color: rgba(0, 0, 0, 0.54);
+}
+
+.score-save-status {
+    align-items: center;
+    color: #6b7280;
+    display: flex;
+    font-size: 0.85rem;
+    gap: 0.35rem;
+    line-height: 1.35;
+    margin: -0.75rem 0 0.75rem;
+}
+
+.score-save-status mat-icon {
+    font-size: 18px;
+    height: 18px;
+    width: 18px;
+}
+
+.score-save-status.unsaved mat-icon {
+    color: #f59e0b;
+}
+
+.score-save-status.saving mat-icon {
+    color: #3f51b5;
+}
+
+.score-save-status.saved mat-icon {
+    color: #16a34a;
 }

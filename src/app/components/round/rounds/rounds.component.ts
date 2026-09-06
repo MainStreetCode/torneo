@@ -19,6 +19,7 @@ import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.comp
 export class RoundsComponent implements OnInit, OnDestroy {
   @Input() game: Game;
   rounds: Round[] = [];
+  playerCount = 0;
   isUserAdmin = false;
   isStartingRound = false;
   allTablesPointsConfirmed$ = of(false);
@@ -39,6 +40,14 @@ export class RoundsComponent implements OnInit, OnDestroy {
       this.gameService.isCurrentUserAdmin(this.game.id).subscribe({
         next: (isAdmin) => {
           this.isUserAdmin = isAdmin;
+        }
+      })
+    );
+
+    this.subscriptions.push(
+      this.playerService.playersForGame(this.game.id).subscribe({
+        next: (players) => {
+          this.playerCount = players.length;
         }
       })
     );
@@ -110,6 +119,96 @@ export class RoundsComponent implements OnInit, OnDestroy {
 
   configuration(): void {
     this.router.navigateByUrl(`/game/${this.game.id}/configuration`);
+  }
+
+  goToPlayers(): void {
+    this.router.navigateByUrl(`/game/${this.game.id}/dashboard?selectedTab=0`);
+  }
+
+  takeEmptyRoundsAction(): void {
+    if (!this.isUserAdmin) {
+      return;
+    }
+
+    if (!this.hasConfiguredRounds) {
+      this.configuration();
+      return;
+    }
+
+    if (!this.hasEnoughPlayers) {
+      this.goToPlayers();
+      return;
+    }
+
+    this.startRound(1);
+  }
+
+  get hasConfiguredRounds(): boolean {
+    return (Number(this.game?.numberOfRounds) || 0) > 0;
+  }
+
+  get hasEnoughPlayers(): boolean {
+    return this.playerCount >= 4;
+  }
+
+  get emptyRoundsIcon(): string {
+    if (!this.hasConfiguredRounds) {
+      return 'tune';
+    }
+
+    if (!this.hasEnoughPlayers) {
+      return 'group_add';
+    }
+
+    return 'play_arrow';
+  }
+
+  get emptyRoundsTitle(): string {
+    return 'No rounds yet';
+  }
+
+  get emptyRoundsMessage(): string {
+    if (!this.hasConfiguredRounds) {
+      return 'Set the number of rounds before starting round 1.';
+    }
+
+    if (!this.hasEnoughPlayers) {
+      return `Add ${4 - this.playerCount} more player${4 - this.playerCount === 1 ? '' : 's'}, then start round 1.`;
+    }
+
+    if (!this.isUserAdmin) {
+      return 'Setup is ready. Waiting for an admin to start round 1.';
+    }
+
+    return 'Setup is ready. Start round 1 to create tables.';
+  }
+
+  get emptyRoundsActionIcon(): string {
+    if (!this.hasConfiguredRounds) {
+      return 'tune';
+    }
+
+    if (!this.hasEnoughPlayers) {
+      return 'group';
+    }
+
+    return 'play_arrow';
+  }
+
+  get emptyRoundsActionText(): string {
+    if (!this.hasConfiguredRounds) {
+      return 'Open setup';
+    }
+
+    if (!this.hasEnoughPlayers) {
+      return 'Go to players';
+    }
+
+    return 'Start round 1';
+  }
+
+  get showEmptyRoundsAction(): boolean {
+    return this.isUserAdmin;
   }
 
   showErrorDialog(title: string, message: string): void {

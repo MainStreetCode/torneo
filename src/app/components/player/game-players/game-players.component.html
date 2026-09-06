@@ -21,6 +21,10 @@
           <mat-label>Player name</mat-label>
           <input matInput id="new-player" #playerName placeholder="Player Name" value="" [disabled]="hasRoundsStarted">
         </mat-form-field>
+        <div class="blocked-reason" *ngIf="hasRoundsStarted">
+          <mat-icon aria-hidden="true">lock</mat-icon>
+          <span>Players cannot be added after round 1 starts.</span>
+        </div>
       </div>
   
       <div>

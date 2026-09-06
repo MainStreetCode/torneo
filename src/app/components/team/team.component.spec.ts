@@ -151,6 +151,45 @@ describe('TeamComponent', () => {
     expect(component.isEditable).toBeTrue();
     expect(component.teamPointsFormControl.disabled).toBeFalse();
   });
+
+  it('labels the current user team and opponent team', () => {
+    component.team = createTeam(5, 'team-a', ['player-a']);
+    component.currentUserTeamId = 'team-a';
+
+    expect(component.teamRoleLabel).toBe('Your team');
+
+    component.team = createTeam(5, 'team-b', ['player-b']);
+
+    expect(component.teamRoleLabel).toBe('Opponent');
+  });
+
+  it('marks score entry as unsaved while the user edits', () => {
+    component.onPointsInput();
+
+    expect(component.scoreSaveStatus).toBe('unsaved');
+    expect(component.scoreSaveStatusLabel).toBe('Unsaved changes');
+  });
+
+  it('marks score entry as saving after emitting a score change', () => {
+    spyOn(component.pointsChange, 'emit');
+
+    component.pointsChanged(10);
+
+    expect(component.scoreSaveStatus).toBe('saving');
+    expect(component.scoreSaveStatusLabel).toBe('Saving');
+    expect(component.pointsChange.emit).toHaveBeenCalledWith({ team: component.team, points: 10 });
+  });
+
+  it('marks score entry as saved when the remote score catches up', () => {
+    component.pointsChanged(10);
+
+    expect(component.scoreSaveStatus).toBe('saving');
+
+    teamUpdates.next(createTeam(10));
+
+    expect(component.scoreSaveStatus).toBe('saved');
+    expect(component.scoreSaveStatusLabel).toBe('Saved');
+  });
 });
 
 function createTeam(points: number, id = 'team-1', playerIds: string[] = []): Team {

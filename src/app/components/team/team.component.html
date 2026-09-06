@@ -1,6 +1,8 @@
 <mat-card class="mdc-card card team-card">
     <div class="team-card-header">
-        <div>Team:</div>
+        <div class="team-role">
+            <span>{{teamRoleLabel}}</span>
+        </div>
         <div class="team-confirmed-status" *ngIf="pointsConfirmed">
             <mat-icon>check</mat-icon>
             Confirmed
@@ -14,19 +16,23 @@
     </div>
     <div>
         <mat-form-field class="full-width" appearance="fill">
-            <mat-label>Points</mat-label>
+            <mat-label>Enter score</mat-label>
             <input matInput id="teamPoints" placeholder="0" type="number" pattern="\d*" [formControl]="teamPointsFormControl" (focus)="onPointsFocus($event)" (input)="onPointsInput()" (blur)="onPointsBlur()">
           </mat-form-field>
+        <div class="score-save-status" [class.unsaved]="scoreSaveStatus === 'unsaved'" [class.saving]="scoreSaveStatus === 'saving'" [class.saved]="scoreSaveStatus === 'saved'">
+            <mat-icon aria-hidden="true">{{scoreSaveStatusIcon}}</mat-icon>
+            <span>{{scoreSaveStatusLabel}}</span>
+        </div>
     </div>
     <div>
         <button mat-raised-button color="primary" class="full-width" (click)="toggleConfirmPoints(true)" *ngIf="!currentUserTeamConfirmed && canConfirmPoints">
             <mat-icon>check</mat-icon>
-            {{isCurrentUserOnTeam ? 'Submit Score' : 'Confirm Score'}}
+            {{isCurrentUserOnTeam ? 'Submit score' : 'Confirm opponent score'}}
         </button>
 
         <button mat-raised-button color="accent" class="full-width" (click)="toggleConfirmPoints(false)" *ngIf="currentUserTeamConfirmed && canConfirmPoints">
             <mat-icon>cancel</mat-icon>
-            {{isCurrentUserOnTeam ? 'Change Score' : 'Change Confirmation'}}
+            {{isCurrentUserOnTeam ? 'Change score' : 'Change confirmation'}}
         </button>
     </div>
 </mat-card>
