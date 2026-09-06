@@ -21,11 +21,32 @@
       </div>
     </mat-toolbar>
 
-    <!-- <nav> -->
-      <!-- <a routerLink="/dashboard">Dashboard</a> -->
-      <!-- <a routerLink="/games">Games</a> -->
-      <!-- <a routerLink="/players">Players</a>   -->
-    <!-- </nav> -->
+    <nav class="app-nav" aria-label="Primary navigation">
+      <a mat-button routerLink="/games" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">
+        <mat-icon aria-hidden="true">emoji_events</mat-icon>
+        Tournaments
+      </a>
+      <a mat-button *ngIf="currentGameId" [routerLink]="['/game', currentGameId, 'dashboard']" routerLinkActive="active-link">
+        <mat-icon aria-hidden="true">dashboard</mat-icon>
+        Dashboard
+      </a>
+      <a mat-button *ngIf="currentGameId" [routerLink]="['/game', currentGameId, 'configuration']" routerLinkActive="active-link">
+        <mat-icon aria-hidden="true">tune</mat-icon>
+        Setup
+      </a>
+    </nav>
+
+    <nav class="breadcrumbs" *ngIf="breadcrumbs.length > 1" aria-label="Breadcrumb">
+      <ng-container *ngFor="let breadcrumb of breadcrumbs; last as isLast">
+        <a *ngIf="breadcrumb.url && !isLast; else breadcrumbLabel" [routerLink]="breadcrumb.url">
+          {{breadcrumb.label}}
+        </a>
+        <ng-template #breadcrumbLabel>
+          <span [attr.aria-current]="isLast ? 'page' : null">{{breadcrumb.label}}</span>
+        </ng-template>
+        <mat-icon *ngIf="!isLast" aria-hidden="true">chevron_right</mat-icon>
+      </ng-container>
+    </nav>
 
     <router-outlet></router-outlet>
     <!-- <app-system-messages></app-system-messages> -->

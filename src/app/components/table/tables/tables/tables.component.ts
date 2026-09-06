@@ -1,9 +1,10 @@
 import { Component, Input, OnChanges, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { User } from 'firebase/auth';
-import { Subscription } from 'rxjs';
+import { combineLatest, Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { GameService } from 'src/app/services/game/game.service';
 import { GamePlayerService } from 'src/app/services/gamePlayer/game-player.service';
 import { TableService } from 'src/app/services/table/table.service';
 import { Table } from '../../table';
@@ -17,16 +18,19 @@ export class TablesComponent implements OnInit, OnChanges, OnDestroy {
   @Input() tables: Table[];
   public filteredTables: Table[];
   public isDataFiltered = false;
-  public isUserPlayer = true;
+  public isUserPlayer = false;
+  public isUserAdmin = false;
   private filterString: string | undefined;
   private gameId: string;
   private roundId: string;
   private currentUser?: User;
+  private hasAppliedDefaultFilter = false;
 
   constructor(
     private tableService: TableService,
     private authService: AuthService,
     private route: ActivatedRoute,
+    private gameService: GameService,
     private gamePlayerService: GamePlayerService) { }
     private subscriptions: Subscription[] = [];
 
@@ -36,7 +40,7 @@ export class TablesComponent implements OnInit, OnChanges, OnDestroy {
     this.roundId = this.route.snapshot.paramMap.get('roundId');
     this.filteredTables = this.sortTables(this.tables);
 
-    this.checkCurrentUserIsPlayer();
+    this.checkCurrentUserTableAccess();
   }
 
   ngOnChanges(): void {
@@ -44,10 +48,7 @@ export class TablesComponent implements OnInit, OnChanges, OnDestroy {
       return;
     }
 
-    this.filteredTables = this.isDataFiltered && this.filterString
-      ? this.tables.filter((table) => table.id === this.filterString)
-      : this.tables;
-    this.filteredTables = this.sortTables(this.filteredTables);
+    this.applyTableFilter();
   }
 
   ngOnDestroy(): void {
@@ -55,51 +56,75 @@ export class TablesComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   public filterTables(): void {
-    this.isDataFiltered = !this.isDataFiltered;
-
-    if (this.currentUser && this.isDataFiltered) {
-      this.subscriptions.push(
-        this.tableService.getTableForPlayer(this.currentUser.uid, this.roundId, this.gameId).pipe(take(1)).subscribe({
-          next: (playerTable) => {
-            if (playerTable) {
-              this.filterString = playerTable.id;
-            } else {
-              this.filterString = undefined;
-            }
-
-            this.filteredTables = this.filterString ? this.tables.filter((table) => table.id === this.filterString) : this.tables;
-            this.filteredTables = this.sortTables(this.filteredTables);
-          }
-        })
-      );
-    } else {
-      this.filteredTables = this.tables;
-      this.filteredTables = this.sortTables(this.filteredTables);
+    if (this.isDataFiltered) {
+      this.showAllTables();
+      return;
     }
+
+    this.showMyTable();
   }
 
   public trackByTableId(index: number, table: Table): string {
     return table.id;
   }
 
-  private checkCurrentUserIsPlayer(): void {
+  private checkCurrentUserTableAccess(): void {
     if (!this.currentUser) {
       this.isUserPlayer = false;
       return;
     }
 
     this.subscriptions.push(
-      this.gamePlayerService.getPlayer(this.currentUser.uid, this.gameId).subscribe({
-        next: (player) => {
-          if (player) {
-            this.isUserPlayer = true;
-            this.filterTables();
-          } else {
-            this.isUserPlayer = false;
-          }
+      combineLatest([
+        this.gameService.isCurrentUserAdmin(this.gameId),
+        this.gamePlayerService.getPlayer(this.currentUser.uid, this.gameId)
+      ]).subscribe({
+        next: ([isAdmin, player]) => {
+          this.isUserAdmin = isAdmin;
+          this.isUserPlayer = !!player;
+          this.applyDefaultPlayerFilter();
         }
       })
     );
+  }
+
+  private applyDefaultPlayerFilter(): void {
+    if (this.hasAppliedDefaultFilter || !this.isUserPlayer || this.isUserAdmin) {
+      return;
+    }
+
+    this.hasAppliedDefaultFilter = true;
+    this.showMyTable();
+  }
+
+  private showMyTable(): void {
+    if (!this.currentUser) {
+      return;
+    }
+
+    this.subscriptions.push(
+      this.tableService.getTableForPlayer(this.currentUser.uid, this.roundId, this.gameId).pipe(take(1)).subscribe({
+        next: (playerTable) => {
+          this.filterString = playerTable?.id;
+          this.isDataFiltered = !!this.filterString;
+          this.applyTableFilter();
+        }
+      })
+    );
+  }
+
+  private showAllTables(): void {
+    this.isDataFiltered = false;
+    this.filterString = undefined;
+    this.applyTableFilter();
+  }
+
+  private applyTableFilter(): void {
+    const tables = this.tables ?? [];
+    this.filteredTables = this.isDataFiltered && this.filterString
+      ? tables.filter((table) => table.id === this.filterString)
+      : tables;
+    this.filteredTables = this.sortTables(this.filteredTables);
   }
 
   private sortTables(tables: Table[]): Table[] {
