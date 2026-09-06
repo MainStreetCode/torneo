@@ -183,7 +183,7 @@ export class TeamComponent implements OnInit, OnChanges, OnDestroy {
       this.gameService.isUserAdmin(currentUser.uid, this.gameId)
       .pipe(take(1)).subscribe({
         next: (isAdmin) => {
-          if (!this.allTablesConfirmed && (isAdmin || this.isCurrentUserOnTeam) && !this.pointsConfirmed) {
+          if (!this.allTablesConfirmed && (isAdmin || this.isCurrentUserOnTeam) && !this.pointsConfirmed && !this.currentUserTeamConfirmed) {
             this.isEditable = true;
             this.teamPointsFormControl.enable();
           } else {

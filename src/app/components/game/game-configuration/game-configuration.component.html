@@ -5,7 +5,7 @@
     </div>
     <h1>Access restricted</h1>
     <p>You do not have access to set up this tournament.</p>
-    <button mat-raised-button color="primary" (click)="goBack()">
+    <button mat-stroked-button color="primary" (click)="goBack()">
       <mat-icon>arrow_back</mat-icon>
       Back
     </button>
@@ -85,7 +85,7 @@
           </mat-form-field>
 
           <div class="settings-actions">
-            <button mat-raised-button color="accent" (click)="save()" [disabled]="isSaving || !game.name">
+            <button mat-raised-button color="primary" (click)="save()" [disabled]="isSaving || !game.name">
               <mat-icon>save</mat-icon>
               {{isSaving ? 'Saving' : 'Save'}}
             </button>

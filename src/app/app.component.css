@@ -11,6 +11,24 @@
   cursor: pointer;
 }
 
+.header .toolbar-primary-action {
+  background-color: #ffffff;
+  color: #af2f2f;
+}
+
+.header .toolbar-secondary-action {
+  border-color: rgba(255, 255, 255, 0.85);
+  color: #ffffff;
+}
+
+.header .toolbar-secondary-action:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+.header .toolbar-profile-action {
+  color: #ffffff;
+}
+
 .app-nav {
   display: flex;
   align-items: center;

@@ -7,16 +7,16 @@
       </div>
 
       <div *ngIf="(isLoggedIn$ | async) === false">
-        <button mat-raised-button color="accent" (click)="login()">Login</button>
+        <button mat-raised-button class="toolbar-primary-action" (click)="login()">Login</button>
       </div>
 
       <div *ngIf="(isLoggedIn$ | async)">
-        <button mat-raised-button color="accent" (click)="logout()">Logout</button>
+        <button mat-stroked-button class="toolbar-secondary-action" (click)="logout()">Logout</button>
       </div>
 
       <div *ngIf="(isLoggedIn$ | async)">
-        <button mat-icon-button color="primary" aria-label="User profile" (click)="userProfile()">
-          <mat-icon color="accent">account_circle</mat-icon>
+        <button mat-icon-button class="toolbar-profile-action" aria-label="User profile" (click)="userProfile()">
+          <mat-icon>account_circle</mat-icon>
         </button>
       </div>
     </mat-toolbar>

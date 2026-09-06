@@ -39,14 +39,14 @@
     </div>
 
     <div class="profile-actions">
-      <button mat-button type="button" (click)="cancelEdit()" [disabled]="isSaving || editableDisplayName === (displayName || '')">
+      <button mat-stroked-button color="primary" type="button" (click)="cancelEdit()" [disabled]="isSaving || editableDisplayName === (displayName || '')">
         Cancel
       </button>
-      <button mat-raised-button color="accent" type="button" (click)="save()" [disabled]="isSaveDisabled()">
+      <button mat-raised-button color="primary" type="button" (click)="save()" [disabled]="isSaveDisabled()">
         <mat-icon>save</mat-icon>
         {{isSaving ? 'Saving' : 'Save'}}
       </button>
-      <button mat-raised-button color="primary" (click)="back()">
+      <button mat-stroked-button color="primary" (click)="back()">
         <mat-icon>arrow_back</mat-icon>
         Back
       </button>
@@ -60,7 +60,7 @@
       </div>
       <h1>No profile loaded</h1>
       <p>Sign in to view your account details.</p>
-      <button mat-raised-button color="primary" (click)="back()">
+      <button mat-stroked-button color="primary" (click)="back()">
         <mat-icon>arrow_back</mat-icon>
         Back
       </button>

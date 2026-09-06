@@ -7,7 +7,7 @@
                 Confirm table scores
             </button>
 
-            <button mat-raised-button color="primary" [disabled]="isDisabled" (click)="toggleConfirmPoints(false)" *ngIf="pointsConfirmed">
+            <button mat-stroked-button color="primary" [disabled]="isDisabled" (click)="toggleConfirmPoints(false)" *ngIf="pointsConfirmed">
                 <mat-icon>cancel</mat-icon>
                 Change table scores
             </button>
@@ -18,12 +18,12 @@
 <section class="table-task-panel">
     <div class="task-summary">
         <div class="task-pill" *ngIf="currentUserTeamLabel">
-            <mat-icon aria-hidden="true">groups</mat-icon>
+            <mat-icon aria-hidden="true">group</mat-icon>
             <span>Your team</span>
             <strong>{{currentUserTeamLabel}}</strong>
         </div>
         <div class="task-pill" *ngIf="opponentTeamLabel">
-            <mat-icon aria-hidden="true">sports_kabaddi</mat-icon>
+            <mat-icon fontSet="material-symbols-outlined" aria-hidden="true">target</mat-icon>
             <span>Opponent</span>
             <strong>{{opponentTeamLabel}}</strong>
         </div>

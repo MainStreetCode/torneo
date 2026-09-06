@@ -30,7 +30,7 @@
             {{isCurrentUserOnTeam ? 'Submit score' : 'Confirm opponent score'}}
         </button>
 
-        <button mat-raised-button color="accent" class="full-width" (click)="toggleConfirmPoints(false)" *ngIf="currentUserTeamConfirmed && canConfirmPoints">
+        <button mat-stroked-button color="primary" class="full-width" (click)="toggleConfirmPoints(false)" *ngIf="currentUserTeamConfirmed && canConfirmPoints">
             <mat-icon>cancel</mat-icon>
             {{isCurrentUserOnTeam ? 'Change score' : 'Change confirmation'}}
         </button>

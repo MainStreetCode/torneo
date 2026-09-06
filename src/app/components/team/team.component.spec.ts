@@ -135,7 +135,7 @@ describe('TeamComponent', () => {
     expect(component.canConfirmPoints).toBeTrue();
   });
 
-  it('keeps the current user team points editable until confirmed or finalized', () => {
+  it('keeps the current user team points editable before the score is submitted', () => {
     component.auth = { currentUser: { uid: 'player-a' } } as any;
     component.team = createTeam(5, 'team-a', ['player-a']);
     component.currentUserTeamId = 'team-a';
@@ -146,6 +146,45 @@ describe('TeamComponent', () => {
       team: new SimpleChange(null, component.team, false),
       currentUserTeamId: new SimpleChange(null, component.currentUserTeamId, false),
       pointsConfirmed: new SimpleChange(true, component.pointsConfirmed, false)
+    });
+
+    expect(component.isEditable).toBeTrue();
+    expect(component.teamPointsFormControl.disabled).toBeFalse();
+  });
+
+  it('disables score entry after the current user team submits that score', () => {
+    component.auth = { currentUser: { uid: 'player-a' } } as any;
+    component.team = createTeam(5, 'team-a', ['player-a']);
+    component.currentUserTeamId = 'team-a';
+    component.currentUserTeamConfirmed = true;
+    component.pointsConfirmed = false;
+    component.allTablesConfirmed = false;
+
+    component.ngOnChanges({
+      team: new SimpleChange(null, component.team, false),
+      currentUserTeamId: new SimpleChange(null, component.currentUserTeamId, false),
+      currentUserTeamConfirmed: new SimpleChange(false, component.currentUserTeamConfirmed, false)
+    });
+
+    expect(component.isEditable).toBeFalse();
+    expect(component.teamPointsFormControl.disabled).toBeTrue();
+  });
+
+  it('re-enables score entry when the current user team changes the submitted score', () => {
+    component.auth = { currentUser: { uid: 'player-a' } } as any;
+    component.team = createTeam(5, 'team-a', ['player-a']);
+    component.currentUserTeamId = 'team-a';
+    component.currentUserTeamConfirmed = true;
+
+    component.ngOnChanges({
+      team: new SimpleChange(null, component.team, false),
+      currentUserTeamId: new SimpleChange(null, component.currentUserTeamId, false),
+      currentUserTeamConfirmed: new SimpleChange(false, component.currentUserTeamConfirmed, false)
+    });
+
+    component.currentUserTeamConfirmed = false;
+    component.ngOnChanges({
+      currentUserTeamConfirmed: new SimpleChange(true, component.currentUserTeamConfirmed, false)
     });
 
     expect(component.isEditable).toBeTrue();
