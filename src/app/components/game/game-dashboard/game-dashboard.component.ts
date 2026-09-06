@@ -217,7 +217,7 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
     }
 
     if (this.roundCount >= configuredRounds) {
-      this.dashboardStatus = this.latestRound.pointsConfirmed ? 'Tournament Completed' : `Round ${this.latestRound.number} Started`;
+      this.dashboardStatus = this.latestRound.pointsConfirmed ? 'Tournament Complete' : `Round ${this.latestRound.number} Started`;
       return;
     }
 

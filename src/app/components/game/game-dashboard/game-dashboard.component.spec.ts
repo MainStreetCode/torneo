@@ -94,7 +94,7 @@ describe('GameDashboardComponent', () => {
   it('keeps tournament completed after the final round is finalized', () => {
     rounds$.next([round(1, true), round(2, true), round(3, true)]);
 
-    expect(component.dashboardStatus).toBe('Tournament Completed');
+    expect(component.dashboardStatus).toBe('Tournament Complete');
   });
 
   it('shows a non-final active round as started', () => {
