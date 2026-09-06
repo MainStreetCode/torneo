@@ -29,9 +29,9 @@ export class GameConfigurationComponent implements OnInit, OnDestroy {
   public playerCount = 0;
   public roundCount = 0;
   public nextStepIcon = 'tune';
-  public nextStepTitle = 'Set the number of rounds';
+  public nextStepTitle = 'Set the Number of Rounds';
   public nextStepDescription = 'Choose how many rounds this tournament should have, then save the setup.';
-  public nextStepButtonText = 'Save setup';
+  public nextStepButtonText = 'Save Setup';
   public nextStepCanSave = false;
   private nextStepAction: 'save' | 'players' | 'rounds' | 'startRound' = 'save';
   private subscriptions: Subscription[] = [];
@@ -183,9 +183,9 @@ export class GameConfigurationComponent implements OnInit, OnDestroy {
   private updateNextStep(): void {
     if (!this.isRoundCountConfigured) {
       this.nextStepIcon = 'tune';
-      this.nextStepTitle = 'Set the number of rounds';
+      this.nextStepTitle = 'Set the Number of Rounds';
       this.nextStepDescription = 'Choose how many rounds this tournament should have, then save the setup.';
-      this.nextStepButtonText = 'Save setup';
+      this.nextStepButtonText = 'Save Setup';
       this.nextStepCanSave = true;
       this.nextStepAction = 'save';
       return;
@@ -193,9 +193,9 @@ export class GameConfigurationComponent implements OnInit, OnDestroy {
 
     if (!this.hasEnoughPlayers) {
       this.nextStepIcon = 'group_add';
-      this.nextStepTitle = 'Add players';
+      this.nextStepTitle = 'Add Players';
       this.nextStepDescription = `Add ${4 - this.playerCount} more player${4 - this.playerCount === 1 ? '' : 's'} to start the first round.`;
-      this.nextStepButtonText = 'Add players';
+      this.nextStepButtonText = 'Add Players';
       this.nextStepCanSave = false;
       this.nextStepAction = 'players';
       return;
@@ -203,18 +203,18 @@ export class GameConfigurationComponent implements OnInit, OnDestroy {
 
     if (!this.hasStartedRounds) {
       this.nextStepIcon = 'play_arrow';
-      this.nextStepTitle = 'Start round 1';
+      this.nextStepTitle = 'Start Round 1';
       this.nextStepDescription = 'Setup is ready. Start the first round to create tables.';
-      this.nextStepButtonText = 'Start round 1';
+      this.nextStepButtonText = 'Start Round 1';
       this.nextStepCanSave = false;
       this.nextStepAction = 'startRound';
       return;
     }
 
     this.nextStepIcon = 'table_bar';
-    this.nextStepTitle = 'Continue tournament';
+    this.nextStepTitle = 'Continue Tournament';
     this.nextStepDescription = 'Rounds have started. Use the dashboard to enter scores and manage remaining rounds.';
-    this.nextStepButtonText = 'Open rounds';
+    this.nextStepButtonText = 'Open Rounds';
     this.nextStepCanSave = false;
     this.nextStepAction = 'rounds';
   }

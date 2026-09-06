@@ -39,7 +39,6 @@
   overflow-wrap: anywhere;
 }
 
-.game-id,
 .section-title,
 .share-copy,
 .quick-actions,
@@ -50,13 +49,6 @@
   display: flex;
 }
 
-.game-id {
-  color: #4b5563;
-  gap: 0.35rem;
-  overflow-wrap: anywhere;
-}
-
-.game-id mat-icon,
 .section-title mat-icon {
   color: #3f51b5;
   flex: 0 0 auto;

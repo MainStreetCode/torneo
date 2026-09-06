@@ -11,10 +11,6 @@
             <mat-chip color="accent" selected>{{isAdmin ? 'Admin' : 'Player'}}</mat-chip>
           </mat-chip-list>
           <h1>{{player.displayName || 'Unnamed player'}}</h1>
-          <div class="player-id">
-            <mat-icon aria-hidden="true">tag</mat-icon>
-            <span>{{player.uid}}</span>
-          </div>
         </div>
       </div>
 
@@ -90,7 +86,6 @@
         <div class="points-row" *ngFor="let roundPoints of player.pointsForRound">
           <div>
             <div class="round-label">Round {{roundPoints.roundNumber}}</div>
-            <div class="round-id">{{roundPoints.roundId}}</div>
           </div>
           <div class="round-points">{{roundPoints.points}}</div>
         </div>

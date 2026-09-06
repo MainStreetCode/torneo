@@ -87,20 +87,20 @@ describe('GameDashboardComponent', () => {
   it('shows the final active round as started', () => {
     rounds$.next([round(1, true), round(2, true), round(3, false)]);
 
-    expect(component.dashboardStatus).toBe('Round 3 started');
+    expect(component.dashboardStatus).toBe('Round 3 Started');
     expect(component.dashboardStatus).not.toBe('All rounds started');
   });
 
   it('keeps tournament completed after the final round is finalized', () => {
     rounds$.next([round(1, true), round(2, true), round(3, true)]);
 
-    expect(component.dashboardStatus).toBe('Tournament completed');
+    expect(component.dashboardStatus).toBe('Tournament Completed');
   });
 
   it('shows a non-final active round as started', () => {
     rounds$.next([round(1, false)]);
 
-    expect(component.dashboardStatus).toBe('Round 1 started');
+    expect(component.dashboardStatus).toBe('Round 1 Started');
   });
 
   it('prompts setup when the number of rounds is missing', () => {
@@ -109,7 +109,7 @@ describe('GameDashboardComponent', () => {
     component = fixture.componentInstance;
     fixture.detectChanges();
 
-    expect(component.nextStepTitle).toBe('Finish tournament setup');
+    expect(component.nextStepTitle).toBe('Finish Tournament Setup');
 
     component.takeNextStep();
 
@@ -119,15 +119,15 @@ describe('GameDashboardComponent', () => {
   it('prompts players when fewer than 4 players are available', () => {
     players$.next(players(3));
 
-    expect(component.nextStepTitle).toBe('Add players');
-    expect(component.nextStepButtonText).toBe('Go to players');
+    expect(component.nextStepTitle).toBe('Add Players');
+    expect(component.nextStepButtonText).toBe('Go to Players');
     expect(component.showStandingsAction).toBeFalse();
   });
 
   it('opens the active round when scores are needed', () => {
     rounds$.next([round(1, false)]);
 
-    expect(component.nextStepTitle).toBe('Enter scores for round 1');
+    expect(component.nextStepTitle).toBe('Enter Scores for Round 1');
 
     component.takeNextStep();
 
@@ -137,13 +137,13 @@ describe('GameDashboardComponent', () => {
   it('prompts the next round after the latest round is complete', () => {
     rounds$.next([round(1, true)]);
 
-    expect(component.nextStepTitle).toBe('Start round 2');
-    expect(component.nextStepButtonText).toBe('Start round 2');
+    expect(component.nextStepTitle).toBe('Start Round 2');
+    expect(component.nextStepButtonText).toBe('Start Round 2');
     expect(component.showStandingsAction).toBeTrue();
   });
 
   it('does not show standings before the first round starts', () => {
-    expect(component.nextStepTitle).toBe('Start round 1');
+    expect(component.nextStepTitle).toBe('Start Round 1');
     expect(component.showStandingsAction).toBeFalse();
   });
 
@@ -151,7 +151,7 @@ describe('GameDashboardComponent', () => {
     expect(component.canCurrentUserJoin).toBeTrue();
 
     const content = fixture.nativeElement.textContent as string;
-    expect(content).toContain('Join this tournament');
+    expect(content).toContain('Join');
   });
 
   it('hides the dashboard join action after the current user joins', () => {
@@ -201,8 +201,8 @@ describe('GameDashboardComponent', () => {
     rounds$.next([round(1, true)]);
 
     expect(component.isCurrentUserAdmin).toBeFalse();
-    expect(component.nextStepTitle).toBe('Waiting for admin to start round 2');
-    expect(component.nextStepButtonText).toBe('View standings');
+    expect(component.nextStepTitle).toBe('Waiting for Admin to Start Round 2');
+    expect(component.nextStepButtonText).toBe('View Standings');
     expect(component.showStandingsAction).toBeFalse();
 
     const roundsComponent = jasmine.createSpyObj('RoundsComponent', ['startRound']);
@@ -218,7 +218,7 @@ describe('GameDashboardComponent', () => {
     spyOn(document, 'getElementById').and.returnValue(standingsElement);
     rounds$.next([round(1, true), round(2, true), round(3, true)]);
 
-    expect(component.nextStepButtonText).toBe('View standings');
+    expect(component.nextStepButtonText).toBe('View Standings');
 
     component.takeNextStep();
     tick();

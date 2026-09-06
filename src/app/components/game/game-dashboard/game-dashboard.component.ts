@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, HostListener, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -32,17 +32,18 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
   selectedTab = GameDashboardTab.Players;
   readonly playersTab = GameDashboardTab.Players;
   readonly roundsTab = GameDashboardTab.Rounds;
+  readonly infoTab = GameDashboardTab.Info;
   playerCount = 0;
   roundCount = 0;
   completedRoundCount = 0;
   progressPercentage = 0;
   nextRoundNumber = 1;
-  dashboardStatus = 'Waiting for players';
-  latestRoundLabel = 'No rounds started';
+  dashboardStatus = 'Waiting for Players';
+  latestRoundLabel = 'No Rounds Started';
   nextStepIcon = 'person_add';
-  nextStepTitle = 'Add players';
+  nextStepTitle = 'Add Players';
   nextStepDescription = 'Add at least 4 players before starting the first round.';
-  nextStepButtonText = 'Go to players';
+  nextStepButtonText = 'Go to Players';
   showStandingsAction = false;
   canCurrentUserJoin = false;
   hasCurrentUserJoined = false;
@@ -53,6 +54,8 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
   private currentUser?: User;
   private players: GamePlayer[] = [];
   private hasRoundsStarted = false;
+  private hasExplicitTabSelection = false;
+  private isSmallScreen = this.matchesSmallScreen();
   private subscriptions: Subscription[] = [];
   private dashboardSubscriptions: Subscription[] = [];
   private dashboardGameId?: string;
@@ -80,12 +83,25 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
     this.dashboardSubscriptions.forEach((subscription) => subscription.unsubscribe());
   }
 
+  @HostListener('window:resize')
+  onResize(): void {
+    const wasSmallScreen = this.isSmallScreen;
+    this.isSmallScreen = this.matchesSmallScreen();
+
+    if (wasSmallScreen !== this.isSmallScreen) {
+      this.applyDefaultTabPreference();
+    }
+  }
+
   private parseURLParams(): void {
     this.subscriptions.push(
       this.route.queryParams.subscribe(params => {
         const tab = Number(params.selectedTab);
         if (Number.isFinite(tab)) {
+          this.hasExplicitTabSelection = true;
           this.selectedTab = tab as GameDashboardTab;
+        } else {
+          this.applyDefaultTabPreference();
         }
 
         const roundEnded = params.roundEnded;
@@ -158,6 +174,7 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
     this.updateJoinState();
     this.updateDashboardStatus();
     this.updateNextStep();
+    this.applyDefaultTabPreference();
   }
 
   private updateRoundStats(rounds: Round[]): void {
@@ -170,12 +187,13 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
     this.hasRoundsStarted = this.roundCount > 0;
     this.latestRoundLabel = this.roundCount > 0
       ? `Round ${this.latestRound.number}`
-      : 'No rounds started';
+      : 'No Rounds Started';
 
     this.updateJoinState();
     this.updateProgressPercentage();
     this.updateDashboardStatus();
     this.updateNextStep();
+    this.applyDefaultTabPreference();
   }
 
   private updateProgressPercentage(): void {
@@ -189,26 +207,27 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
     const configuredRounds = this.game?.numberOfRounds ?? 0;
 
     if (configuredRounds === 0) {
-      this.dashboardStatus = 'Setup needed';
+      this.dashboardStatus = 'Setup Needed';
       return;
     }
 
     if (!this.latestRound) {
-      this.dashboardStatus = this.playerCount > 0 ? 'Ready for round 1' : 'Waiting for players';
+      this.dashboardStatus = this.playerCount > 0 ? 'Ready for Round 1' : 'Waiting for Players';
       return;
     }
 
     if (this.roundCount >= configuredRounds) {
-      this.dashboardStatus = this.latestRound.pointsConfirmed ? 'Tournament completed' : `Round ${this.latestRound.number} started`;
+      this.dashboardStatus = this.latestRound.pointsConfirmed ? 'Tournament Completed' : `Round ${this.latestRound.number} Started`;
       return;
     }
 
     this.dashboardStatus = this.latestRound.pointsConfirmed
-      ? `Round ${this.latestRound.number} completed`
-      : `Round ${this.latestRound.number} started`;
+      ? `Round ${this.latestRound.number} Completed`
+      : `Round ${this.latestRound.number} Started`;
   }
 
   selectTab(tabNumber: number): void {
+    this.hasExplicitTabSelection = true;
     this.selectedTab = tabNumber as unknown as GameDashboardTab;
     this.router.navigate([], {
       relativeTo: this.route,
@@ -244,6 +263,13 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
 
   viewStandings(): void {
     this.showPlayersSection();
+  }
+
+  viewTournamentInfo(): void {
+    this.selectTab(this.infoTab);
+    window.setTimeout(() => {
+      document.getElementById('tournament-info')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
   }
 
   joinTournament(): void {
@@ -283,6 +309,7 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
         next: (isAdmin) => {
           this.isCurrentUserAdmin = isAdmin;
           this.updateNextStep();
+          this.applyDefaultTabPreference();
         }
       })
     );
@@ -343,40 +370,40 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
 
     if (configuredRounds === 0) {
       this.nextStepIcon = 'tune';
-      this.nextStepTitle = this.isCurrentUserAdmin ? 'Finish tournament setup' : 'Waiting for setup';
+      this.nextStepTitle = this.isCurrentUserAdmin ? 'Finish Tournament Setup' : 'Waiting for Setup';
       this.nextStepDescription = this.isCurrentUserAdmin
         ? 'Set the number of rounds before players can start competing.'
         : 'An admin needs to set the number of rounds before play can begin.';
-      this.nextStepButtonText = this.isCurrentUserAdmin ? 'Open setup' : 'View players';
+      this.nextStepButtonText = this.isCurrentUserAdmin ? 'Open Setup' : 'View Players';
       this.nextStepAction = this.isCurrentUserAdmin ? 'configuration' : 'players';
       return;
     }
 
     if (this.playerCount < 4) {
       this.nextStepIcon = 'person_add';
-      this.nextStepTitle = 'Add players';
+      this.nextStepTitle = 'Add Players';
       this.nextStepDescription = 'You need at least 4 players to create the first table.';
-      this.nextStepButtonText = 'Go to players';
+      this.nextStepButtonText = 'Go to Players';
       this.nextStepAction = 'players';
       return;
     }
 
     if (!this.latestRound) {
       this.nextStepIcon = 'play_arrow';
-      this.nextStepTitle = this.isCurrentUserAdmin ? 'Start round 1' : 'Waiting for admin to start round 1';
+      this.nextStepTitle = this.isCurrentUserAdmin ? 'Start Round 1' : 'Waiting for Admin to Start Round 1';
       this.nextStepDescription = this.isCurrentUserAdmin
         ? 'Players are ready. Start the first round to create tables.'
         : 'Players are ready. An admin needs to start round 1.';
-      this.nextStepButtonText = this.isCurrentUserAdmin ? 'Start round 1' : 'View players';
+      this.nextStepButtonText = this.isCurrentUserAdmin ? 'Start Round 1' : 'View Players';
       this.nextStepAction = this.isCurrentUserAdmin ? 'rounds' : 'players';
       return;
     }
 
     if (!this.latestRound.pointsConfirmed) {
       this.nextStepIcon = 'edit_note';
-      this.nextStepTitle = `Enter scores for round ${this.latestRound.number}`;
+      this.nextStepTitle = `Enter Scores for Round ${this.latestRound.number}`;
       this.nextStepDescription = 'Open the active round, enter table scores, and confirm them.';
-      this.nextStepButtonText = 'Open current round';
+      this.nextStepButtonText = 'Open Current Round';
       this.nextStepAction = 'currentRound';
       return;
     }
@@ -384,21 +411,21 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
     if (this.roundCount < configuredRounds) {
       this.nextStepIcon = 'play_arrow';
       this.nextStepTitle = this.isCurrentUserAdmin
-        ? `Start round ${this.nextRoundNumber}`
-        : `Waiting for admin to start round ${this.nextRoundNumber}`;
+        ? `Start Round ${this.nextRoundNumber}`
+        : `Waiting for Admin to Start Round ${this.nextRoundNumber}`;
       this.nextStepDescription = this.isCurrentUserAdmin
         ? `Round ${this.latestRound.number} is complete. Start the next round when everyone is ready.`
         : `Round ${this.latestRound.number} is complete. An admin needs to start round ${this.nextRoundNumber}.`;
-      this.nextStepButtonText = this.isCurrentUserAdmin ? `Start round ${this.nextRoundNumber}` : 'View standings';
+      this.nextStepButtonText = this.isCurrentUserAdmin ? `Start Round ${this.nextRoundNumber}` : 'View Standings';
       this.showStandingsAction = this.isCurrentUserAdmin;
       this.nextStepAction = this.isCurrentUserAdmin ? 'rounds' : 'players';
       return;
     }
 
     this.nextStepIcon = 'leaderboard';
-    this.nextStepTitle = 'Review final standings';
+    this.nextStepTitle = 'Review Final Standings';
     this.nextStepDescription = 'All configured rounds are complete. Check the player standings and point totals.';
-    this.nextStepButtonText = 'View standings';
+    this.nextStepButtonText = 'View Standings';
     this.nextStepAction = 'players';
   }
 
@@ -416,6 +443,24 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
     window.setTimeout(() => {
       document.getElementById('players-standings')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
+  }
+
+  private applyDefaultTabPreference(): void {
+    if (this.hasExplicitTabSelection) {
+      return;
+    }
+
+    if (this.hasRoundsStarted && this.isCurrentUserAdmin && !this.isSmallScreen) {
+      this.selectedTab = this.roundsTab;
+      return;
+    }
+
+    this.selectedTab = this.playersTab;
+  }
+
+  private matchesSmallScreen(): boolean {
+    return typeof window !== 'undefined'
+      && window.matchMedia('(max-width: 760px)').matches;
   }
 }
 

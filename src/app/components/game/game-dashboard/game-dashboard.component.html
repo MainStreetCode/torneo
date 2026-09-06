@@ -1,123 +1,126 @@
 <div *ngIf="game">
   <app-section-header [sectionName]="sectionName"></app-section-header>
 
-  <section class="game-lobby">
-    <mat-card class="lobby-card">
-      <div class="lobby-hero">
-        <div class="hero-copy">
-          <mat-chip-list aria-label="Tournament status">
-            <mat-chip color="accent" selected>{{dashboardStatus}}</mat-chip>
-          </mat-chip-list>
+  <section class="game-dashboard" [class.live-dashboard]="roundCount > 0" [class.admin-dashboard]="isCurrentUserAdmin">
+    <mat-card class="status-card">
+      <div class="status-header">
+        <div class="title-block">
           <h1>{{game.name}}</h1>
-          <div class="game-id">
-            <mat-icon aria-hidden="true">tag</mat-icon>
-            <span>{{game.id}}</span>
-          </div>
+        </div>
 
-          <div class="hero-actions" *ngIf="canCurrentUserJoin">
-            <button mat-raised-button color="primary" class="join-tournament-action" (click)="joinTournament()">
-              <mat-icon>person_add</mat-icon>
-              Join this tournament
+        <div class="header-actions">
+          <button mat-raised-button color="primary" class="join-tournament-action" *ngIf="canCurrentUserJoin" (click)="joinTournament()">
+            <mat-icon>person_add</mat-icon>
+            Join
+          </button>
+          <button mat-stroked-button color="primary" class="share-action" (click)="viewTournamentInfo()">
+            <mat-icon>qr_code_2</mat-icon>
+            Info
+          </button>
+        </div>
+      </div>
+
+      <div class="status-content">
+        <div class="next-step-panel">
+          <div class="next-step-icon">
+            <mat-icon aria-hidden="true">{{nextStepIcon}}</mat-icon>
+          </div>
+          <div class="next-step-copy">
+            <div class="next-step-eyebrow">Next Step</div>
+            <h2>{{nextStepTitle}}</h2>
+            <p>{{nextStepDescription}}</p>
+          </div>
+          <div class="next-step-actions">
+            <button mat-stroked-button color="primary" class="next-step-action" *ngIf="showStandingsAction" (click)="viewStandings()">
+              <mat-icon>leaderboard</mat-icon>
+              Standings
             </button>
-          </div>
-
-          <div class="round-progress" aria-label="Round progress">
-            <div class="progress-header">
-              <span>{{latestRoundLabel}}</span>
-              <span>{{roundCount}} / {{game.numberOfRounds ?? 0}} rounds</span>
-            </div>
-            <div class="progress-track">
-              <div class="progress-fill" [style.width.%]="progressPercentage"></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="share-panel">
-          <div class="share-copy">
-            <mat-icon aria-hidden="true">qr_code_2</mat-icon>
-            <div>
-              <div class="share-title">Join link</div>
-              <div class="share-subtitle">Scan to open this tournament dashboard.</div>
-            </div>
-          </div>
-          <div class="qr-frame">
-            <qrcode *ngIf="gameURL" [qrdata]="gameURL" [width]="176" [errorCorrectionLevel]="'M'"></qrcode>
-          </div>
-        </div>
-      </div>
-
-      <mat-divider></mat-divider>
-
-      <div class="next-step-panel">
-        <div class="next-step-icon">
-          <mat-icon aria-hidden="true">{{nextStepIcon}}</mat-icon>
-        </div>
-        <div class="next-step-copy">
-          <div class="next-step-eyebrow">Next step</div>
-          <h2>{{nextStepTitle}}</h2>
-          <p>{{nextStepDescription}}</p>
-        </div>
-        <div class="next-step-actions">
-          <button mat-stroked-button color="primary" class="next-step-action" *ngIf="showStandingsAction" (click)="viewStandings()">
-            <mat-icon>leaderboard</mat-icon>
-            View standings
-          </button>
-          <button mat-raised-button color="primary" class="next-step-action" (click)="takeNextStep()">
-            <mat-icon>{{nextStepIcon}}</mat-icon>
-            {{nextStepButtonText}}
-          </button>
-        </div>
-      </div>
-
-      <mat-divider></mat-divider>
-
-      <div class="stat-grid">
-        <div class="stat-tile">
-          <mat-icon aria-hidden="true">group</mat-icon>
-          <div>
-            <div class="stat-value">{{playerCount}}</div>
-            <div class="stat-label">Players</div>
-          </div>
-        </div>
-        <div class="stat-tile">
-          <mat-icon aria-hidden="true">event_available</mat-icon>
-          <div>
-            <div class="stat-value">{{completedRoundCount}}</div>
-            <div class="stat-label">Completed</div>
-          </div>
-        </div>
-        <div class="stat-tile">
-          <mat-icon aria-hidden="true">table_bar</mat-icon>
-          <div>
-            <div class="stat-value">{{roundCount}}</div>
-            <div class="stat-label">Started</div>
-          </div>
-        </div>
-        <div class="stat-tile">
-          <mat-icon aria-hidden="true">flag</mat-icon>
-          <div>
-            <div class="stat-value">{{game.numberOfRounds ?? 0}}</div>
-            <div class="stat-label">Rounds</div>
+            <button mat-raised-button color="primary" class="next-step-action" (click)="takeNextStep()">
+              <mat-icon>{{nextStepIcon}}</mat-icon>
+              {{nextStepButtonText}}
+            </button>
           </div>
         </div>
       </div>
     </mat-card>
 
-    <mat-card class="tabs-card">
+    <mat-card class="tabs-card" id="dashboard-tabs">
       <mat-tab-group mat-stretch-tabs [selectedIndex]="selectedTab" (selectedIndexChange)="selectTab($event)">
         <mat-tab>
           <ng-template mat-tab-label>
-            <mat-icon class="tab-icon">group</mat-icon> {{hasScores ? 'Standings' : 'Players'}}
+            <mat-icon class="tab-icon">leaderboard</mat-icon> {{hasScores ? 'Standings' : 'Players'}}
           </ng-template>
           <div id="players-standings">
-            <app-game-players [game]="game"></app-game-players>
+            <app-game-players [game]="game" [showHeader]="false"></app-game-players>
           </div>
         </mat-tab>
         <mat-tab>
           <ng-template mat-tab-label>
             <mat-icon class="tab-icon">table_bar</mat-icon> Rounds
           </ng-template>
-          <app-rounds [game]="game"></app-rounds>
+          <app-rounds [game]="game" [showHeader]="false"></app-rounds>
+        </mat-tab>
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <mat-icon class="tab-icon">info</mat-icon> Info
+          </ng-template>
+
+          <div class="info-view" id="tournament-info">
+            <section class="info-panel share-panel">
+              <div class="info-heading">
+                <mat-icon aria-hidden="true">qr_code_2</mat-icon>
+                <div>
+                  <h2>Join Link</h2>
+                  <p>Scan to open this tournament dashboard.</p>
+                </div>
+              </div>
+              <div class="qr-frame">
+                <qrcode *ngIf="gameURL" [qrdata]="gameURL" [width]="176" [errorCorrectionLevel]="'M'"></qrcode>
+              </div>
+            </section>
+
+            <section class="info-panel details-panel">
+              <div class="info-heading">
+                <mat-icon aria-hidden="true">emoji_events</mat-icon>
+                <div>
+                  <h2>Tournament Details</h2>
+                  <p>Current state and progress for this tournament.</p>
+                </div>
+              </div>
+              <div class="round-progress" aria-label="Round progress">
+                <div class="progress-header">
+                  <span>{{latestRoundLabel}}</span>
+                  <span>{{roundCount}} / {{game.numberOfRounds ?? 0}} rounds</span>
+                </div>
+                <div class="progress-track">
+                  <div class="progress-fill" [style.width.%]="progressPercentage"></div>
+                </div>
+              </div>
+              <div class="stat-grid" aria-label="Tournament summary">
+                <div class="stat-tile">
+                  <mat-icon aria-hidden="true">radio_button_checked</mat-icon>
+                  <div>
+                    <div class="stat-value status-value">{{dashboardStatus}}</div>
+                    <div class="stat-label">Status</div>
+                  </div>
+                </div>
+                <div class="stat-tile">
+                  <mat-icon aria-hidden="true">group</mat-icon>
+                  <div>
+                    <div class="stat-value">{{playerCount}}</div>
+                    <div class="stat-label">Players</div>
+                  </div>
+                </div>
+                <div class="stat-tile">
+                  <mat-icon aria-hidden="true">event_available</mat-icon>
+                  <div>
+                    <div class="stat-value">{{completedRoundCount}}</div>
+                    <div class="stat-label">Completed Rounds</div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
         </mat-tab>
       </mat-tab-group>
     </mat-card>

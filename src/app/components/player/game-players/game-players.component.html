@@ -1,11 +1,11 @@
 <div class="players">
-  <div class="flex-box-rows">
+  <div class="flex-box-rows" *ngIf="showHeader">
     <mat-toolbar color="accent">
       <div class="flex-box-item">Players</div>
     </mat-toolbar>  
   </div>
   
-  <mat-toolbar color="secondary">
+  <mat-toolbar color="secondary" *ngIf="showHeader">
     <span>{{hasScores ? 'Standings' : 'Players'}} ({{players.length}})</span>
   </mat-toolbar>
   <div class="player-list">

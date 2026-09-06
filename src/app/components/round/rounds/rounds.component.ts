@@ -18,6 +18,7 @@ import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.comp
 })
 export class RoundsComponent implements OnInit, OnDestroy {
   @Input() game: Game;
+  @Input() showHeader = true;
   rounds: Round[] = [];
   playerCount = 0;
   isUserAdmin = false;

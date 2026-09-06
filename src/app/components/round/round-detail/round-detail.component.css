@@ -4,28 +4,6 @@
     padding: 1rem;
 }
 
-.round-status-header {
-    align-items: baseline;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-}
-
-.round-eyebrow {
-    color: rgba(0, 0, 0, 0.6);
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0;
-    text-transform: uppercase;
-}
-
-.round-id {
-    color: rgba(0, 0, 0, 0.72);
-    font-size: 0.875rem;
-    overflow-wrap: anywhere;
-}
-
 .round-status-grid {
     align-items: start;
     display: grid;

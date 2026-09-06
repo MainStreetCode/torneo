@@ -74,15 +74,15 @@ describe('GameSetupComponent', () => {
   });
 
   it('starts by prompting admins to set the number of rounds', () => {
-    expect(component.nextStepTitle).toBe('Set the number of rounds');
-    expect(component.nextStepButtonText).toBe('Save setup');
+    expect(component.nextStepTitle).toBe('Set the Number of Rounds');
+    expect(component.nextStepButtonText).toBe('Save Setup');
   });
 
   it('prompts admins to add players after rounds are configured', () => {
     component.game.numberOfRounds = 3;
     players$.next([{}, {}]);
 
-    expect(component.nextStepTitle).toBe('Add players');
+    expect(component.nextStepTitle).toBe('Add Players');
     expect(component.nextStepDescription).toBe('Add 2 more players to start the first round.');
   });
 
@@ -90,8 +90,8 @@ describe('GameSetupComponent', () => {
     component.game.numberOfRounds = 3;
     players$.next([{}, {}, {}, {}]);
 
-    expect(component.nextStepTitle).toBe('Start round 1');
-    expect(component.nextStepButtonText).toBe('Start round 1');
+    expect(component.nextStepTitle).toBe('Start Round 1');
+    expect(component.nextStepButtonText).toBe('Start Round 1');
   });
 
   it('starts round 1 from the setup next step', () => {
