@@ -35,7 +35,7 @@ describe('GameDashboardComponent', () => {
     rounds$ = new BehaviorSubject<Round[]>([]);
     loggedIn$ = new BehaviorSubject<boolean>(true);
     currentUser = { uid: 'user-1', displayName: 'Angela' };
-    gameService = jasmine.createSpyObj<GameService>('GameService', ['getGame']);
+    gameService = jasmine.createSpyObj<GameService>('GameService', ['getGame', 'isCurrentUserAdmin']);
     gamePlayerService = jasmine.createSpyObj<GamePlayerService>('GamePlayerService', ['playersForGame', 'addPlayer']);
     roundService = jasmine.createSpyObj<RoundService>('RoundService', ['roundsForGame']);
     snackBar = jasmine.createSpyObj<MatSnackBar>('MatSnackBar', ['open']);
@@ -47,6 +47,7 @@ describe('GameDashboardComponent', () => {
     } as unknown as jasmine.SpyObj<AuthService>;
 
     gameService.getGame.and.returnValue(of(game(3)));
+    gameService.isCurrentUserAdmin.and.returnValue(of(true));
     gamePlayerService.playersForGame.and.returnValue(players$.asObservable());
     roundService.roundsForGame.and.returnValue(rounds$.asObservable());
     dialog.open.and.returnValue({ afterClosed: () => of(false) } as never);
@@ -192,6 +193,26 @@ describe('GameDashboardComponent', () => {
 
     expect(roundsComponent.startRound).toHaveBeenCalledWith(1);
     expect(router.navigate).not.toHaveBeenCalled();
+  });
+
+  it('does not offer round start actions to non-admins', () => {
+    gameService.isCurrentUserAdmin.and.returnValue(of(false));
+    fixture = TestBed.createComponent(GameDashboardComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+    rounds$.next([round(1, true)]);
+
+    expect(component.isCurrentUserAdmin).toBeFalse();
+    expect(component.nextStepTitle).toBe('Waiting for admin to start round 2');
+    expect(component.nextStepButtonText).toBe('View standings');
+    expect(component.showStandingsAction).toBeFalse();
+
+    const roundsComponent = jasmine.createSpyObj('RoundsComponent', ['startRound']);
+    component.roundsComponent = roundsComponent;
+    component.takeNextStep();
+
+    expect(roundsComponent.startRound).not.toHaveBeenCalled();
+    expect(router.navigate).toHaveBeenCalled();
   });
 
   it('scrolls to standings when the tournament is complete', fakeAsync(() => {

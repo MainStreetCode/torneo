@@ -6,6 +6,7 @@ import { GamePlayerService } from 'src/app/services/gamePlayer/game-player.servi
 import { RoundMediatorService } from 'src/app/services/round-mediator/round-mediator.service';
 import { Round } from 'src/app/services/round/round';
 import { RoundService } from 'src/app/services/round/round.service';
+import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component';
 
 import { RoundsComponent } from './rounds.component';
 
@@ -97,6 +98,20 @@ describe('RoundsComponent', () => {
     createRound$.complete();
 
     expect(component.isStartingRound).toBeFalse();
+  });
+
+  it('blocks non-admins from starting a round', () => {
+    gameService.isCurrentUserAdmin.and.returnValue(of(false));
+
+    component.startRound(1);
+
+    expect(roundMediatorService.createRound).not.toHaveBeenCalled();
+    expect(dialog.open).toHaveBeenCalledWith(ConfirmDialogComponent, jasmine.objectContaining({
+      data: jasmine.objectContaining({
+        title: 'Start round',
+        message: 'Only tournament admins can start rounds.'
+      })
+    }));
   });
 
   it('explains that rounds are blocked by missing setup', () => {

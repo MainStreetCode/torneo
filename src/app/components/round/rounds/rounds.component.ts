@@ -81,10 +81,16 @@ export class RoundsComponent implements OnInit, OnDestroy {
     this.isStartingRound = true;
     this.subscriptions.push(
       combineLatest([
-        this.allTablesPointsConfirmed$,
+        this.gameService.isCurrentUserAdmin(this.game.id).pipe(take(1)),
+        this.allTablesPointsConfirmed$.pipe(take(1)),
         this.playerService.playersForGame(this.game.id).pipe(take(1))
       ]).pipe(
-        switchMap(([allPointsConfirmed, players]) => {
+        switchMap(([isAdmin, allPointsConfirmed, players]) => {
+          if (!isAdmin) {
+            this.showErrorDialog('Start round', 'Only tournament admins can start rounds.');
+            return EMPTY;
+          }
+
           if (roundNumber > 1 && !allPointsConfirmed) {
             this.showErrorDialog('Start round', `Confirm all table scores for round ${roundNumber - 1} first.`);
             return EMPTY;

@@ -48,6 +48,7 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
   canCurrentUserJoin = false;
   hasCurrentUserJoined = false;
   hasScores = false;
+  isCurrentUserAdmin = false;
   private nextStepAction: 'players' | 'rounds' | 'configuration' | 'currentRound' = 'players';
   private latestRound?: Round;
   private currentUser?: User;
@@ -129,6 +130,7 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
           this.updateProgressPercentage();
           this.updateNextStep();
           this.watchDashboardData(this.game.id);
+          this.watchAdminState(this.game.id);
         }
       })
     );
@@ -271,7 +273,23 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
   private watchCurrentUser(): void {
     this.subscriptions.push(
       this.authService.isLoggedIn$.subscribe({
-        next: () => this.updateJoinState()
+        next: () => {
+          this.updateJoinState();
+          if (this.game?.id) {
+            this.watchAdminState(this.game.id);
+          }
+        }
+      })
+    );
+  }
+
+  private watchAdminState(gameId: string): void {
+    this.dashboardSubscriptions.push(
+      this.gameService.isCurrentUserAdmin(gameId).pipe(take(1)).subscribe({
+        next: (isAdmin) => {
+          this.isCurrentUserAdmin = isAdmin;
+          this.updateNextStep();
+        }
       })
     );
   }
@@ -331,10 +349,12 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
 
     if (configuredRounds === 0) {
       this.nextStepIcon = 'tune';
-      this.nextStepTitle = 'Finish tournament setup';
-      this.nextStepDescription = 'Set the number of rounds before players can start competing.';
-      this.nextStepButtonText = 'Open setup';
-      this.nextStepAction = 'configuration';
+      this.nextStepTitle = this.isCurrentUserAdmin ? 'Finish tournament setup' : 'Waiting for setup';
+      this.nextStepDescription = this.isCurrentUserAdmin
+        ? 'Set the number of rounds before players can start competing.'
+        : 'An admin needs to set the number of rounds before play can begin.';
+      this.nextStepButtonText = this.isCurrentUserAdmin ? 'Open setup' : 'View players';
+      this.nextStepAction = this.isCurrentUserAdmin ? 'configuration' : 'players';
       return;
     }
 
@@ -349,10 +369,12 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
 
     if (!this.latestRound) {
       this.nextStepIcon = 'play_arrow';
-      this.nextStepTitle = 'Start round 1';
-      this.nextStepDescription = 'Players are ready. Start the first round to create tables.';
-      this.nextStepButtonText = 'Start round 1';
-      this.nextStepAction = 'rounds';
+      this.nextStepTitle = this.isCurrentUserAdmin ? 'Start round 1' : 'Waiting for admin to start round 1';
+      this.nextStepDescription = this.isCurrentUserAdmin
+        ? 'Players are ready. Start the first round to create tables.'
+        : 'Players are ready. An admin needs to start round 1.';
+      this.nextStepButtonText = this.isCurrentUserAdmin ? 'Start round 1' : 'View players';
+      this.nextStepAction = this.isCurrentUserAdmin ? 'rounds' : 'players';
       return;
     }
 
@@ -367,11 +389,15 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
 
     if (this.roundCount < configuredRounds) {
       this.nextStepIcon = 'play_arrow';
-      this.nextStepTitle = `Start round ${this.nextRoundNumber}`;
-      this.nextStepDescription = `Round ${this.latestRound.number} is complete. Start the next round when everyone is ready.`;
-      this.nextStepButtonText = `Start round ${this.nextRoundNumber}`;
-      this.showStandingsAction = true;
-      this.nextStepAction = 'rounds';
+      this.nextStepTitle = this.isCurrentUserAdmin
+        ? `Start round ${this.nextRoundNumber}`
+        : `Waiting for admin to start round ${this.nextRoundNumber}`;
+      this.nextStepDescription = this.isCurrentUserAdmin
+        ? `Round ${this.latestRound.number} is complete. Start the next round when everyone is ready.`
+        : `Round ${this.latestRound.number} is complete. An admin needs to start round ${this.nextRoundNumber}.`;
+      this.nextStepButtonText = this.isCurrentUserAdmin ? `Start round ${this.nextRoundNumber}` : 'View standings';
+      this.showStandingsAction = this.isCurrentUserAdmin;
+      this.nextStepAction = this.isCurrentUserAdmin ? 'rounds' : 'players';
       return;
     }
 
