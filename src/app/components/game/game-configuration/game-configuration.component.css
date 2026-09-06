@@ -41,7 +41,6 @@
 
 .section-title,
 .share-copy,
-.quick-actions,
 .next-step-panel,
 .setup-checklist,
 .checklist-item {
@@ -54,11 +53,7 @@
   flex: 0 0 auto;
 }
 
-.quick-actions {
-  gap: 0.75rem;
-}
-
-.quick-actions button mat-icon,
+.settings-actions button mat-icon,
 .empty-state button mat-icon {
   margin-right: 0.35rem;
 }
@@ -162,6 +157,11 @@
 
 .settings-form {
   min-width: 0;
+}
+
+.settings-actions {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .section-title {
@@ -268,11 +268,6 @@
     font-size: 1.65rem;
   }
 
-  .quick-actions {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
   .next-step-panel,
   .setup-checklist {
     align-items: stretch;
@@ -290,6 +285,10 @@
 
   .share-panel {
     justify-self: stretch;
+  }
+
+  .settings-actions button {
+    width: 100%;
   }
 
   .players-card-header {

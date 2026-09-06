@@ -25,16 +25,6 @@
           <h1>{{game.name}}</h1>
         </div>
 
-        <div class="quick-actions">
-          <button mat-raised-button color="accent" (click)="save()" [disabled]="isSaving">
-            <mat-icon>save</mat-icon>
-            {{isSaving ? 'Saving' : 'Save'}}
-          </button>
-          <button mat-raised-button color="primary" (click)="startGame()">
-            <mat-icon>play_arrow</mat-icon>
-            Go to rounds
-          </button>
-        </div>
       </div>
 
       <mat-divider></mat-divider>
@@ -93,6 +83,13 @@
             <mat-label>Number of rounds</mat-label>
             <input id="game-rounds" matInput placeholder="8" [(ngModel)]="game.numberOfRounds" [disabled]="isSaving">
           </mat-form-field>
+
+          <div class="settings-actions">
+            <button mat-raised-button color="accent" (click)="save()" [disabled]="isSaving || !game.name">
+              <mat-icon>save</mat-icon>
+              {{isSaving ? 'Saving' : 'Save'}}
+            </button>
+          </div>
         </div>
 
         <div class="share-panel">

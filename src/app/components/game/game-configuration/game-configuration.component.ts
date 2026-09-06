@@ -118,12 +118,6 @@ export class GameConfigurationComponent implements OnInit, OnDestroy {
     );
   }
 
-  startGame(): void {
-    if (this.game) {
-      this.router.navigateByUrl(`/game/${this.game.id}/dashboard?selectedTab=1`);
-    }
-  }
-
   takeNextStep(): void {
     if (this.nextStepAction === 'save') {
       this.save();
