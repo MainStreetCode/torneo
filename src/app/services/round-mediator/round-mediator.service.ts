@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { combineLatest, forkJoin, Observable, of, Subscription, throwError } from 'rxjs';
-import { catchError, map, mergeMap, switchMap, take } from 'rxjs/operators';
+import { map, mergeMap, switchMap, take } from 'rxjs/operators';
 import { GamePlayer } from 'src/app/components/player/game-player';
 import { RoundPoints } from 'src/app/components/player/game-players/round-points';
 import { Table } from 'src/app/components/table/table';
@@ -21,12 +21,6 @@ export class FixedTableAssignmentError extends Error {
     super(message);
     this.name = 'FixedTableAssignmentError';
   }
-}
-
-export interface RoundFinalizationResult {
-  finalized: boolean;
-  nextRoundStarted: boolean;
-  roundAlreadyFinalized?: boolean;
 }
 
 export interface RoundCreationResult {
@@ -348,38 +342,6 @@ export class RoundMediatorService {
     );
   }
 
-  public finalizeRoundAndStartNextIfReady(roundId: string, gameId: string): Observable<RoundFinalizationResult> {
-    return this.finalizeRoundForStartup(roundId, gameId).pipe(
-      switchMap((finalizeResult) => {
-        if (!finalizeResult.finalized || !finalizeResult.round) {
-          return of({ finalized: false, nextRoundStarted: false });
-        }
-
-        return this.startNextRoundIfReady(finalizeResult.round, gameId, !!finalizeResult.roundAlreadyFinalized);
-      })
-    );
-  }
-
-  public ensureNextRoundStartedForLatestRound(gameId: string): Observable<RoundFinalizationResult> {
-    return combineLatest([
-      this.roundService.roundsForGame(gameId).pipe(take(1))
-    ]).pipe(
-      switchMap(([rounds]) => {
-        if (!rounds || rounds.length === 0) {
-          return of({ finalized: false, nextRoundStarted: false });
-        }
-
-        const latestRound = [...rounds].sort((a, b) => b.number - a.number)[0];
-
-        if (!latestRound.pointsConfirmed) {
-          return of({ finalized: false, nextRoundStarted: false });
-        }
-
-        return this.startNextRoundIfReady(latestRound, gameId, true);
-      })
-    );
-  }
-
   private finalizeRoundForStartup(roundId: string, gameId: string): Observable<FinalizedRoundResult> {
     if (!roundId || !gameId) {
       return of({ finalized: false });
@@ -412,69 +374,6 @@ export class RoundMediatorService {
           switchMap(() => this.roundService.updateRound(finalizedRound, gameId)),
           map(() => ({ finalized: true, round: finalizedRound, roundAlreadyFinalized: false }))
         );
-      })
-    );
-  }
-
-  private startNextRoundIfReady(
-    round: Round,
-    gameId: string,
-    roundAlreadyFinalized: boolean
-  ): Observable<RoundFinalizationResult> {
-    return combineLatest([
-      this.gameService.getGame(gameId).pipe(take(1)),
-      this.roundService.roundsForGame(gameId).pipe(take(1)),
-      this.gamePlayerService.playersForGame(gameId).pipe(take(1))
-    ]).pipe(
-      switchMap(([game, rounds, players]) => {
-        const nextRound = rounds?.find((gameRound) => gameRound.number === round.number + 1);
-
-        if (nextRound) {
-          return of({ finalized: true, nextRoundStarted: true, roundAlreadyFinalized });
-        }
-
-        if (
-          !round.pointsConfirmed ||
-          !game ||
-          !rounds ||
-          !players ||
-          players.length < 4 ||
-          round.number >= game.numberOfRounds
-        ) {
-          return of({ finalized: true, nextRoundStarted: false, roundAlreadyFinalized });
-        }
-
-        const latestRoundNumber = Math.max(...rounds.map((gameRound) => gameRound.number));
-
-        if (round.number !== latestRoundNumber) {
-          return of({ finalized: true, nextRoundStarted: false, roundAlreadyFinalized });
-        }
-
-        const claimNextRound = () => this.roundService.claimNextRoundStarted(round.id, gameId).pipe(
-          switchMap((claimed) => {
-            if (!claimed) {
-              return of({ finalized: true, nextRoundStarted: false, roundAlreadyFinalized });
-            }
-
-            return this.createRound(gameId, round.number + 1).pipe(
-              map(() => ({ finalized: true, nextRoundStarted: true, roundAlreadyFinalized })),
-              catchError((error) => this.roundService.releaseNextRoundStarted(round.id, gameId).pipe(
-                switchMap(() => {
-                  this.log(error.message || 'Unable to start the next round');
-                  return throwError(() => error);
-                })
-              ))
-            );
-          })
-        );
-
-        if (round.nextRoundStarted) {
-          return this.roundService.releaseNextRoundStarted(round.id, gameId).pipe(
-            switchMap(() => claimNextRound())
-          );
-        }
-
-        return claimNextRound();
       })
     );
   }
@@ -545,19 +444,32 @@ export class RoundMediatorService {
   }
 
   public createRound(gameId: string, expectedRoundNumber?: number): Observable<RoundCreationResult> {
-    return this.selectByes(gameId).pipe(
-      switchMap((game) => {
-        return combineLatest([
-          this.roundService.roundsForGame(gameId),
-          this.gamePlayerService.playersForGame(gameId)
-        ]).pipe(
-          take(1),
-          switchMap(([rounds, players]) => {
+    return this.roundService.roundsForGame(gameId).pipe(
+      take(1),
+      switchMap((existingRounds) => {
+        const newRoundNumber = expectedRoundNumber ?? existingRounds.length + 1;
+
+        if (existingRounds.some((gameRound) => gameRound.number === newRoundNumber)) {
+          return throwError(() => new Error(`Round ${newRoundNumber} already exists.`));
+        }
+
+        return this.selectByes(gameId).pipe(
+          switchMap((game) => {
+            return combineLatest([
+              this.roundService.roundsForGame(gameId),
+              this.gamePlayerService.playersForGame(gameId)
+            ]).pipe(
+              take(1),
+              switchMap(([rounds, players]) => {
             if (!game || !rounds || !players) {
               return throwError(() => new Error('Unable to load game data for the next round.'));
             }
 
             this.log('createRound');
+
+            if (rounds.some((gameRound) => gameRound.number === newRoundNumber)) {
+              return throwError(() => new Error(`Round ${newRoundNumber} already exists.`));
+            }
 
             let filteredPlayers = [...players];
 
@@ -586,7 +498,7 @@ export class RoundMediatorService {
             }
 
             const newRound = {
-              number: expectedRoundNumber ?? rounds.length + 1,
+              number: newRoundNumber,
               byes: this.byes,
               pointsConfirmed: false
             } as Round;
@@ -632,6 +544,8 @@ export class RoundMediatorService {
                 ).pipe(
                   map((tables) => ({ round, tables }))
                 );
+              })
+            );
               })
             );
           })

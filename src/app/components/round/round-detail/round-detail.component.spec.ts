@@ -20,11 +20,8 @@ describe('RoundDetailComponent', () => {
     dialog.open.and.returnValue({
       afterClosed: () => of(undefined)
     });
-    roundMediatorService = jasmine.createSpyObj<RoundMediatorService>('RoundMediatorService', ['finalizeRoundAndStartNextIfReady']);
-    roundMediatorService.finalizeRoundAndStartNextIfReady.and.returnValue(of({
-      finalized: true,
-      nextRoundStarted: true
-    }));
+    roundMediatorService = jasmine.createSpyObj<RoundMediatorService>('RoundMediatorService', ['finalizeRoundIfReady']);
+    roundMediatorService.finalizeRoundIfReady.and.returnValue(of(true));
 
     component = new RoundDetailComponent(
       router,
@@ -42,7 +39,7 @@ describe('RoundDetailComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('keeps dashboard navigation after finalizing and starting the next round', () => {
+  it('keeps dashboard navigation after finalizing the round', () => {
     component.gameId = 'game-1';
     component.roundId = 'round-1';
     component.round = {
@@ -54,7 +51,7 @@ describe('RoundDetailComponent', () => {
 
     component.endRound();
 
-    expect(roundMediatorService.finalizeRoundAndStartNextIfReady).toHaveBeenCalledWith('round-1', 'game-1');
+    expect(roundMediatorService.finalizeRoundIfReady).toHaveBeenCalledWith('round-1', 'game-1');
     expect(router.navigateByUrl).toHaveBeenCalledWith('/game/game-1/dashboard?selectedTab=0&roundEnded=1');
   });
 

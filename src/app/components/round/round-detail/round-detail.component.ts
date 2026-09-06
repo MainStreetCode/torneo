@@ -63,15 +63,15 @@ export class RoundDetailComponent implements OnInit, OnDestroy {
   endRound(): void {
     this.isEndingRound = true;
     this.subscriptions.push(
-      this.roundMediatorService.finalizeRoundAndStartNextIfReady(this.roundId, this.gameId).subscribe({
-        next: (result) => {
-          if (result.finalized) {
+      this.roundMediatorService.finalizeRoundIfReady(this.roundId, this.gameId).subscribe({
+        next: (finalized) => {
+          if (finalized) {
             this.navigateToScores();
           }
         },
         error: (error) => {
           this.isEndingRound = false;
-          this.showErrorDialog('Start Next Round', error.message || 'The round ended, but the next round could not be started.');
+          this.showErrorDialog('End Round', error.message || 'The round could not be ended.');
         },
         complete: () => {
           this.isEndingRound = false;

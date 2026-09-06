@@ -54,33 +54,6 @@ export class RoundService {
       ));
   }
 
-  claimNextRoundStarted(roundId: string, gameId: string): Observable<boolean> {
-    const roundRef = this.store.collection(Collection.Games)
-      .doc(gameId)
-      .collection(Collection.Rounds)
-      .doc(roundId).ref;
-
-    return from(this.store.firestore.runTransaction(async (transaction) => {
-      const snapshot = await transaction.get(roundRef);
-      const round = snapshot.data() as Round | undefined;
-
-      if (!round || round.nextRoundStarted) {
-        return false;
-      }
-
-      transaction.update(roundRef, { nextRoundStarted: true });
-      return true;
-    }));
-  }
-
-  releaseNextRoundStarted(roundId: string, gameId: string): Observable<void> {
-    return from(this.store.collection(Collection.Games)
-      .doc(gameId)
-      .collection(Collection.Rounds)
-      .doc(roundId)
-      .update({ nextRoundStarted: false }));
-  }
-
   deleteRound(roundId: string, gameId: string): void {
     this.store.collection(Collection.Games)
     .doc(gameId)

@@ -148,9 +148,7 @@ describe('RoundMediatorService', () => {
       'getRound',
       'roundsForGame',
       'updateRound',
-      'addRound',
-      'claimNextRoundStarted',
-      'releaseNextRoundStarted'
+      'addRound'
     ]);
     gamePlayerService = jasmine.createSpyObj<GamePlayerService>('GamePlayerService', ['playersForGame', 'updatePlayer']);
     messageService = jasmine.createSpyObj<MessageService>('MessageService', ['add']);
@@ -171,7 +169,6 @@ describe('RoundMediatorService', () => {
     spyOn(service, 'createRound').and.returnValue(of({ round: round(1), tables: [] as Table[] }));
     roundService.updateRound.and.callFake((roundToUpdate) => of(roundToUpdate));
     roundService.addRound.and.callFake((roundToAdd) => of({ ...roundToAdd, id: 'new-round' }));
-    roundService.releaseNextRoundStarted.and.returnValue(of(undefined));
     gameService.updateGame.and.callFake((gameToUpdate) => of(gameToUpdate));
     gamePlayerService.updatePlayer.and.callFake((playerToUpdate) => of(playerToUpdate));
     tableService.addTable.and.callFake((tableToAdd) => of({ ...tableToAdd, id: `table-${tableToAdd.number}` }));
@@ -179,36 +176,30 @@ describe('RoundMediatorService', () => {
     tableService.getTablesForRound.and.returnValue(of([table(true)]));
   });
 
-  it('finalizes the final round without starting another round', (done) => {
-    arrangeNextRoundCheck({ ...round(3), pointsConfirmed: true }, [round(1), round(2), round(3)], game(3), players(4));
+  it('returns finalized for an already finalized round without starting another round', (done) => {
+    roundService.getRound.and.returnValue(of({ ...round(3), pointsConfirmed: true }));
 
-    service.finalizeRoundAndStartNextIfReady('round-3', 'game-1').subscribe({
-      next: (result) => {
-        expect(result).toEqual(jasmine.objectContaining({ finalized: true, nextRoundStarted: false }));
-        expect(roundService.claimNextRoundStarted).not.toHaveBeenCalled();
+    service.finalizeRoundIfReady('round-3', 'game-1').subscribe({
+      next: (finalized) => {
+        expect(finalized).toBeFalse();
         expect(service.createRound).not.toHaveBeenCalled();
         done();
       }
     });
   });
 
-  it('starts the next round after finalizing the latest non-final round without a second round read', (done) => {
+  it('finalizes the round without starting another round', (done) => {
     roundService.getRound.and.returnValue(of({ ...round(2), pointsConfirmed: false }));
-    roundService.roundsForGame.and.returnValue(of([round(1), round(2)]));
-    gameService.getGame.and.returnValue(of(game(3)));
-    gamePlayerService.playersForGame.and.returnValue(of(players(4)));
-    roundService.claimNextRoundStarted.and.returnValue(of(true));
 
-    service.finalizeRoundAndStartNextIfReady('round-2', 'game-1').subscribe({
-      next: (result) => {
-        expect(result).toEqual(jasmine.objectContaining({ finalized: true, nextRoundStarted: true }));
+    service.finalizeRoundIfReady('round-2', 'game-1').subscribe({
+      next: (finalized) => {
+        expect(finalized).toBeTrue();
         expect(roundService.getRound).toHaveBeenCalledTimes(1);
         expect(roundService.updateRound).toHaveBeenCalledWith(jasmine.objectContaining({
           id: 'round-2',
           pointsConfirmed: true
         }), 'game-1');
-        expect(roundService.claimNextRoundStarted).toHaveBeenCalledWith('round-2', 'game-1');
-        expect(service.createRound).toHaveBeenCalledWith('game-1', 3);
+        expect(service.createRound).not.toHaveBeenCalled();
         done();
       }
     });
@@ -218,120 +209,23 @@ describe('RoundMediatorService', () => {
     roundService.getRound.and.returnValue(of({ ...round(2), pointsConfirmed: false }));
     tableService.getTablesForRound.and.returnValue(of([table(false)]));
 
-    service.finalizeRoundAndStartNextIfReady('round-2', 'game-1').subscribe({
-      next: (result) => {
-        expect(result).toEqual(jasmine.objectContaining({ finalized: false, nextRoundStarted: false }));
+    service.finalizeRoundIfReady('round-2', 'game-1').subscribe({
+      next: (finalized) => {
+        expect(finalized).toBeFalse();
         expect(service.createRound).not.toHaveBeenCalled();
         done();
       }
     });
   });
 
-  it('starts the next round when the round was already finalized but not claimed', (done) => {
-    arrangeNextRoundCheck(round(2), [round(1), round(2)], game(3), players(4));
-    roundService.claimNextRoundStarted.and.returnValue(of(true));
+  it('does not update points again when the round was already finalized', (done) => {
+    roundService.getRound.and.returnValue(of(round(2)));
 
-    service.finalizeRoundAndStartNextIfReady('round-2', 'game-1').subscribe({
-      next: (result) => {
-        expect(result).toEqual(jasmine.objectContaining({ finalized: true, nextRoundStarted: true, roundAlreadyFinalized: true }));
+    service.finalizeRoundIfReady('round-2', 'game-1').subscribe({
+      next: (finalized) => {
+        expect(finalized).toBeFalse();
         expect(service.updatePlayerPoints).not.toHaveBeenCalled();
-        expect(roundService.claimNextRoundStarted).toHaveBeenCalledWith('round-2', 'game-1');
-        expect(service.createRound).toHaveBeenCalledWith('game-1', 3);
-        done();
-      }
-    });
-  });
-
-  it('treats an already claimed round with an existing next round as started', (done) => {
-    arrangeNextRoundCheck(
-      { ...round(2), nextRoundStarted: true },
-      [round(1), { ...round(2), nextRoundStarted: true }, round(3)],
-      game(3),
-      players(4)
-    );
-
-    service.finalizeRoundAndStartNextIfReady('round-2', 'game-1').subscribe({
-      next: (result) => {
-        expect(result).toEqual(jasmine.objectContaining({ finalized: true, nextRoundStarted: true }));
-        expect(roundService.claimNextRoundStarted).not.toHaveBeenCalled();
         expect(service.createRound).not.toHaveBeenCalled();
-        done();
-      }
-    });
-  });
-
-  it('resets a stale next round claim and starts the next round when none exists', (done) => {
-    arrangeNextRoundCheck(
-      { ...round(2), nextRoundStarted: true },
-      [round(1), { ...round(2), nextRoundStarted: true }],
-      game(3),
-      players(4)
-    );
-    roundService.claimNextRoundStarted.and.returnValue(of(true));
-
-    service.finalizeRoundAndStartNextIfReady('round-2', 'game-1').subscribe({
-      next: (result) => {
-        expect(result).toEqual(jasmine.objectContaining({ finalized: true, nextRoundStarted: true }));
-        expect(roundService.releaseNextRoundStarted).toHaveBeenCalledWith('round-2', 'game-1');
-        expect(roundService.claimNextRoundStarted).toHaveBeenCalledWith('round-2', 'game-1');
-        expect(service.createRound).toHaveBeenCalledWith('game-1', 3);
-        done();
-      }
-    });
-  });
-
-  it('does not start the next round with fewer than four players', (done) => {
-    arrangeNextRoundCheck(round(2), [round(1), round(2)], game(3), players(3));
-
-    service.finalizeRoundAndStartNextIfReady('round-2', 'game-1').subscribe({
-      next: (result) => {
-        expect(result).toEqual(jasmine.objectContaining({ finalized: true, nextRoundStarted: false }));
-        expect(roundService.claimNextRoundStarted).not.toHaveBeenCalled();
-        expect(service.createRound).not.toHaveBeenCalled();
-        done();
-      }
-    });
-  });
-
-  it('ensures the next round starts from the latest finalized dashboard round', (done) => {
-    roundService.roundsForGame.and.returnValue(of([round(1), round(2)]));
-    gameService.getGame.and.returnValue(of(game(3)));
-    gamePlayerService.playersForGame.and.returnValue(of(players(4)));
-    roundService.claimNextRoundStarted.and.returnValue(of(true));
-
-    service.ensureNextRoundStartedForLatestRound('game-1').subscribe({
-      next: (result) => {
-        expect(result).toEqual(jasmine.objectContaining({ finalized: true, nextRoundStarted: true }));
-        expect(roundService.claimNextRoundStarted).toHaveBeenCalledWith('round-2', 'game-1');
-        expect(service.createRound).toHaveBeenCalledWith('game-1', 3);
-        done();
-      }
-    });
-  });
-
-  it('does not ensure another round when the latest dashboard round is still active', (done) => {
-    roundService.roundsForGame.and.returnValue(of([round(1), { ...round(2), pointsConfirmed: false }]));
-
-    service.ensureNextRoundStartedForLatestRound('game-1').subscribe({
-      next: (result) => {
-        expect(result).toEqual(jasmine.objectContaining({ finalized: false, nextRoundStarted: false }));
-        expect(roundService.claimNextRoundStarted).not.toHaveBeenCalled();
-        expect(service.createRound).not.toHaveBeenCalled();
-        done();
-      }
-    });
-  });
-
-  it('releases the next round claim when creating the round fails', (done) => {
-    const error = new Error('Unable to assign fixed table');
-    arrangeNextRoundCheck(round(2), [round(1), round(2)], game(3), players(4));
-    roundService.claimNextRoundStarted.and.returnValue(of(true));
-    (service.createRound as jasmine.Spy).and.returnValue(throwError(() => error));
-
-    service.finalizeRoundAndStartNextIfReady('round-2', 'game-1').subscribe({
-      error: (thrownError) => {
-        expect(thrownError).toBe(error);
-        expect(roundService.releaseNextRoundStarted).toHaveBeenCalledWith('round-2', 'game-1');
         done();
       }
     });
@@ -347,6 +241,22 @@ describe('RoundMediatorService', () => {
     service.createRound('game-1', 3).subscribe({
       error: (error) => {
         expect(error.message).toContain('Unable to create the next round');
+        done();
+      }
+    });
+  });
+
+  it('throws when the requested round number already exists', (done) => {
+    (service.createRound as jasmine.Spy).and.callThrough();
+    gameService.getGame.and.returnValue(of(game(3)));
+    gamePlayerService.playersForGame.and.returnValue(of(players(4)));
+    roundService.roundsForGame.and.returnValue(of([round(1), round(2)]));
+
+    service.createRound('game-1', 2).subscribe({
+      error: (error) => {
+        expect(error.message).toContain('Round 2 already exists');
+        expect(roundService.addRound).not.toHaveBeenCalled();
+        expect(gameService.updateGame).not.toHaveBeenCalled();
         done();
       }
     });
@@ -466,13 +376,6 @@ describe('RoundMediatorService', () => {
   it('throws when active players cannot be evenly assigned to tables', () => {
     expect(() => assignPlayersToTables(players(5))).toThrowError(FixedTableAssignmentError);
   });
-
-  function arrangeNextRoundCheck(currentRound: Round, rounds: Round[], currentGame: Game, gamePlayers: GamePlayer[]): void {
-    roundService.getRound.and.returnValue(of(currentRound));
-    roundService.roundsForGame.and.returnValue(of(rounds));
-    gameService.getGame.and.returnValue(of(currentGame));
-    gamePlayerService.playersForGame.and.returnValue(of(gamePlayers));
-  }
 
   function table(pointsConfirmed: boolean): Table {
     return {

@@ -2,7 +2,7 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { combineLatest, EMPTY, of, Subscription } from 'rxjs';
-import { switchMap, take } from 'rxjs/operators';
+import { finalize, switchMap, take } from 'rxjs/operators';
 import { Game } from 'src/app/services/game/game';
 import { GameService } from 'src/app/services/game/game.service';
 import { GamePlayerService } from 'src/app/services/gamePlayer/game-player.service';
@@ -20,6 +20,7 @@ export class RoundsComponent implements OnInit, OnDestroy {
   @Input() game: Game;
   rounds: Round[] = [];
   isUserAdmin = false;
+  isStartingRound = false;
   allTablesPointsConfirmed$ = of(false);
   private subscriptions: Subscription[] = [];
 
@@ -64,6 +65,11 @@ export class RoundsComponent implements OnInit, OnDestroy {
   }
 
   startRound(roundNumber: number): void {
+    if (this.isStartingRound) {
+      return;
+    }
+
+    this.isStartingRound = true;
     this.subscriptions.push(
       combineLatest([
         this.allTablesPointsConfirmed$,
@@ -81,10 +87,15 @@ export class RoundsComponent implements OnInit, OnDestroy {
           }
 
           if (roundNumber <= this.game.numberOfRounds) {
-              return this.roundMediatorService.createRound(this.game.id);
+            return this.roundMediatorService.createRound(this.game.id, roundNumber);
           }
-        }
-      )).subscribe({
+
+          return EMPTY;
+        }),
+        finalize(() => {
+          this.isStartingRound = false;
+        })
+      ).subscribe({
         next: (result) => {
           if (result?.round?.id) {
             this.router.navigateByUrl(`/game/${this.game.id}/round/${result.round.id}`);

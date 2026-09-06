@@ -30,7 +30,7 @@ describe('TableDetailComponent', () => {
     gameService = jasmine.createSpyObj<GameService>('GameService', ['isUserAdmin']);
     teamService = jasmine.createSpyObj<TeamService>('TeamService', ['updateTeam']);
     tableService = jasmine.createSpyObj<TableService>('TableService', ['updateTable']);
-    roundMediatorService = jasmine.createSpyObj<RoundMediatorService>('RoundMediatorService', ['finalizeRoundAndStartNextIfReady']);
+    roundMediatorService = jasmine.createSpyObj<RoundMediatorService>('RoundMediatorService', ['finalizeRoundIfReady']);
     messageService = jasmine.createSpyObj<MessageService>('MessageService', ['add']);
     router = jasmine.createSpyObj('Router', ['navigateByUrl']);
     roundService = jasmine.createSpyObj<RoundService>('RoundService', ['getRound']);
@@ -39,10 +39,7 @@ describe('TableDetailComponent', () => {
     gameService.isUserAdmin.and.returnValue(of(false));
     teamService.updateTeam.and.returnValue(of(undefined));
     tableService.updateTable.and.returnValue(of(undefined));
-    roundMediatorService.finalizeRoundAndStartNextIfReady.and.returnValue(of({
-      finalized: true,
-      nextRoundStarted: true
-    }));
+    roundMediatorService.finalizeRoundIfReady.and.returnValue(of(true));
 
     component = new TableDetailComponent(
       authService,
@@ -108,14 +105,14 @@ describe('TableDetailComponent', () => {
     expect(component.pointsConfirmed).toBeTrue();
     expect(component.table.pointsConfirmed).toBeTrue();
     expect(tableService.updateTable).toHaveBeenCalledWith(component.table, 'round-1', 'game-1');
-    expect(roundMediatorService.finalizeRoundAndStartNextIfReady).not.toHaveBeenCalled();
+    expect(roundMediatorService.finalizeRoundIfReady).not.toHaveBeenCalled();
   });
 
   it('auto-finalizes when all tables confirmed is observed', () => {
     (component as any).handleAllTablesConfirmedChange(false);
     (component as any).handleAllTablesConfirmedChange(true);
 
-    expect(roundMediatorService.finalizeRoundAndStartNextIfReady).toHaveBeenCalledWith('round-1', 'game-1');
+    expect(roundMediatorService.finalizeRoundIfReady).toHaveBeenCalledWith('round-1', 'game-1');
   });
 
   it('navigates after local finalization emits a finalized result', () => {
@@ -147,15 +144,15 @@ describe('TableDetailComponent', () => {
     expect(router.navigateByUrl).toHaveBeenCalledWith('/game/game-1/dashboard?selectedTab=0&roundEnded=1');
   });
 
-  it('logs auto-start errors from the observed all tables confirmed path', () => {
-    roundMediatorService.finalizeRoundAndStartNextIfReady.and.returnValue(
-      throwError(() => new Error('Unable to start next round'))
+  it('logs finalization errors from the observed all tables confirmed path', () => {
+    roundMediatorService.finalizeRoundIfReady.and.returnValue(
+      throwError(() => new Error('Unable to finalize round'))
     );
 
     (component as any).handleAllTablesConfirmedChange(false);
     (component as any).handleAllTablesConfirmedChange(true);
 
-    expect(messageService.add).toHaveBeenCalledWith('TableDetailComponent: Unable to start next round');
+    expect(messageService.add).toHaveBeenCalledWith('TableDetailComponent: Unable to finalize round');
   });
 
   it('does not let a stale unconfirmed table update permanently block auto-finalization', () => {
@@ -166,12 +163,12 @@ describe('TableDetailComponent', () => {
 
     component.toggleTeamConfirmPoints(component.teams[0], true);
 
-    expect(roundMediatorService.finalizeRoundAndStartNextIfReady).not.toHaveBeenCalled();
+    expect(roundMediatorService.finalizeRoundIfReady).not.toHaveBeenCalled();
 
     (component as any).handleAllTablesConfirmedChange(false);
     (component as any).handleAllTablesConfirmedChange(true);
 
-    expect(roundMediatorService.finalizeRoundAndStartNextIfReady).toHaveBeenCalledWith('round-1', 'game-1');
+    expect(roundMediatorService.finalizeRoundIfReady).toHaveBeenCalledWith('round-1', 'game-1');
   });
 
   it('detects whether the current user team has confirmed a team score', () => {

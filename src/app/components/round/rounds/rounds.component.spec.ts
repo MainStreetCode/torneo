@@ -1,4 +1,4 @@
-import { of } from 'rxjs';
+import { of, Subject } from 'rxjs';
 import { GamePlayer } from 'src/app/components/player/game-player';
 import { Game } from 'src/app/services/game/game';
 import { GameService } from 'src/app/services/game/game.service';
@@ -63,6 +63,7 @@ describe('RoundsComponent', () => {
 
     component.startRound(1);
 
+    expect(roundMediatorService.createRound).toHaveBeenCalledWith('game-1', 1);
     expect(router.navigateByUrl).toHaveBeenCalledWith('/game/game-1/round/round-1');
   });
 
@@ -75,7 +76,27 @@ describe('RoundsComponent', () => {
 
     component.startRound(2);
 
+    expect(roundMediatorService.createRound).toHaveBeenCalledWith('game-1', 2);
     expect(router.navigateByUrl).toHaveBeenCalledWith('/game/game-1/round/round-2');
+  });
+
+  it('ignores another start request while round creation is in progress', () => {
+    const createRound$ = new Subject<any>();
+    roundMediatorService.createRound.and.returnValue(createRound$.asObservable());
+
+    component.startRound(1);
+    component.startRound(1);
+
+    expect(roundMediatorService.createRound).toHaveBeenCalledTimes(1);
+    expect(component.isStartingRound).toBeTrue();
+
+    createRound$.next({
+      round: round(1),
+      tables: []
+    });
+    createRound$.complete();
+
+    expect(component.isStartingRound).toBeFalse();
   });
 
   function round(number: number): Round {

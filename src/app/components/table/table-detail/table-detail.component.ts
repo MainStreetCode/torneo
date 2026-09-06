@@ -271,14 +271,14 @@ export class TableDetailComponent implements OnInit, OnDestroy {
     this.isFinalizingRound = true;
     this.isEndingRound = true;
     this.subscriptions.push(
-      this.roundMediatorService.finalizeRoundAndStartNextIfReady(this.roundId, this.gameId).subscribe({
-        next: (result) => {
-          if (result.finalized) {
+      this.roundMediatorService.finalizeRoundIfReady(this.roundId, this.gameId).subscribe({
+        next: (finalized) => {
+          if (finalized) {
             this.navigateToScores();
           }
         },
         error: (error) => {
-          this.messageService.add(`TableDetailComponent: ${error.message || 'Unable to start the next round'}`);
+          this.messageService.add(`TableDetailComponent: ${error.message || 'Unable to finalize the round'}`);
           this.isFinalizingRound = false;
           this.isEndingRound = false;
         },

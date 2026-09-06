@@ -5,5 +5,4 @@ export interface Round {
     number: number;
     byes: GamePlayer[];
     pointsConfirmed: boolean;
-    nextRoundStarted?: boolean;
 }
