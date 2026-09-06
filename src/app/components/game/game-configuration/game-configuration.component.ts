@@ -4,9 +4,11 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { of, Subscription } from 'rxjs';
+import { finalize, switchMap } from 'rxjs/operators';
 import { Game } from 'src/app/services/game/game';
 import { GameService } from 'src/app/services/game/game.service';
 import { GamePlayerService } from 'src/app/services/gamePlayer/game-player.service';
+import { RoundMediatorService } from 'src/app/services/round-mediator/round-mediator.service';
 import { RoundService } from 'src/app/services/round/round.service';
 import { environment } from 'src/environments/environment';
 import { ProgressDialogComponent } from '../../progress-dialog/progress-dialog.component';
@@ -23,6 +25,7 @@ export class GameConfigurationComponent implements OnInit, OnDestroy {
   public sectionName: string;
   public isAdmin$ = of(false);
   public isSaving = false;
+  public isStartingRound = false;
   public playerCount = 0;
   public roundCount = 0;
   public nextStepIcon = 'tune';
@@ -30,7 +33,7 @@ export class GameConfigurationComponent implements OnInit, OnDestroy {
   public nextStepDescription = 'Choose how many rounds this tournament should have, then save the setup.';
   public nextStepButtonText = 'Save setup';
   public nextStepCanSave = false;
-  private nextStepAction: 'save' | 'players' | 'rounds' = 'save';
+  private nextStepAction: 'save' | 'players' | 'rounds' | 'startRound' = 'save';
   private subscriptions: Subscription[] = [];
   private setupSubscriptions: Subscription[] = [];
   private setupGameId?: string;
@@ -40,6 +43,7 @@ export class GameConfigurationComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private gameService: GameService,
     private gamePlayerService: GamePlayerService,
+    private roundMediatorService: RoundMediatorService,
     private roundService: RoundService,
     private location: Location,
     private dialog: MatDialog,
@@ -131,6 +135,11 @@ export class GameConfigurationComponent implements OnInit, OnDestroy {
       return;
     }
 
+    if (this.nextStepAction === 'startRound') {
+      this.startFirstRound();
+      return;
+    }
+
     if (this.game) {
       this.router.navigateByUrl(`/game/${this.game.id}/dashboard?selectedTab=1`);
     }
@@ -195,10 +204,10 @@ export class GameConfigurationComponent implements OnInit, OnDestroy {
     if (!this.hasStartedRounds) {
       this.nextStepIcon = 'play_arrow';
       this.nextStepTitle = 'Start round 1';
-      this.nextStepDescription = 'Setup is ready. Open the Rounds tab and start the first round.';
+      this.nextStepDescription = 'Setup is ready. Start the first round to create tables.';
       this.nextStepButtonText = 'Start round 1';
       this.nextStepCanSave = false;
-      this.nextStepAction = 'rounds';
+      this.nextStepAction = 'startRound';
       return;
     }
 
@@ -208,5 +217,35 @@ export class GameConfigurationComponent implements OnInit, OnDestroy {
     this.nextStepButtonText = 'Open rounds';
     this.nextStepCanSave = false;
     this.nextStepAction = 'rounds';
+  }
+
+  private startFirstRound(): void {
+    if (!this.game || this.isSaving || this.isStartingRound) {
+      return;
+    }
+
+    const game = this.game;
+    this.isSaving = true;
+    this.isStartingRound = true;
+    this.subscriptions.push(
+      this.gameService.updateGame(game).pipe(
+        switchMap(() => this.roundMediatorService.createRound(game.id, 1)),
+        finalize(() => {
+          this.isSaving = false;
+          this.isStartingRound = false;
+        })
+      ).subscribe({
+        next: (result) => {
+          if (result?.round?.id) {
+            this.router.navigateByUrl(`/game/${game.id}/round/${result.round.id}`);
+          }
+        },
+        error: (error) => {
+          this.snackBar.open(error.message || 'Unable to start round 1.', 'Dismiss', {
+            duration: 5000
+          });
+        }
+      })
+    );
   }
 }

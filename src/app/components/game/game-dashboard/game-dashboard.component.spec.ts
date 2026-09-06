@@ -106,6 +106,7 @@ describe('GameDashboardComponent', () => {
 
     expect(component.nextStepTitle).toBe('Add players');
     expect(component.nextStepButtonText).toBe('Go to players');
+    expect(component.showStandingsAction).toBeFalse();
   });
 
   it('opens the active round when scores are needed', () => {
@@ -123,6 +124,12 @@ describe('GameDashboardComponent', () => {
 
     expect(component.nextStepTitle).toBe('Start round 2');
     expect(component.nextStepButtonText).toBe('Start round 2');
+    expect(component.showStandingsAction).toBeTrue();
+  });
+
+  it('does not show standings before the first round starts', () => {
+    expect(component.nextStepTitle).toBe('Start round 1');
+    expect(component.showStandingsAction).toBeFalse();
   });
 
   it('starts the next round directly when the rounds component is available', () => {

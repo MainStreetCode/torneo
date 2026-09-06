@@ -38,6 +38,7 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
   nextStepTitle = 'Add players';
   nextStepDescription = 'Add at least 4 players before starting the first round.';
   nextStepButtonText = 'Go to players';
+  showStandingsAction = false;
   private nextStepAction: 'players' | 'rounds' | 'configuration' | 'currentRound' = 'players';
   private latestRound?: Round;
   private subscriptions: Subscription[] = [];
@@ -221,12 +222,17 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
     }
   }
 
+  viewStandings(): void {
+    this.showPlayersSection();
+  }
+
   goBack(): void {
     this.location.back();
   }
 
   private updateNextStep(): void {
     const configuredRounds = this.game?.numberOfRounds ?? 0;
+    this.showStandingsAction = false;
 
     if (configuredRounds === 0) {
       this.nextStepIcon = 'tune';
@@ -269,6 +275,7 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
       this.nextStepTitle = `Start round ${this.nextRoundNumber}`;
       this.nextStepDescription = `Round ${this.latestRound.number} is complete. Start the next round when everyone is ready.`;
       this.nextStepButtonText = `Start round ${this.nextRoundNumber}`;
+      this.showStandingsAction = true;
       this.nextStepAction = 'rounds';
       return;
     }

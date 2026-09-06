@@ -53,7 +53,7 @@
             <h2>{{nextStepTitle}}</h2>
             <p>{{nextStepDescription}}</p>
           </div>
-          <button mat-raised-button color="primary" class="next-step-action" (click)="takeNextStep()" [disabled]="isSaving || (nextStepCanSave && !game.name)">
+          <button mat-raised-button color="primary" class="next-step-action" (click)="takeNextStep()" [disabled]="isSaving || isStartingRound || (nextStepCanSave && !game.name)">
             <mat-icon>{{nextStepIcon}}</mat-icon>
             {{nextStepButtonText}}
           </button>
