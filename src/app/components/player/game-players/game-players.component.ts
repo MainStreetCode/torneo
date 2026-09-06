@@ -21,6 +21,7 @@ export class GamePlayersComponent implements OnInit, OnDestroy {
   players: GamePlayer[] = [];
   isAdmin$ = of(false);  
   isGameJoinable$ = of(true);
+  hasRoundsStarted = false;
   currentUser: User;
   private subscriptions: Subscription[] = [];
 
@@ -38,6 +39,7 @@ export class GamePlayersComponent implements OnInit, OnDestroy {
     this.isAdmin$ = this.gameService.isCurrentUserAdmin(this.game.id);
 
     this.getPlayers();
+    this.watchRoundsStarted();
 
     this.subscriptions.push(
       this.authService.isLoggedIn$.subscribe({
@@ -71,23 +73,24 @@ export class GamePlayersComponent implements OnInit, OnDestroy {
     );
   }
 
-  private checkIsGameJoinable(): void {
-    this.currentUser = this.authService.getCurrentUser();
-    // if the current user is one of the players in the game, then disable the join button
-    if (this.currentUser && this.players.find((player) => player.uid === this.currentUser.uid)) {
-      this.isGameJoinable$ = of(false);
-    }
-
-    // if the game has already started, then the game is not joinable
+  private watchRoundsStarted(): void {
     this.subscriptions.push(
       this.roundService.roundsForGame(this.game.id).subscribe({
         next: (rounds) => {
-          if (rounds.length > 0) {
-            this.isGameJoinable$ = of(false);
-          }
+          this.hasRoundsStarted = rounds.length > 0;
+          this.checkIsGameJoinable();
         }
       })
     );
+  }
+
+  private checkIsGameJoinable(): void {
+    this.currentUser = this.authService.getCurrentUser();
+    const isCurrentUserPlayer = this.currentUser && this.players.find((player) => player.uid === this.currentUser.uid);
+
+    // if the current user is one of the players in the game, then disable the join button
+    // if the game has already started, then the game is not joinable
+    this.isGameJoinable$ = of(!isCurrentUserPlayer && !this.hasRoundsStarted);
   }
 
   private calculateTotalPoints(player: GamePlayer): number {
@@ -106,12 +109,13 @@ export class GamePlayersComponent implements OnInit, OnDestroy {
     displayName = displayName.trim();
 
     if (!displayName) { return; }
+    if (this.hasRoundsStarted) { return; }
 
     this.addPlayerToGame({ displayName } as GamePlayer);
   }
 
   addPlayerToGame(player: GamePlayer): void {
-    if (this.game) {
+    if (this.game && !this.hasRoundsStarted) {
       this.playerService.addPlayer(player, this.game.id);
     }
   }
