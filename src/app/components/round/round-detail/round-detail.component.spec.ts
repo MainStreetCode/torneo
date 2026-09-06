@@ -30,7 +30,6 @@ describe('RoundDetailComponent', () => {
       {} as TableService,
       roundMediatorService,
       {} as GameService,
-      {} as any,
       dialog
     );
   });

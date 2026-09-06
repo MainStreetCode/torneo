@@ -1,4 +1,3 @@
-import { Location } from '@angular/common';
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -65,7 +64,6 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
     private roundService: RoundService,
     private authService: AuthService,
     private dialog: MatDialog,
-    private location: Location,
     private router: Router,
     private snackBar: MatSnackBar) {
 
@@ -264,10 +262,6 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
         }
       })
     );
-  }
-
-  goBack(): void {
-    this.location.back();
   }
 
   private watchCurrentUser(): void {

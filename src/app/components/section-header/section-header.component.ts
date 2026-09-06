@@ -1,5 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { Location } from '@angular/common';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-section-header',
@@ -8,10 +7,4 @@ import { Location } from '@angular/common';
 })
 export class SectionHeaderComponent {
   @Input() sectionName: string;
-
-  constructor(private location: Location) { }
-
-  goBack(): void {
-    this.location.back();
-  }
 }

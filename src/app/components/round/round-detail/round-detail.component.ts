@@ -1,4 +1,3 @@
-import { Location } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -38,7 +37,6 @@ export class RoundDetailComponent implements OnInit, OnDestroy {
     private tableService: TableService,
     private roundMediatorService: RoundMediatorService,
     private gameService: GameService,
-    private location: Location,
     private dialog: MatDialog) { }
 
   ngOnInit(): void {
@@ -113,10 +111,6 @@ export class RoundDetailComponent implements OnInit, OnDestroy {
         }
       })
     );
-  }
-
-  goBack(): void {
-    this.location.back();
   }
 
   private navigateToScores(): void {

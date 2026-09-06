@@ -1,4 +1,3 @@
-import { Location } from '@angular/common';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
@@ -61,7 +60,6 @@ describe('GameDashboardComponent', () => {
         { provide: AuthService, useValue: authService },
         { provide: MatDialog, useValue: dialog },
         { provide: MatSnackBar, useValue: snackBar },
-        { provide: Location, useValue: jasmine.createSpyObj<Location>('Location', ['back']) },
         { provide: Router, useValue: router },
         {
           provide: ActivatedRoute,
