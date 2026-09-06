@@ -8,7 +8,13 @@
   <mat-toolbar color="secondary">
     <span>{{hasScores ? 'Standings' : 'Players'}} ({{players.length}})</span>
   </mat-toolbar>
-  <div class="player-list">      
+  <div class="player-list">
+    <div class="standings-header" [class.with-actions]="isAdmin$ | async" *ngIf="players.length > 0">
+      <div class="header-position">#</div>
+      <div>Player name</div>
+      <div class="header-points">Points</div>
+      <div class="header-actions" *ngIf="isAdmin$ | async">Actions</div>
+    </div>
     <app-player-card *ngFor="let player of players; index as i" [player]="player" [position]="i+1"></app-player-card>
   </div>
 

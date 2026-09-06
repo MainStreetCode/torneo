@@ -2,25 +2,48 @@
 .card {
   display: flex;
   align-items: center;
-  margin: 1rem;
+  gap: 1rem;
+  margin: 0.5rem 1rem;
+  padding: 0.75rem;
 }
   
 .details {
-  flex-grow: 10;    
+  flex: 1 1 auto;
+  min-width: 0;
   cursor: pointer; 
+}
+
+.player-row {
+  align-items: center;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 3rem minmax(0, 1fr) 5rem;
+  min-height: 40px;
 }
   
 .position {
-  flex-grow: 1;
+  color: #6b7280;
+  font-weight: 700;
+  text-align: center;
 }
 
 .name {
-  flex-grow: 9;
-  flex-basis: 0;
+  color: #111827;
+  font-weight: 500;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .score {
-  flex-grow: 1;
+  color: #111827;
+  font-weight: 700;
+  text-align: right;
+}
+
+.player-actions {
+  display: flex;
+  flex: 0 0 6rem;
+  justify-content: flex-end;
 }
 
 .players .badge {
