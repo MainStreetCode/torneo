@@ -55,6 +55,14 @@
   flex: 0 0 auto;
 }
 
+.hero-actions {
+  margin-top: 1rem;
+}
+
+.join-tournament-action mat-icon {
+  margin-right: 0.35rem;
+}
+
 .round-progress {
   margin-top: 2rem;
   max-width: 520px;

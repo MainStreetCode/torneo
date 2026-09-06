@@ -2,9 +2,6 @@
   <div class="flex-box-rows">
     <mat-toolbar color="accent">
       <div class="flex-box-item">Players</div>
-      <div *ngIf="(isGameJoinable$ | async)">
-        <button mat-raised-button color="primary" (click)="joinGame()">Join Game</button>
-      </div>
     </mat-toolbar>  
   </div>
   

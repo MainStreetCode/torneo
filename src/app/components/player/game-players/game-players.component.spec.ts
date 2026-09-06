@@ -1,8 +1,6 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatDialog } from '@angular/material/dialog';
 import { BehaviorSubject, of } from 'rxjs';
-import { AuthService } from 'src/app/services/auth/auth.service';
 import { Game } from 'src/app/services/game/game';
 import { GameService } from 'src/app/services/game/game.service';
 import { GamePlayerService } from 'src/app/services/gamePlayer/game-player.service';
@@ -26,16 +24,7 @@ describe('PlayersComponent', () => {
       providers: [
         { provide: GamePlayerService, useValue: { playersForGame: () => of([]), addPlayer: addPlayerSpy } },
         { provide: GameService, useValue: { isCurrentUserAdmin: () => of(false) } },
-        {
-          provide: AuthService,
-          useValue: {
-            getCurrentUser: () => null,
-            isLoggedIn$: of(false),
-            currentUser$: of(null)
-          }
-        },
-        { provide: RoundService, useValue: { roundsForGame: () => rounds$.asObservable() } },
-        { provide: MatDialog, useValue: { open: () => ({ afterClosed: () => of(undefined) }) } }
+        { provide: RoundService, useValue: { roundsForGame: () => rounds$.asObservable() } }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     })

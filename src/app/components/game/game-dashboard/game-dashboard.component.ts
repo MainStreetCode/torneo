@@ -1,9 +1,15 @@
 import { Location } from '@angular/common';
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { take } from 'rxjs/operators';
+import { User } from 'firebase/auth';
+import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component';
 import { GamePlayer } from 'src/app/components/player/game-player';
+import { LoginDialogComponent } from 'src/app/components/user/login/login-dialog/login-dialog-component';
+import { AuthService } from 'src/app/services/auth/auth.service';
 import { Game } from 'src/app/services/game/game';
 import { GameService } from 'src/app/services/game/game.service';
 import { GamePlayerService } from 'src/app/services/gamePlayer/game-player.service';
@@ -39,8 +45,13 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
   nextStepDescription = 'Add at least 4 players before starting the first round.';
   nextStepButtonText = 'Go to players';
   showStandingsAction = false;
+  canCurrentUserJoin = false;
+  hasCurrentUserJoined = false;
   private nextStepAction: 'players' | 'rounds' | 'configuration' | 'currentRound' = 'players';
   private latestRound?: Round;
+  private currentUser?: User;
+  private players: GamePlayer[] = [];
+  private hasRoundsStarted = false;
   private subscriptions: Subscription[] = [];
   private dashboardSubscriptions: Subscription[] = [];
   private dashboardGameId?: string;
@@ -50,6 +61,8 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
     private gameService: GameService,
     private gamePlayerService: GamePlayerService,
     private roundService: RoundService,
+    private authService: AuthService,
+    private dialog: MatDialog,
     private location: Location,
     private router: Router,
     private snackBar: MatSnackBar) {
@@ -59,6 +72,7 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.getGame();
     this.parseURLParams();
+    this.watchCurrentUser();
   }
 
   ngOnDestroy(): void {
@@ -137,7 +151,9 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
   }
 
   private updatePlayerStats(players: GamePlayer[]): void {
+    this.players = players;
     this.playerCount = players.length;
+    this.updateJoinState();
     this.updateDashboardStatus();
     this.updateNextStep();
   }
@@ -149,10 +165,12 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
     this.completedRoundCount = sortedRounds.filter((round) => round.pointsConfirmed).length;
     this.nextRoundNumber = this.roundCount + 1;
     this.latestRound = this.roundCount > 0 ? sortedRounds[this.roundCount - 1] : undefined;
+    this.hasRoundsStarted = this.roundCount > 0;
     this.latestRoundLabel = this.roundCount > 0
       ? `Round ${this.latestRound.number}`
       : 'No rounds started';
 
+    this.updateJoinState();
     this.updateProgressPercentage();
     this.updateDashboardStatus();
     this.updateNextStep();
@@ -226,8 +244,83 @@ export class GameDashboardComponent implements OnInit, OnDestroy {
     this.showPlayersSection();
   }
 
+  joinTournament(): void {
+    if (!this.game?.id || this.hasCurrentUserJoined || this.hasRoundsStarted) {
+      return;
+    }
+
+    this.subscriptions.push(
+      this.authService.isLoggedIn$.pipe(take(1)).subscribe({
+        next: (loggedIn) => {
+          if (loggedIn) {
+            this.createPlayerFromCurrentUser();
+          } else {
+            this.showJoinDialog();
+          }
+        }
+      })
+    );
+  }
+
   goBack(): void {
     this.location.back();
+  }
+
+  private watchCurrentUser(): void {
+    this.subscriptions.push(
+      this.authService.isLoggedIn$.subscribe({
+        next: () => this.updateJoinState()
+      })
+    );
+  }
+
+  private updateJoinState(): void {
+    this.currentUser = this.authService.getCurrentUser();
+    this.hasCurrentUserJoined = !!this.currentUser
+      && this.players.some((player) => player.uid === this.currentUser?.uid);
+    this.canCurrentUserJoin = !!this.game?.id && !this.hasCurrentUserJoined && !this.hasRoundsStarted;
+  }
+
+  private createPlayerFromCurrentUser(): void {
+    const currentUser = this.authService.getCurrentUser();
+
+    if (!currentUser || !this.game?.id || this.hasRoundsStarted) {
+      return;
+    }
+
+    this.gamePlayerService.addPlayer({
+      uid: currentUser.uid,
+      displayName: currentUser.displayName
+    } as unknown as GamePlayer, this.game.id);
+  }
+
+  private showJoinDialog(): void {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      panelClass: 'dialog-container',
+      data: {
+        title: 'Join tournament',
+        message: 'Log in to join this tournament and appear in the standings.',
+        confirmButtonText: 'Log in'
+      }
+    });
+
+    this.subscriptions.push(
+      dialogRef.afterClosed().subscribe((result) => {
+        if (result) {
+          this.showLoginDialog();
+        }
+      })
+    );
+  }
+
+  private showLoginDialog(): void {
+    const dialogRef = this.dialog.open(LoginDialogComponent, {
+      panelClass: 'dialog-container',
+    });
+
+    this.subscriptions.push(
+      dialogRef.afterClosed().subscribe()
+    );
   }
 
   private updateNextStep(): void {

@@ -1,10 +1,12 @@
 import { Location } from '@angular/common';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
 import { BehaviorSubject, of } from 'rxjs';
 import { GamePlayer } from 'src/app/components/player/game-player';
+import { AuthService } from 'src/app/services/auth/auth.service';
 import { Game } from 'src/app/services/game/game';
 import { GameService } from 'src/app/services/game/game.service';
 import { GamePlayerService } from 'src/app/services/gamePlayer/game-player.service';
@@ -20,22 +22,34 @@ describe('GameDashboardComponent', () => {
   let gamePlayerService: jasmine.SpyObj<GamePlayerService>;
   let roundService: jasmine.SpyObj<RoundService>;
   let snackBar: jasmine.SpyObj<MatSnackBar>;
+  let dialog: jasmine.SpyObj<MatDialog>;
   let router: jasmine.SpyObj<Router>;
+  let authService: jasmine.SpyObj<AuthService>;
   let players$: BehaviorSubject<GamePlayer[]>;
   let rounds$: BehaviorSubject<Round[]>;
+  let loggedIn$: BehaviorSubject<boolean>;
+  let currentUser: { uid: string; displayName: string };
 
   beforeEach(async () => {
     players$ = new BehaviorSubject<GamePlayer[]>(players(4));
     rounds$ = new BehaviorSubject<Round[]>([]);
+    loggedIn$ = new BehaviorSubject<boolean>(true);
+    currentUser = { uid: 'user-1', displayName: 'Angela' };
     gameService = jasmine.createSpyObj<GameService>('GameService', ['getGame']);
-    gamePlayerService = jasmine.createSpyObj<GamePlayerService>('GamePlayerService', ['playersForGame']);
+    gamePlayerService = jasmine.createSpyObj<GamePlayerService>('GamePlayerService', ['playersForGame', 'addPlayer']);
     roundService = jasmine.createSpyObj<RoundService>('RoundService', ['roundsForGame']);
     snackBar = jasmine.createSpyObj<MatSnackBar>('MatSnackBar', ['open']);
+    dialog = jasmine.createSpyObj<MatDialog>('MatDialog', ['open']);
     router = jasmine.createSpyObj<Router>('Router', ['navigate', 'navigateByUrl']);
+    authService = {
+      getCurrentUser: jasmine.createSpy('getCurrentUser').and.callFake(() => currentUser),
+      isLoggedIn$: loggedIn$.asObservable()
+    } as unknown as jasmine.SpyObj<AuthService>;
 
     gameService.getGame.and.returnValue(of(game(3)));
     gamePlayerService.playersForGame.and.returnValue(players$.asObservable());
     roundService.roundsForGame.and.returnValue(rounds$.asObservable());
+    dialog.open.and.returnValue({ afterClosed: () => of(false) } as never);
 
     await TestBed.configureTestingModule({
       declarations: [GameDashboardComponent],
@@ -43,6 +57,8 @@ describe('GameDashboardComponent', () => {
         { provide: GameService, useValue: gameService },
         { provide: GamePlayerService, useValue: gamePlayerService },
         { provide: RoundService, useValue: roundService },
+        { provide: AuthService, useValue: authService },
+        { provide: MatDialog, useValue: dialog },
         { provide: MatSnackBar, useValue: snackBar },
         { provide: Location, useValue: jasmine.createSpyObj<Location>('Location', ['back']) },
         { provide: Router, useValue: router },
@@ -130,6 +146,42 @@ describe('GameDashboardComponent', () => {
   it('does not show standings before the first round starts', () => {
     expect(component.nextStepTitle).toBe('Start round 1');
     expect(component.showStandingsAction).toBeFalse();
+  });
+
+  it('shows the dashboard join action before the current user joins', () => {
+    expect(component.canCurrentUserJoin).toBeTrue();
+
+    const content = fixture.nativeElement.textContent as string;
+    expect(content).toContain('Join this tournament');
+  });
+
+  it('hides the dashboard join action after the current user joins', () => {
+    players$.next([
+      { uid: 'user-1', displayName: 'Angela', pointsForRound: [] } as GamePlayer
+    ]);
+    fixture.detectChanges();
+
+    expect(component.hasCurrentUserJoined).toBeTrue();
+    expect(component.canCurrentUserJoin).toBeFalse();
+  });
+
+  it('adds the signed-in current user from the dashboard join action', () => {
+    component.joinTournament();
+
+    expect(gamePlayerService.addPlayer).toHaveBeenCalledWith(jasmine.objectContaining({
+      uid: 'user-1',
+      displayName: 'Angela'
+    }), 'game-1');
+  });
+
+  it('prompts logged-out visitors to log in before joining', () => {
+    currentUser = undefined;
+    loggedIn$.next(false);
+
+    component.joinTournament();
+
+    expect(dialog.open).toHaveBeenCalled();
+    expect(gamePlayerService.addPlayer).not.toHaveBeenCalled();
   });
 
   it('starts the next round directly when the rounds component is available', () => {
