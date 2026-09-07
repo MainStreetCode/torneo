@@ -1,7 +1,7 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
-import { of } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { GameService } from 'src/app/services/game/game.service';
 import { GamePlayerService } from 'src/app/services/gamePlayer/game-player.service';
@@ -18,6 +18,7 @@ describe('TablesComponent', () => {
   let gameService: jasmine.SpyObj<GameService>;
   let gamePlayerService: jasmine.SpyObj<GamePlayerService>;
   let currentUser: { uid: string } | undefined;
+  let loginState: BehaviorSubject<boolean>;
 
   beforeEach(async () => {
     tableService = jasmine.createSpyObj<TableService>('TableService', ['getTableForPlayer']);
@@ -25,9 +26,11 @@ describe('TablesComponent', () => {
     gameService = jasmine.createSpyObj<GameService>('GameService', ['isCurrentUserAdmin']);
     gamePlayerService = jasmine.createSpyObj<GamePlayerService>('GamePlayerService', ['getPlayer']);
     currentUser = undefined;
+    loginState = new BehaviorSubject<boolean>(true);
 
     tableService.getTableForPlayer.and.returnValue(of(undefined));
     authService.getCurrentUser.and.callFake(() => currentUser as never);
+    Object.defineProperty(authService, 'isLoggedIn$', { get: () => loginState.asObservable() });
     gameService.isCurrentUserAdmin.and.returnValue(of(false));
     gamePlayerService.getPlayer.and.returnValue(of(undefined));
 
@@ -107,6 +110,22 @@ describe('TablesComponent', () => {
 
     expect(component.isDataFiltered).toBeFalse();
     expect(component.filteredTables.map((table) => table.id)).toEqual(['table-1', 'table-2']);
+  });
+
+  it('applies the player default filter when auth resolves after init', () => {
+    const tables = createTables();
+    tableService.getTableForPlayer.and.returnValue(of(tables.find((table) => table.id === 'table-2')));
+    gamePlayerService.getPlayer.and.returnValue(of({ uid: 'player-1', displayName: 'Angela', pointsForRound: [] } as never));
+
+    component.tables = tables;
+    component.ngOnChanges();
+    currentUser = { uid: 'player-1' };
+    loginState.next(true);
+
+    expect(component.isUserPlayer).toBeTrue();
+    expect(component.isUserAdmin).toBeFalse();
+    expect(component.isDataFiltered).toBeTrue();
+    expect(component.filteredTables.map((table) => table.id)).toEqual(['table-2']);
   });
 });
 

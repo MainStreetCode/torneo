@@ -1,8 +1,8 @@
 import { Component, Input, OnChanges, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { User } from 'firebase/auth';
-import { combineLatest, Subscription } from 'rxjs';
-import { take } from 'rxjs/operators';
+import { combineLatest, of, Subscription } from 'rxjs';
+import { map, switchMap, take } from 'rxjs/operators';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { GameService } from 'src/app/services/game/game.service';
 import { GamePlayerService } from 'src/app/services/gamePlayer/game-player.service';
@@ -86,19 +86,33 @@ export class TablesComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private checkCurrentUserTableAccess(): void {
-    if (!this.currentUser) {
-      this.isUserPlayer = false;
-      return;
-    }
-
     this.subscriptions.push(
-      combineLatest([
-        this.gameService.isCurrentUserAdmin(this.gameId),
-        this.gamePlayerService.getPlayer(this.currentUser.uid, this.gameId)
-      ]).subscribe({
-        next: ([isAdmin, player]) => {
+      this.authService.isLoggedIn$.pipe(
+        switchMap(() => {
+          this.currentUser = this.authService.getCurrentUser();
+
+          if (!this.currentUser) {
+            return of({ isAdmin: false, player: undefined });
+          }
+
+          return combineLatest([
+            this.gameService.isCurrentUserAdmin(this.gameId),
+            this.gamePlayerService.getPlayer(this.currentUser.uid, this.gameId)
+          ]).pipe(
+            map(([isAdmin, player]) => ({ isAdmin, player }))
+          );
+        })
+      ).subscribe({
+        next: ({ isAdmin, player }) => {
           this.isUserAdmin = isAdmin;
           this.isUserPlayer = !!player;
+
+          if (!this.currentUser || this.isUserAdmin) {
+            this.hasAppliedDefaultFilter = false;
+            this.showAllTables();
+            return;
+          }
+
           this.applyDefaultPlayerFilter();
         }
       })
