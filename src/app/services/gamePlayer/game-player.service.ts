@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { EMPTY, from, Observable, of } from 'rxjs';
 import { GamePlayer } from 'src/app/components/player/game-player';
+import { RoundPoints } from 'src/app/components/player/game-players/round-points';
 import { MessageService } from '../message/message.service';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Collection } from '../collection';
@@ -48,14 +49,69 @@ export class GamePlayerService {
 
   }
 
-  updatePlayer(player: GamePlayer, gameId: string): Observable<GamePlayer | void> {
-    return from(this.store.collection(Collection.Games).doc(gameId).collection(Collection.GamePlayers).doc(player.uid).update(player).then(
+  updatePlayerProfile(
+    playerId: string,
+    gameId: string,
+    playerProfile: Pick<GamePlayer, 'displayName'> & Partial<Pick<GamePlayer, 'fixedTableNumber'>>
+  ): Observable<void> {
+    return from(this.store.collection(Collection.Games).doc(gameId).collection(Collection.GamePlayers).doc(playerId).update(playerProfile).then(
       () => {
-        this.log(`updatePlayer id: ${player.uid} name: ${player.displayName}`);
-        return player;
+        this.log(`updatePlayerProfile id: ${playerId} name: ${playerProfile.displayName}`);
       },
-      err => this.log(`updatePlayer ${err}`)
-      ));
+      err => this.log(`updatePlayerProfile ${err}`)
+    ));
+  }
+
+  updatePlayerRoundPoints(playerId: string, gameId: string, roundPoints: RoundPoints): Observable<void> {
+    const playerRef = this.store.collection(Collection.Games)
+      .doc(gameId)
+      .collection(Collection.GamePlayers)
+      .doc<GamePlayer>(playerId).ref;
+
+    return from(this.store.firestore.runTransaction(async (transaction) => {
+      const snapshot = await transaction.get(playerRef);
+
+      if (!snapshot.exists) {
+        throw new Error(`Unable to update points for missing player ${playerId}.`);
+      }
+
+      const player = snapshot.data() as GamePlayer | undefined;
+      const pointsForRound = [...(player?.pointsForRound ?? [])];
+      const existingRoundPoints = pointsForRound.find((points) => points.roundId === roundPoints.roundId);
+
+      if (existingRoundPoints) {
+        existingRoundPoints.roundNumber = roundPoints.roundNumber;
+        existingRoundPoints.points = roundPoints.points;
+      } else {
+        pointsForRound.push(roundPoints);
+      }
+
+      transaction.update(playerRef, { pointsForRound });
+    }).then(() => {
+      this.log(`updatePlayerRoundPoints id: ${playerId} roundId: ${roundPoints.roundId}`);
+    }));
+  }
+
+  deletePlayerRoundPoints(playerId: string, gameId: string, roundId: string): Observable<void> {
+    const playerRef = this.store.collection(Collection.Games)
+      .doc(gameId)
+      .collection(Collection.GamePlayers)
+      .doc<GamePlayer>(playerId).ref;
+
+    return from(this.store.firestore.runTransaction(async (transaction) => {
+      const snapshot = await transaction.get(playerRef);
+
+      if (!snapshot.exists) {
+        throw new Error(`Unable to delete points for missing player ${playerId}.`);
+      }
+
+      const player = snapshot.data() as GamePlayer | undefined;
+      const pointsForRound = (player?.pointsForRound ?? []).filter((round) => round.roundId !== roundId);
+
+      transaction.update(playerRef, { pointsForRound });
+    }).then(() => {
+      this.log(`deletePlayerRoundPoints id: ${playerId} roundId: ${roundId}`);
+    }));
   }
 
   deletePlayer(playerId: string, gameId: string): void {

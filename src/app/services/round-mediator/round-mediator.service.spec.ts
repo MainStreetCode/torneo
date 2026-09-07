@@ -150,7 +150,11 @@ describe('RoundMediatorService', () => {
       'updateRound',
       'addRound'
     ]);
-    gamePlayerService = jasmine.createSpyObj<GamePlayerService>('GamePlayerService', ['playersForGame', 'updatePlayer']);
+    gamePlayerService = jasmine.createSpyObj<GamePlayerService>('GamePlayerService', [
+      'playersForGame',
+      'updatePlayerRoundPoints',
+      'deletePlayerRoundPoints'
+    ]);
     messageService = jasmine.createSpyObj<MessageService>('MessageService', ['add']);
     tableService = jasmine.createSpyObj<TableService>('TableService', ['getTablesForRound', 'addTable']);
     teamService = jasmine.createSpyObj<TeamService>('TeamService', ['addTeam', 'getTeamsForTable']);
@@ -170,7 +174,8 @@ describe('RoundMediatorService', () => {
     roundService.updateRound.and.callFake((roundToUpdate) => of(roundToUpdate));
     roundService.addRound.and.callFake((roundToAdd) => of({ ...roundToAdd, id: 'new-round' }));
     gameService.updateGame.and.callFake((gameToUpdate) => of(gameToUpdate));
-    gamePlayerService.updatePlayer.and.callFake((playerToUpdate) => of(playerToUpdate));
+    gamePlayerService.updatePlayerRoundPoints.and.returnValue(of(undefined));
+    gamePlayerService.deletePlayerRoundPoints.and.returnValue(of(undefined));
     tableService.addTable.and.callFake((tableToAdd) => of({ ...tableToAdd, id: `table-${tableToAdd.number}` }));
     teamService.addTeam.and.callFake((teamToAdd) => of(teamToAdd));
     tableService.getTablesForRound.and.returnValue(of([table(true)]));
@@ -293,7 +298,7 @@ describe('RoundMediatorService', () => {
     });
   });
 
-  it('updates the current player document instead of the stale table snapshot', (done) => {
+  it('updates only the current player points instead of the stale table snapshot', (done) => {
     (service.updatePlayerPoints as jasmine.Spy).and.callThrough();
     const currentPlayer = {
       uid: 'player-1',
@@ -321,12 +326,11 @@ describe('RoundMediatorService', () => {
 
     service.updatePlayerPoints('round-1', 'game-1', 1).subscribe({
       next: () => {
-        expect(gamePlayerService.updatePlayer).toHaveBeenCalledWith(jasmine.objectContaining({
-          uid: 'player-1',
-          displayName: 'Edited Name',
-          fixedTableNumber: 2,
-          pointsForRound: jasmine.arrayContaining([jasmine.objectContaining({ roundId: 'round-1', points: 12 })])
-        }), 'game-1');
+        expect(gamePlayerService.updatePlayerRoundPoints).toHaveBeenCalledWith('player-1', 'game-1', {
+          roundId: 'round-1',
+          roundNumber: 1,
+          points: 12
+        });
         done();
       }
     });

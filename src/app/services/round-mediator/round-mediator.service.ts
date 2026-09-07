@@ -227,32 +227,20 @@ export class RoundMediatorService {
               return throwError(() => new Error(`Unable to update points for missing player ${teamGamePlayer.uid}.`));
             }
 
-            if (!gamePlayer.pointsForRound) {
-              gamePlayer.pointsForRound = [];
+            const currentRoundPoints = gamePlayer.pointsForRound
+              ?.find((pointsForRound) => pointsForRound.roundId === roundId);
+
+            if (currentRoundPoints?.points === teamPlayer.points) {
+              return of(gamePlayer);
             }
 
-            let gamePlayerPointsForRound: RoundPoints | undefined;
+            const newRoundPoints: RoundPoints = {
+              roundId,
+              roundNumber,
+              points: teamPlayer.points
+            };
 
-            if (gamePlayer.pointsForRound) {
-              gamePlayerPointsForRound = gamePlayer.pointsForRound.find((roundPoints) => roundPoints.roundId === roundId);  
-            }
-
-            // check game player points to see if they already have points to prevent extra call to update
-            if (gamePlayer && gamePlayerPointsForRound) {
-              if (gamePlayerPointsForRound.points === teamPlayer.points) {
-                return of(gamePlayer);
-              }
-              gamePlayerPointsForRound.points = teamPlayer.points;
-            } else {
-              const newRoundPoints: RoundPoints = {                
-                roundId,
-                roundNumber,                
-                points: teamPlayer.points
-              };
-              gamePlayer.pointsForRound.push(newRoundPoints);
-            }
-
-            return this.gamePlayerService.updatePlayer(gamePlayer, gameId);
+            return this.gamePlayerService.updatePlayerRoundPoints(teamGamePlayer.uid, gameId, newRoundPoints);
           })
         );
       })
@@ -314,22 +302,13 @@ export class RoundMediatorService {
               return of(null);
             }
 
-            if (!gamePlayer.pointsForRound) {
-              gamePlayer.pointsForRound = [];
-            }
-
-            const roundPoints = gamePlayer.pointsForRound.find((pfr) => pfr.roundId === roundId);
+            const roundPoints = gamePlayer.pointsForRound?.find((pfr) => pfr.roundId === roundId);
             // if roundPoints already exists, then update the points
-            if (roundPoints) {
-              if (roundPoints.points === averagePoints) {
-                return of(gamePlayer);
-              }
-              roundPoints.points = averagePoints;
-            } else {
-              gamePlayer.pointsForRound.push(newRoundPoints);
+            if (roundPoints?.points === averagePoints) {
+              return of(gamePlayer);
             }
 
-            return this.gamePlayerService.updatePlayer(gamePlayer, gameId);
+            return this.gamePlayerService.updatePlayerRoundPoints(byePlayer.uid, gameId, newRoundPoints);
           })
         );
       })
@@ -430,10 +409,8 @@ export class RoundMediatorService {
 
           // delete the points for the round for each player
           gamePlayers.forEach((gamePlayer) => {
-            if (gamePlayer.pointsForRound) {
-              const filteredRoundPoints = gamePlayer.pointsForRound.filter((round) => round.roundId !== roundId);
-              gamePlayer.pointsForRound = filteredRoundPoints;
-              this.gamePlayerService.updatePlayer(gamePlayer, gameId).subscribe();
+            if (gamePlayer.pointsForRound?.some((round) => round.roundId === roundId)) {
+              this.gamePlayerService.deletePlayerRoundPoints(gamePlayer.uid, gameId, roundId).subscribe();
             }
           });
 

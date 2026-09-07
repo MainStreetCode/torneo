@@ -88,9 +88,17 @@ export class GamePlayerDetailComponent implements OnInit, OnDestroy {
 
     this.normalizeFixedTableNumber();
 
+    const playerProfile: Pick<GamePlayer, 'displayName'> & Partial<Pick<GamePlayer, 'fixedTableNumber'>> = {
+      displayName: this.player.displayName
+    };
+
+    if (this.isCurrentUserAdmin) {
+      playerProfile.fixedTableNumber = this.player.fixedTableNumber;
+    }
+
     this.isSaving = true;
     this.subscriptions.push(
-      this.playerService.updatePlayer(this.player, this.gameId).subscribe({
+      this.playerService.updatePlayerProfile(this.player.uid, this.gameId, playerProfile).subscribe({
         next: () => {
           this.isSaving = false;
           this.sectionName = `${this.player.displayName.toUpperCase()} Details`;
