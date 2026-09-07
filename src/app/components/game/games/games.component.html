@@ -1,47 +1,130 @@
-<div>
-  <mat-toolbar class="mat-h1" color="secondary">Tournaments</mat-toolbar>
+<section class="tournament-hub">
+  <header class="hub-header" [class.signed-out]="(isLoggedIn$ | async) === false">
+    <div class="hub-title-block">
+      <div class="hub-kicker">
+        <mat-icon aria-hidden="true">emoji_events</mat-icon>
+        Tournament Hub
+      </div>
+      <h1>Tournaments</h1>
+      <p>Recent Euchre tournaments, ordered by creation date.</p>
+    </div>
 
-  <mat-toolbar color="accent"><span>Add new tournament</span></mat-toolbar>
-
-  <div class="content flex-box-rows" *ngIf="isLoggedIn$ | async">
-    <div>
-      <mat-form-field class="example-full-width" appearance="fill">
+    <div class="hub-actions" *ngIf="isLoggedIn$ | async">
+      <mat-form-field appearance="outline" class="create-field">
         <mat-label>Tournament name</mat-label>
         <input matInput id="new-game" #gameName placeholder="Angela's Euchre Tournament" value="">
       </mat-form-field>
+      <button mat-raised-button color="primary" class="create-action" [disabled]="!gameName.value" (click)="add(gameName.value); gameName.value=''">
+        <mat-icon>add</mat-icon>
+        Create
+      </button>
     </div>
+  </header>
+
+  <section class="summary-grid" aria-label="Tournament summary">
+    <div class="summary-tile">
+      <mat-icon aria-hidden="true">emoji_events</mat-icon>
+      <div>
+        <div class="summary-value">{{games.length}}</div>
+        <div class="summary-label">{{games.length === 1 ? 'Tournament' : 'Tournaments'}}</div>
+      </div>
+    </div>
+    <div class="summary-tile">
+      <mat-icon aria-hidden="true">admin_panel_settings</mat-icon>
+      <div>
+        <div class="summary-value">{{getAdminTournamentCount()}}</div>
+        <div class="summary-label">Admin Access</div>
+      </div>
+    </div>
+    <div class="summary-tile">
+      <mat-icon aria-hidden="true">event_available</mat-icon>
+      <div>
+        <div class="summary-value" *ngIf="getLatestCreatedDate() as latestDate; else noLatestDate">{{latestDate | date:'shortDate'}}</div>
+        <ng-template #noLatestDate>
+          <div class="summary-value muted">None</div>
+        </ng-template>
+        <div class="summary-label">Latest Created</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="auth-panel" *ngIf="(isLoggedIn$ | async) === false">
+    <mat-icon aria-hidden="true">lock_open</mat-icon>
     <div>
-      <!-- (click) passes input value to add() and then clears the input -->
-      <button mat-raised-button color="primary" [disabled]="!gameName.value" (click)="add(gameName.value); gameName.value=''">
-        <mat-icon>add</mat-icon>    
-        <span class="mdc-button__label">        
-          <span class="mdc-button__label">Create tournament</span>
-        </span>
-      </button>    
+      <h2>Log in to create tournaments</h2>
+      <p>Log in to create or join a tournament.</p>
     </div>
-  </div>
+    <button mat-raised-button color="primary" (click)="login()">Log in</button>
+  </section>
 
-  <div class="content" *ngIf="(isLoggedIn$ | async) === false">
-    Log in to start creating tournaments.
-  </div>
-
-  <mat-toolbar color="accent"><span>Tournaments</span></mat-toolbar>
-  <div class="games">      
-    <mat-card class="mdc-card card" *ngFor="let game of games">
-      <div class="mdc-card__primary-action details" tabindex="0" (click)="dashboard(game)">        
-        <button mat-button (click)="dashboard(game)">{{game.name}}</button>
-        <div class="game-subtitle" *ngIf="getCreatedDate(game) as createdDate">Created {{ createdDate | date:'shortDate' }}</div>
+  <section class="tournament-section">
+    <div class="section-heading">
+      <div>
+        <h2>Recent Tournaments</h2>
+        <p *ngIf="games.length">{{games.length}} total</p>
       </div>
-      
-      <div *ngIf="gameAdminMap.get(game.id)">
-        <button mat-icon-button color="primary" aria-label="tournament setup" title="tournament setup" (click)="configuration(game)">
-          <mat-icon>edit</mat-icon>
-        </button>
-        <button mat-icon-button color="primary" aria-label="delete tournament" title="delete tournament" (click)="delete(game)">
-          <mat-icon>delete</mat-icon>
-        </button>
-      </div>
+    </div>
 
-    </mat-card>
-  </div>
-</div>
+    <div class="loading-state" *ngIf="isLoading">
+      <mat-spinner diameter="32"></mat-spinner>
+      <span>Loading tournaments</span>
+    </div>
+
+    <div class="empty-state" *ngIf="!isLoading && games.length === 0">
+      <mat-icon aria-hidden="true">emoji_events</mat-icon>
+      <h3>No tournaments yet</h3>
+      <p *ngIf="isLoggedIn$ | async">Create the first tournament to get started.</p>
+      <p *ngIf="(isLoggedIn$ | async) === false">Log in to create the first tournament.</p>
+    </div>
+
+    <div class="games" *ngIf="!isLoading && games.length">
+      <ng-container *ngFor="let game of games">
+        <mat-card class="tournament-card" *ngIf="getTournamentStats(game) as stats">
+          <div class="tournament-card-header">
+            <span class="tournament-icon" aria-hidden="true">
+              <mat-icon>emoji_events</mat-icon>
+            </span>
+            <div class="tournament-card-copy">
+              <h3>{{game.name}}</h3>
+              <span class="game-subtitle" *ngIf="getCreatedDate(game) as createdDate">Created {{ createdDate | date:'shortDate' }}</span>
+            </div>
+            <span class="status-pill" [ngClass]="stats.statusClass">{{stats.statusLabel}}</span>
+          </div>
+
+          <div class="tile-stats" aria-label="Tournament stats">
+            <div class="tile-stat">
+              <mat-icon aria-hidden="true">group</mat-icon>
+              <strong>{{stats.playerCount}}</strong>
+              <span>{{stats.playerCount === 1 ? 'Player' : 'Players'}}</span>
+            </div>
+            <div class="tile-stat">
+              <mat-icon aria-hidden="true">scoreboard</mat-icon>
+              <strong>{{(stats.configuredRoundCount || stats.roundCount) ? stats.completedRoundCount + '/' + (stats.configuredRoundCount || stats.roundCount) : 'TBD'}}</strong>
+              <span>{{(stats.configuredRoundCount || stats.roundCount) === 1 ? 'Round' : 'Rounds'}}</span>
+            </div>
+            <div class="tile-stat">
+              <mat-icon aria-hidden="true">table_bar</mat-icon>
+              <strong>{{stats.tableCount || 'TBD'}}</strong>
+              <span>{{stats.tableCount === 1 ? 'Table' : 'Tables'}}</span>
+            </div>
+          </div>
+
+          <div class="card-actions">
+            <button mat-raised-button color="primary" class="open-action" (click)="dashboard(game)">
+              <mat-icon>dashboard</mat-icon>
+              Open
+            </button>
+            <span class="admin-actions" *ngIf="(isLoggedIn$ | async) && gameAdminMap.get(game.id)">
+              <button mat-icon-button color="primary" aria-label="Tournament setup" title="Tournament setup" (click)="configuration(game)">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="primary" aria-label="Delete tournament" title="Delete tournament" (click)="delete(game)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </span>
+          </div>
+        </mat-card>
+      </ng-container>
+    </div>
+  </section>
+</section>

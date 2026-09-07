@@ -5,6 +5,8 @@ import { Router } from '@angular/router';
 import { of } from 'rxjs';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { GameService } from 'src/app/services/game/game.service';
+import { GamePlayerService } from 'src/app/services/gamePlayer/game-player.service';
+import { RoundService } from 'src/app/services/round/round.service';
 
 import { GamesComponent } from './games.component';
 
@@ -18,6 +20,8 @@ describe('GamesComponent', () => {
       providers: [
         { provide: MatDialog, useValue: { open: () => ({ close: () => undefined, afterClosed: () => of(undefined) }) } },
         { provide: GameService, useValue: { games$: of([]) } },
+        { provide: GamePlayerService, useValue: { playersForGame: () => of([]) } },
+        { provide: RoundService, useValue: { roundsForGame: () => of([]) } },
         { provide: Router, useValue: jasmine.createSpyObj<Router>('Router', ['navigateByUrl']) },
         { provide: AuthService, useValue: { isLoggedIn$: of(false), getCurrentUser: () => null } }
       ],
