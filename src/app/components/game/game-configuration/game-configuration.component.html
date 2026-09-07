@@ -79,7 +79,7 @@
 
           <mat-form-field appearance="fill" class="full-width">
             <mat-label>Number of rounds</mat-label>
-            <input id="game-rounds" matInput placeholder="8" [(ngModel)]="game.numberOfRounds" [disabled]="isSaving">
+            <input id="game-rounds" matInput type="number" min="1" step="1" placeholder="8" [(ngModel)]="game.numberOfRounds" [disabled]="isSaving">
           </mat-form-field>
 
           <div class="settings-actions">

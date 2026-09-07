@@ -24,6 +24,7 @@ describe('GameSetupComponent', () => {
   let roundService: jasmine.SpyObj<RoundService>;
   let authService: jasmine.SpyObj<AuthService>;
   let router: jasmine.SpyObj<Router>;
+  let snackBar: jasmine.SpyObj<MatSnackBar>;
   let players$: BehaviorSubject<unknown[]>;
   let rounds$: BehaviorSubject<Round[]>;
 
@@ -36,6 +37,7 @@ describe('GameSetupComponent', () => {
     roundMediatorService = jasmine.createSpyObj<RoundMediatorService>('RoundMediatorService', ['createRound']);
     roundService = jasmine.createSpyObj<RoundService>('RoundService', ['roundsForGame']);
     router = jasmine.createSpyObj<Router>('Router', ['navigateByUrl']);
+    snackBar = jasmine.createSpyObj<MatSnackBar>('MatSnackBar', ['open']);
 
     gameService.getGame.and.returnValue(of(game(0)));
     gameService.isCurrentUserAdmin.and.returnValue(of(true));
@@ -67,7 +69,7 @@ describe('GameSetupComponent', () => {
         { provide: RoundService, useValue: roundService },
         { provide: Location, useValue: jasmine.createSpyObj<Location>('Location', ['back']) },
         { provide: MatDialog, useValue: { open: () => ({ close: () => undefined }) } },
-        { provide: MatSnackBar, useValue: jasmine.createSpyObj<MatSnackBar>('MatSnackBar', ['open']) }
+        { provide: MatSnackBar, useValue: snackBar }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     })
@@ -85,6 +87,17 @@ describe('GameSetupComponent', () => {
   it('starts by prompting admins to set the number of rounds', () => {
     expect(component.nextStepTitle).toBe('Set the Number of Rounds');
     expect(component.nextStepButtonText).toBe('Save Setup');
+  });
+
+  it('does not save when the number of rounds is zero', () => {
+    component.game.numberOfRounds = 0;
+
+    component.save();
+
+    expect(gameService.updateGame).not.toHaveBeenCalled();
+    expect(snackBar.open).toHaveBeenCalledWith('Number of rounds must be a whole number at least 1.', 'Dismiss', {
+      duration: 5000
+    });
   });
 
   it('prompts admins to add players after rounds are configured', () => {

@@ -104,6 +104,13 @@ export class GameConfigurationComponent implements OnInit, OnDestroy {
       return;
     }
 
+    if (!this.isValidRoundCount()) {
+      this.snackBar.open('Number of rounds must be a whole number at least 1.', 'Dismiss', {
+        duration: 5000
+      });
+      return;
+    }
+
     this.isSaving = true;
     this.subscriptions.push(
       this.gameService.updateGame(this.game).subscribe({
@@ -172,7 +179,7 @@ export class GameConfigurationComponent implements OnInit, OnDestroy {
   }
 
   get isRoundCountConfigured(): boolean {
-    return (Number(this.game?.numberOfRounds) || 0) > 0;
+    return this.isValidRoundCount();
   }
 
   get hasEnoughPlayers(): boolean {
@@ -214,6 +221,12 @@ export class GameConfigurationComponent implements OnInit, OnDestroy {
     this.canCurrentAdminJoin = !!this.currentUser
       && this.roundCount === 0
       && !this.players.some((player) => player.uid === this.currentUser?.uid);
+  }
+
+  private isValidRoundCount(): boolean {
+    const roundCount = Number(this.game?.numberOfRounds);
+
+    return Number.isInteger(roundCount) && roundCount > 0;
   }
 
   private updateNextStep(): void {
