@@ -1,23 +1,53 @@
-<div class="flex-box-rows" *ngIf="showHeader">
-    <mat-toolbar color="accent">
-        <span class="flex-box-item">Rounds</span>
-    </mat-toolbar>
-</div>
+<section class="rounds-view">
+  <div class="rounds-heading" *ngIf="showHeader">
+    <div>
+      <h1>Rounds</h1>
+      <p>{{rounds.length}} / {{configuredRoundCount}} rounds created</p>
+    </div>
+  </div>
 
-<mat-card class="rounds-empty-state" *ngIf="rounds.length === 0">
+  <mat-card class="rounds-empty-state" *ngIf="rounds.length === 0">
     <div class="empty-icon">
-        <mat-icon aria-hidden="true">{{emptyRoundsIcon}}</mat-icon>
+      <mat-icon aria-hidden="true">{{emptyRoundsIcon}}</mat-icon>
     </div>
     <div class="empty-copy">
-        <h2>{{emptyRoundsTitle}}</h2>
-        <p>{{emptyRoundsMessage}}</p>
+      <h2>{{emptyRoundsTitle}}</h2>
+      <p>{{emptyRoundsMessage}}</p>
     </div>
-    <button mat-raised-button color="primary" *ngIf="showEmptyRoundsAction" (click)="takeEmptyRoundsAction()">
-        <mat-icon>{{emptyRoundsActionIcon}}</mat-icon>
-        {{emptyRoundsActionText}}
-    </button>
-</mat-card>
+  </mat-card>
 
-<div *ngIf="rounds.length > 0" class="rounds">
-  <app-round-card *ngFor="let round of rounds" [round]="round" [gameId]="game.id"></app-round-card>
-</div>
+  <div *ngIf="rounds.length > 0" class="rounds-content">
+    <mat-card class="rounds-summary">
+      <div class="summary-main">
+        <div class="summary-icon">
+          <mat-icon aria-hidden="true">{{roundsSummaryIcon}}</mat-icon>
+        </div>
+        <div class="summary-copy">
+          <div class="summary-eyebrow">Rounds</div>
+          <h2>{{roundsSummaryTitle}}</h2>
+          <p>{{roundsSummaryMessage}}</p>
+        </div>
+      </div>
+
+      <div class="summary-progress" aria-label="Round progress">
+        <div class="progress-header">
+          <span>{{completedRoundCount}} finalized</span>
+          <span>{{rounds.length}} / {{configuredRoundCount}} rounds</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" [style.width.%]="roundsProgressPercentage"></div>
+        </div>
+      </div>
+    </mat-card>
+
+    <div class="round-list">
+      <div class="rounds-list-header" [class.with-actions]="isUserAdmin">
+        <div>Round</div>
+        <div>Status</div>
+        <div>Byes</div>
+        <div class="header-actions" *ngIf="isUserAdmin">Actions</div>
+      </div>
+      <app-round-card *ngFor="let round of rounds" [round]="round" [gameId]="game.id"></app-round-card>
+    </div>
+  </div>
+</section>

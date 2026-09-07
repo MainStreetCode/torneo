@@ -1,17 +1,30 @@
-<mat-card class="mdc-card card">
-  <div class="mdc-card__primary-action details" tabindex="0" (click)="view(round)">
-    <div class="flex-box-rows">
-      <div class="mdc-button__label name flex-box-item">
-        Round {{round.number}}            
-      </div>          
-    </div>   
-  </div>
-  
-  <mat-icon color="accent" *ngIf="allTablesPointsConfirmed$ | async" title="All table scores confirmed">checkmark</mat-icon>
-  
-  <div *ngIf="this.isAdmin$ | async">
-    <button mat-icon-button color="primary" aria-label="delete round" title="delete round" (click)="delete(round)">
-        <mat-icon>delete</mat-icon>
+<ng-container *ngIf="{ allConfirmed: allTablesPointsConfirmed$ | async, isAdmin: isAdmin$ | async } as state">
+  <mat-card class="round-card" [class.with-actions]="state.isAdmin">
+    <button class="round-open" type="button" (click)="view(round)">
+      <span class="round-icon">
+        <mat-icon aria-hidden="true">table_bar</mat-icon>
+      </span>
+      <span class="round-title-group">
+        <span class="round-title">Round {{round.number}}</span>
+        <span class="round-subtitle">{{round.pointsConfirmed ? 'Points finalized' : 'Scores in progress'}}</span>
+      </span>
     </button>
-  </div>    
-</mat-card>
+
+    <div class="status-cell">
+      <span class="status-pill" [class.finalized]="round.pointsConfirmed" [class.ready]="!round.pointsConfirmed && state.allConfirmed === true" [class.active]="!round.pointsConfirmed && state.allConfirmed !== true">
+        <mat-icon aria-hidden="true">{{statusIcon(state.allConfirmed === true)}}</mat-icon>
+        {{statusLabel(state.allConfirmed === true)}}
+      </span>
+    </div>
+
+    <div class="bye-cell" [title]="byeSummary">
+      {{byeSummary}}
+    </div>
+
+    <div class="round-actions" *ngIf="state.isAdmin">
+      <button mat-icon-button color="primary" aria-label="delete round" title="delete round" (click)="delete(round)">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </div>
+  </mat-card>
+</ng-container>

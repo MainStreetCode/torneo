@@ -158,6 +158,72 @@ export class RoundsComponent implements OnInit, OnDestroy {
     return this.playerCount >= 4;
   }
 
+  get configuredRoundCount(): number {
+    return Number(this.game?.numberOfRounds) || 0;
+  }
+
+  get completedRoundCount(): number {
+    return this.rounds.filter((round) => round.pointsConfirmed).length;
+  }
+
+  get latestRound(): Round | undefined {
+    return this.rounds.length > 0 ? this.rounds[this.rounds.length - 1] : undefined;
+  }
+
+  get nextRoundNumber(): number {
+    return this.rounds.length + 1;
+  }
+
+  get roundsProgressPercentage(): number {
+    return this.configuredRoundCount > 0
+      ? Math.min(100, Math.round((this.rounds.length / this.configuredRoundCount) * 100))
+      : 0;
+  }
+
+  get roundsSummaryIcon(): string {
+    if (this.completedRoundCount >= this.configuredRoundCount && this.configuredRoundCount > 0) {
+      return 'emoji_events';
+    }
+
+    if (this.latestRound?.pointsConfirmed) {
+      return 'task_alt';
+    }
+
+    return 'edit_note';
+  }
+
+  get roundsSummaryTitle(): string {
+    if (this.completedRoundCount >= this.configuredRoundCount && this.configuredRoundCount > 0) {
+      return 'Tournament rounds complete';
+    }
+
+    if (this.latestRound?.pointsConfirmed) {
+      return `Round ${this.latestRound.number} complete`;
+    }
+
+    return this.latestRound ? `Round ${this.latestRound.number} in progress` : 'No rounds yet';
+  }
+
+  get roundsSummaryMessage(): string {
+    if (!this.latestRound) {
+      return 'Start round 1 to create tables.';
+    }
+
+    if (this.completedRoundCount >= this.configuredRoundCount && this.configuredRoundCount > 0) {
+      return 'All configured rounds are finalized. Review the standings for final results.';
+    }
+
+    if (!this.latestRound.pointsConfirmed) {
+      return 'Table scores are still being entered and confirmed.';
+    }
+
+    if (this.isUserAdmin) {
+      return `Round ${this.latestRound.number} is finalized. Round ${this.nextRoundNumber} is ready when players are ready.`;
+    }
+
+    return `Round ${this.latestRound.number} is finalized. Waiting for an admin to start round ${this.nextRoundNumber}.`;
+  }
+
   get emptyRoundsIcon(): string {
     if (!this.hasConfiguredRounds) {
       return 'tune';

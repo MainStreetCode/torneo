@@ -61,4 +61,28 @@ export class RoundCardComponent implements OnInit, OnDestroy {
   public configuration(): void {
     this.router.navigateByUrl(`/game/${this.gameId}/configuration`);
   }
+
+  public statusLabel(allTablesPointsConfirmed: boolean): string {
+    if (this.round.pointsConfirmed) {
+      return 'Finalized';
+    }
+
+    return allTablesPointsConfirmed ? 'Scores confirmed' : 'In progress';
+  }
+
+  public statusIcon(allTablesPointsConfirmed: boolean): string {
+    if (this.round.pointsConfirmed) {
+      return 'task_alt';
+    }
+
+    return allTablesPointsConfirmed ? 'check_circle' : 'edit_note';
+  }
+
+  get byeSummary(): string {
+    if (!this.round.byes || this.round.byes.length === 0) {
+      return 'No byes';
+    }
+
+    return this.round.byes.map((player) => player.displayName).join(', ');
+  }
 }
