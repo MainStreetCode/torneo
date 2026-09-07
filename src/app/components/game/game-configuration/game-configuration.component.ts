@@ -3,8 +3,11 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
+import { User } from 'firebase/auth';
 import { of, Subscription } from 'rxjs';
 import { finalize, switchMap } from 'rxjs/operators';
+import { GamePlayer } from 'src/app/components/player/game-player';
+import { AuthService } from 'src/app/services/auth/auth.service';
 import { Game } from 'src/app/services/game/game';
 import { GameService } from 'src/app/services/game/game.service';
 import { GamePlayerService } from 'src/app/services/gamePlayer/game-player.service';
@@ -33,15 +36,19 @@ export class GameConfigurationComponent implements OnInit, OnDestroy {
   public nextStepDescription = 'Choose how many rounds this tournament should have, then save the setup.';
   public nextStepButtonText = 'Save Setup';
   public nextStepCanSave = false;
+  public canCurrentAdminJoin = false;
   private nextStepAction: 'save' | 'players' | 'rounds' | 'startRound' = 'save';
   private subscriptions: Subscription[] = [];
   private setupSubscriptions: Subscription[] = [];
   private setupGameId?: string;
+  private currentUser?: User;
+  private players: GamePlayer[] = [];
 
   constructor(
     private router: Router,
     private route: ActivatedRoute,
     private gameService: GameService,
+    private authService: AuthService,
     private gamePlayerService: GamePlayerService,
     private roundMediatorService: RoundMediatorService,
     private roundService: RoundService,
@@ -118,6 +125,31 @@ export class GameConfigurationComponent implements OnInit, OnDestroy {
     );
   }
 
+  joinCurrentAdmin(): void {
+    if (!this.game?.id || !this.canCurrentAdminJoin) {
+      return;
+    }
+
+    const currentUser = this.authService.getCurrentUser();
+
+    if (!currentUser) {
+      this.snackBar.open('Log in to join this tournament.', 'Dismiss', {
+        duration: 4000
+      });
+      return;
+    }
+
+    this.gamePlayerService.addPlayer({
+      uid: currentUser.uid,
+      displayName: currentUser.displayName || currentUser.email || 'Player'
+    } as unknown as GamePlayer, this.game.id);
+
+    this.canCurrentAdminJoin = false;
+    this.snackBar.open('You joined this tournament.', 'Dismiss', {
+      duration: 4000
+    });
+  }
+
   takeNextStep(): void {
     if (this.nextStepAction === 'save') {
       this.save();
@@ -161,17 +193,27 @@ export class GameConfigurationComponent implements OnInit, OnDestroy {
     this.setupSubscriptions = [
       this.gamePlayerService.playersForGame(gameId).subscribe({
         next: (players) => {
+          this.players = players;
           this.playerCount = players.length;
+          this.updateAdminJoinState();
           this.updateNextStep();
         }
       }),
       this.roundService.roundsForGame(gameId).subscribe({
         next: (rounds) => {
           this.roundCount = rounds.length;
+          this.updateAdminJoinState();
           this.updateNextStep();
         }
       })
     ];
+  }
+
+  private updateAdminJoinState(): void {
+    this.currentUser = this.authService.getCurrentUser();
+    this.canCurrentAdminJoin = !!this.currentUser
+      && this.roundCount === 0
+      && !this.players.some((player) => player.uid === this.currentUser?.uid);
   }
 
   private updateNextStep(): void {

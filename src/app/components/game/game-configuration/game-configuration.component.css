@@ -17,7 +17,7 @@
 .configuration-hero {
   align-items: center;
   background:
-    linear-gradient(135deg, rgba(63, 81, 181, 0.08), rgba(255, 64, 129, 0.08)),
+    linear-gradient(135deg, rgba(175, 47, 47, 0.1), rgba(17, 17, 17, 0.05)),
     #ffffff;
   display: grid;
   gap: 1.5rem;
@@ -35,8 +35,12 @@
   font-size: 2rem;
   font-weight: 700;
   line-height: 1.15;
-  margin: 1rem 0 0.5rem;
+  margin: 0;
   overflow-wrap: anywhere;
+}
+
+.hero-status {
+  justify-self: end;
 }
 
 .section-title,
@@ -54,7 +58,8 @@
 }
 
 .settings-actions button mat-icon,
-.empty-state button mat-icon {
+.empty-state button mat-icon,
+.join-admin-action mat-icon {
   margin-right: 0.35rem;
 }
 
@@ -214,7 +219,29 @@
 }
 
 .players-card-header {
-  padding: 1.25rem 1.5rem 0;
+  align-items: center;
+  background:
+    linear-gradient(135deg, rgba(175, 47, 47, 0.1), rgba(17, 17, 17, 0.05)),
+    #ffffff;
+  border-bottom: 1px solid #e7d4d4;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+}
+
+.players-card-header .section-title {
+  color: #111827;
+  margin-bottom: 0;
+}
+
+.players-card-header .section-title mat-icon {
+  color: #af2f2f;
+}
+
+.join-admin-action {
+  flex: 0 0 auto;
+  margin: 0;
 }
 
 .empty-state {
@@ -258,6 +285,10 @@
     grid-template-columns: 1fr;
   }
 
+  .hero-status {
+    justify-self: start;
+  }
+
   .configuration-hero,
   .settings-layout {
     padding: 1rem;
@@ -292,6 +323,12 @@
   }
 
   .players-card-header {
-    padding: 1rem 1rem 0;
+    align-items: stretch;
+    flex-direction: column;
+    padding: 1rem;
+  }
+
+  .join-admin-action {
+    width: 100%;
   }
 }

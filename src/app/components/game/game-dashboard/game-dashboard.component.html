@@ -1,6 +1,4 @@
 <div *ngIf="game">
-  <app-section-header [sectionName]="sectionName"></app-section-header>
-
   <section class="game-dashboard" [class.live-dashboard]="roundCount > 0" [class.admin-dashboard]="isCurrentUserAdmin">
     <mat-card class="status-card">
       <div class="status-header">

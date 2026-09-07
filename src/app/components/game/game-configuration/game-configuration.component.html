@@ -13,18 +13,16 @@
 </section>
 
 <div *ngIf="game && (isAdmin$ | async)">
-  <app-section-header [sectionName]="sectionName"></app-section-header>
-
   <section class="configuration-page">
     <mat-card class="configuration-card">
       <div class="configuration-hero">
         <div class="hero-copy">
-          <mat-chip-list aria-label="Setup status">
-            <mat-chip color="accent" selected>Setup</mat-chip>
-          </mat-chip-list>
           <h1>{{game.name}}</h1>
         </div>
 
+        <mat-chip-list aria-label="Setup status" class="hero-status">
+          <mat-chip color="accent" selected>Setup</mat-chip>
+        </mat-chip-list>
       </div>
 
       <mat-divider></mat-divider>
@@ -111,10 +109,14 @@
       <div class="players-card-header">
         <div class="section-title">
           <mat-icon aria-hidden="true">group</mat-icon>
-          <span>Players</span>
+          <span>Players ({{playerCount}})</span>
         </div>
+        <button mat-raised-button color="primary" class="join-admin-action" *ngIf="canCurrentAdminJoin" (click)="joinCurrentAdmin()">
+          <mat-icon>person_add</mat-icon>
+          Join as player
+        </button>
       </div>
-      <app-game-players [game]="game"></app-game-players>
+      <app-game-players [game]="game" [showHeader]="false" [showAddPlayerHeader]="false"></app-game-players>
     </mat-card>
   </section>
 </div>

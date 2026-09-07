@@ -13,6 +13,7 @@ import { RoundService } from 'src/app/services/round/round.service';
 export class GamePlayersComponent implements OnInit, OnDestroy {
   @Input() game?: Game;
   @Input() showHeader = true;
+  @Input() showAddPlayerHeader = true;
   players: GamePlayer[] = [];
   isAdmin$ = of(false);  
   hasRoundsStarted = false;

@@ -6,6 +6,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
 import { BehaviorSubject, of } from 'rxjs';
 import { Game } from 'src/app/services/game/game';
+import { AuthService } from 'src/app/services/auth/auth.service';
 import { GameService } from 'src/app/services/game/game.service';
 import { GamePlayerService } from 'src/app/services/gamePlayer/game-player.service';
 import { RoundMediatorService } from 'src/app/services/round-mediator/round-mediator.service';
@@ -21,6 +22,7 @@ describe('GameSetupComponent', () => {
   let gamePlayerService: jasmine.SpyObj<GamePlayerService>;
   let roundMediatorService: jasmine.SpyObj<RoundMediatorService>;
   let roundService: jasmine.SpyObj<RoundService>;
+  let authService: jasmine.SpyObj<AuthService>;
   let router: jasmine.SpyObj<Router>;
   let players$: BehaviorSubject<unknown[]>;
   let rounds$: BehaviorSubject<Round[]>;
@@ -29,7 +31,8 @@ describe('GameSetupComponent', () => {
     players$ = new BehaviorSubject<unknown[]>([]);
     rounds$ = new BehaviorSubject<Round[]>([]);
     gameService = jasmine.createSpyObj<GameService>('GameService', ['getGame', 'isCurrentUserAdmin', 'updateGame']);
-    gamePlayerService = jasmine.createSpyObj<GamePlayerService>('GamePlayerService', ['playersForGame']);
+    authService = jasmine.createSpyObj<AuthService>('AuthService', ['getCurrentUser']);
+    gamePlayerService = jasmine.createSpyObj<GamePlayerService>('GamePlayerService', ['playersForGame', 'addPlayer']);
     roundMediatorService = jasmine.createSpyObj<RoundMediatorService>('RoundMediatorService', ['createRound']);
     roundService = jasmine.createSpyObj<RoundService>('RoundService', ['roundsForGame']);
     router = jasmine.createSpyObj<Router>('Router', ['navigateByUrl']);
@@ -37,6 +40,11 @@ describe('GameSetupComponent', () => {
     gameService.getGame.and.returnValue(of(game(0)));
     gameService.isCurrentUserAdmin.and.returnValue(of(true));
     gameService.updateGame.and.returnValue(of(game(3)));
+    authService.getCurrentUser.and.returnValue({
+      uid: 'admin-1',
+      displayName: 'Angela',
+      email: 'angela@example.com'
+    } as never);
     gamePlayerService.playersForGame.and.returnValue(players$.asObservable() as never);
     roundMediatorService.createRound.and.returnValue(of({
       round: round(1),
@@ -53,6 +61,7 @@ describe('GameSetupComponent', () => {
           useValue: { snapshot: { paramMap: convertToParamMap({ gameId: 'game-1' }) } }
         },
         { provide: GameService, useValue: gameService },
+        { provide: AuthService, useValue: authService },
         { provide: GamePlayerService, useValue: gamePlayerService },
         { provide: RoundMediatorService, useValue: roundMediatorService },
         { provide: RoundService, useValue: roundService },
@@ -103,6 +112,34 @@ describe('GameSetupComponent', () => {
     expect(gameService.updateGame).toHaveBeenCalledWith(component.game);
     expect(roundMediatorService.createRound).toHaveBeenCalledWith('game-1', 1);
     expect(router.navigateByUrl).toHaveBeenCalledWith('/game/game-1/round/round-1');
+  });
+
+  it('allows an admin to join before rounds start', () => {
+    players$.next([]);
+
+    expect(component.canCurrentAdminJoin).toBeTrue();
+
+    component.joinCurrentAdmin();
+
+    expect(gamePlayerService.addPlayer).toHaveBeenCalledWith(
+      jasmine.objectContaining({
+        uid: 'admin-1',
+        displayName: 'Angela'
+      }),
+      'game-1'
+    );
+  });
+
+  it('does not show admin join after the admin is already a player', () => {
+    players$.next([{ uid: 'admin-1' }]);
+
+    expect(component.canCurrentAdminJoin).toBeFalse();
+  });
+
+  it('does not show admin join after rounds start', () => {
+    rounds$.next([round(1)]);
+
+    expect(component.canCurrentAdminJoin).toBeFalse();
   });
 
   function game(numberOfRounds: number): Game {

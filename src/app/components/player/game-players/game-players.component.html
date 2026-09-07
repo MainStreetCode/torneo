@@ -1,10 +1,4 @@
 <div class="players">
-  <div class="flex-box-rows" *ngIf="showHeader">
-    <mat-toolbar color="accent">
-      <div class="flex-box-item">Players</div>
-    </mat-toolbar>  
-  </div>
-  
   <mat-toolbar color="secondary" *ngIf="showHeader">
     <span>{{hasScores ? 'Standings' : 'Players'}} ({{players.length}})</span>
   </mat-toolbar>
@@ -18,11 +12,14 @@
     <app-player-card *ngFor="let player of players; index as i" [player]="player" [position]="i+1"></app-player-card>
   </div>
 
-  <div *ngIf="this.isAdmin$ | async">
-    <mat-toolbar color="secondary"><span>Add new player</span></mat-toolbar>
+  <div class="add-player-section" [class.without-heading]="!showAddPlayerHeader" *ngIf="this.isAdmin$ | async">
+    <div class="add-player-heading" *ngIf="showAddPlayerHeader">
+      <mat-icon aria-hidden="true">person_add</mat-icon>
+      <span>Add new player</span>
+    </div>
   
-    <div class="content flex-box-rows">
-      <div>
+    <div class="content add-player-form">
+      <div class="add-player-field">
         <mat-form-field class="example-full-width" appearance="fill">
           <mat-label>Player name</mat-label>
           <input matInput id="new-player" #playerName placeholder="Player Name" value="" [disabled]="hasRoundsStarted">
@@ -33,9 +30,9 @@
         </div>
       </div>
   
-      <div>
+      <div class="add-player-actions">
         <!-- (click) passes input value to add() and then clears the input -->
-        <button mat-raised-button color="primary" [disabled]="hasRoundsStarted || !playerName.value"
+        <button mat-raised-button color="primary" class="add-player-action" [disabled]="hasRoundsStarted || !playerName.value"
           (click)="add(playerName.value); playerName.value=''">
           <mat-icon>add</mat-icon>
           <span class="mdc-button__label">
