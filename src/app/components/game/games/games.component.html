@@ -1,5 +1,5 @@
 <section class="tournament-hub">
-  <header class="hub-header" [class.signed-out]="(isLoggedIn$ | async) === false">
+  <header class="hub-header">
     <div class="hub-title-block">
       <div class="hub-kicker">
         <mat-icon aria-hidden="true">emoji_events</mat-icon>
@@ -8,8 +8,17 @@
       <h1>Tournaments</h1>
       <p>Recent Euchre tournaments, ordered by creation date.</p>
     </div>
+  </header>
 
-    <div class="hub-actions" *ngIf="isLoggedIn$ | async">
+  <section class="create-panel" *ngIf="isLoggedIn$ | async">
+    <div class="create-copy">
+      <mat-icon aria-hidden="true">add_circle</mat-icon>
+      <div>
+        <h2>Create Tournament</h2>
+        <p>Start your own Euchre tournament</p>
+      </div>
+    </div>
+    <div class="hub-actions">
       <mat-form-field appearance="outline" class="create-field">
         <mat-label>Tournament name</mat-label>
         <input matInput id="new-game" #gameName placeholder="Angela's Euchre Tournament" value="">
@@ -19,7 +28,7 @@
         Create
       </button>
     </div>
-  </header>
+  </section>
 
   <section class="summary-grid" aria-label="Tournament summary">
     <div class="summary-tile">
