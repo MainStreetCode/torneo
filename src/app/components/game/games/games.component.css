@@ -90,7 +90,7 @@
 }
 
 .hub-actions {
-  align-items: start;
+  align-items: center;
   display: grid;
   gap: 0.75rem;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -98,6 +98,10 @@
 
 .create-field {
   width: 100%;
+}
+
+.create-field ::ng-deep .mat-form-field-wrapper {
+  padding-bottom: 0;
 }
 
 .create-action mat-icon {
@@ -110,9 +114,8 @@
 }
 
 .hub-actions .create-action {
-  align-self: start;
+  align-self: center;
   min-height: 56px;
-  margin-top: 0.25em;
 }
 
 .summary-grid {
