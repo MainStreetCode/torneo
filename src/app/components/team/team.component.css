@@ -1,29 +1,92 @@
 .team-card {
-    margin: 1rem 0;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    box-shadow: none;
+    display: grid;
+    gap: 1rem;
+    margin: 0;
+    padding: 1rem;
+}
+
+.team-card.current-user-team {
+    border-color: rgba(63, 81, 181, 0.35);
 }
 
 .team-card-header,
+.team-role,
+.team-role-icon,
 .team-confirmed-status {
     align-items: center;
     display: flex;
 }
 
 .team-card-header {
+    gap: 1rem;
     justify-content: space-between;
 }
 
-.team-role span {
+.team-role {
+    gap: 0.75rem;
+    min-width: 0;
+}
+
+.team-role-icon {
+    background: #eef2ff;
+    border-radius: 8px;
+    color: #3f51b5;
+    flex: 0 0 auto;
+    height: 40px;
+    justify-content: center;
+    width: 40px;
+}
+
+.team-role h4 {
     color: #111827;
+    font-size: 1rem;
     font-weight: 700;
+    line-height: 1.25;
+    margin: 0;
+}
+
+.team-role p {
+    color: #6b7280;
+    font-size: 0.85rem;
+    line-height: 1.3;
+    margin: 0.15rem 0 0;
 }
 
 .team-confirmed-status {
+    background: #e8f5e9;
+    border-radius: 999px;
     color: #2e7d32;
+    flex: 0 0 auto;
+    font-size: 0.85rem;
+    font-weight: 700;
     gap: 0.25rem;
+    line-height: 1.2;
+    min-height: 2rem;
+    padding: 0.35rem 0.65rem;
+}
+
+.team-confirmed-status mat-icon {
+    font-size: 1.125rem;
+    height: 1.125rem;
+    width: 1.125rem;
 }
 
 .team-confirmed-status.unconfirmed {
-    color: rgba(0, 0, 0, 0.54);
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+.team-player-list {
+    border: 1px solid #edf0f5;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.score-entry {
+    min-width: 0;
 }
 
 .score-save-status {
@@ -52,4 +115,19 @@
 
 .score-save-status.saved mat-icon {
     color: #16a34a;
+}
+
+.team-actions mat-icon {
+    margin-right: 0.35rem;
+}
+
+@media (max-width: 760px) {
+    .team-card-header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .team-confirmed-status {
+        justify-content: center;
+    }
 }

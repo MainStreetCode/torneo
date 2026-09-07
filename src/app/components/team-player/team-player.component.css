@@ -1,4 +1,47 @@
-.team-player-card {
-    margin: 1rem 0;
+:host {
+    display: block;
+}
+
+:host + :host .team-player-row {
+    border-top: 1px solid #edf0f5;
+}
+
+.team-player-row {
+    align-items: center;
+    background: #ffffff;
+    color: #111827;
     display: flex;
+    gap: 0.5rem;
+    min-height: 40px;
+    padding: 0.65rem 0.75rem;
+}
+
+.team-player-row.current-user {
+    background: #f8faff;
+}
+
+.team-player-row mat-icon {
+    color: #9ca3af;
+    flex: 0 0 auto;
+    font-size: 1.125rem;
+    height: 1.125rem;
+    width: 1.125rem;
+}
+
+.player-name {
+    flex: 1 1 auto;
+    font-weight: 500;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.current-user-pill {
+    background: #eef2ff;
+    border-radius: 999px;
+    color: #303f9f;
+    flex: 0 0 auto;
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1.2;
+    padding: 0.25rem 0.5rem;
 }

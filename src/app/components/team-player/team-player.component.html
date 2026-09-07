@@ -1,6 +1,5 @@
-<mat-card class="mdc-card team-player-card">
-    <div class="flex-box-item">
-        {{teamPlayer.player.displayName}}
-        <span *ngIf="isCurrentUserTeamPlayer"> (you)</span>
-    </div>
-</mat-card>
+<div class="team-player-row" [class.current-user]="isCurrentUserTeamPlayer">
+    <mat-icon aria-hidden="true">person</mat-icon>
+    <span class="player-name">{{teamPlayer.player.displayName}}</span>
+    <span class="current-user-pill" *ngIf="isCurrentUserTeamPlayer">You</span>
+</div>

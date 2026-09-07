@@ -1,63 +1,71 @@
-<div *ngIf="round">
-
-  <app-section-header [sectionName]="sectionName"></app-section-header>
-    
-  <div class="content mat-typography">
-    <div class="round-status-panel">
-      <div class="round-status-grid">
-        <section class="status-group" aria-label="Round byes">
-          <div class="status-group-header">
-            <mat-icon>person_off</mat-icon>
-            <span>Byes</span>
-            <span class="status-count">{{round.byes.length}}</span>
-          </div>
-
-          <mat-chip-list aria-label="Bye players" class="chip-list">
-            <mat-chip class="status-chip bye-chip" *ngFor="let player of round.byes">
-              {{player.displayName}}
-            </mat-chip>
-            <mat-chip class="status-chip empty-chip" *ngIf="round.byes.length === 0">
-              No byes
-            </mat-chip>
-          </mat-chip-list>
-        </section>
-
-        <section class="status-group" aria-label="Unconfirmed table scores" *ngIf="unConfirmedTables$ | async as unConfirmedTables">
-          <div class="status-group-header">
-            <mat-icon>pending_actions</mat-icon>
-            <span>Unconfirmed table scores</span>
-            <span class="status-count">{{unConfirmedTables.length}}</span>
-          </div>
-
-          <mat-chip-list aria-label="Tables with unconfirmed scores" class="chip-list" *ngIf="(allTablesPointsConfirmed$ | async) === false">
-            <mat-chip class="status-chip table-chip" *ngFor="let table of unConfirmedTables">
-              Table {{ table.number }}
-            </mat-chip>
-          </mat-chip-list>
-
-          <mat-chip-list aria-label="All table scores confirmed" class="chip-list" *ngIf="allTablesPointsConfirmed$ | async">
-            <mat-chip class="status-chip confirmed-chip">
-              <mat-icon>check_circle</mat-icon>
-              All table scores confirmed
-            </mat-chip>
-          </mat-chip-list>
-
-          <mat-chip-list aria-label="Round finalized" class="chip-list" *ngIf="round.pointsConfirmed">
-            <mat-chip class="status-chip confirmed-chip">
-              <mat-icon>emoji_events</mat-icon>
-              Round finalized
-            </mat-chip>
-          </mat-chip-list>
-        </section>
-
-        <div class="round-action" *ngIf="isAdmin$ | async">
-          <button mat-raised-button color="primary" aria-label="Finalize round" title="Finalize round" (click)="endRound()" [disabled]="round.pointsConfirmed || (allTablesPointsConfirmed$ | async) === false">
-            Finalize round
-          </button>
+<div class="round-detail-view" *ngIf="round">
+  <mat-card class="round-overview-card">
+    <div class="round-overview-header">
+      <div class="round-title-group">
+        <div class="round-icon">
+          <mat-icon aria-hidden="true">table_bar</mat-icon>
+        </div>
+        <div>
+          <div class="round-eyebrow">Round</div>
+          <h1>{{sectionName}}</h1>
         </div>
       </div>
-    </div>
-  </div>
 
-  <app-tables [tables]="tables" *ngIf="tables"></app-tables>    
+      <div class="round-action" *ngIf="isAdmin$ | async">
+        <button mat-raised-button color="primary" aria-label="Finalize round" title="Finalize round" (click)="endRound()" [disabled]="round.pointsConfirmed || (allTablesPointsConfirmed$ | async) === false">
+          <mat-icon>task_alt</mat-icon>
+          Finalize round
+        </button>
+      </div>
+    </div>
+
+    <div class="round-status-grid">
+      <section class="status-group" aria-label="Round byes">
+        <div class="status-group-header">
+          <mat-icon>person_off</mat-icon>
+          <span>Byes</span>
+          <span class="status-count">{{round.byes.length}}</span>
+        </div>
+
+        <mat-chip-list aria-label="Bye players" class="chip-list">
+          <mat-chip class="status-chip bye-chip" *ngFor="let player of round.byes">
+            {{player.displayName}}
+          </mat-chip>
+          <mat-chip class="status-chip empty-chip" *ngIf="round.byes.length === 0">
+            No byes
+          </mat-chip>
+        </mat-chip-list>
+      </section>
+
+      <section class="status-group" aria-label="Unconfirmed table scores" *ngIf="unConfirmedTables$ | async as unConfirmedTables">
+        <div class="status-group-header">
+          <mat-icon>pending_actions</mat-icon>
+          <span>Unconfirmed table scores</span>
+          <span class="status-count">{{unConfirmedTables.length}}</span>
+        </div>
+
+        <mat-chip-list aria-label="Tables with unconfirmed scores" class="chip-list" *ngIf="(allTablesPointsConfirmed$ | async) === false">
+          <mat-chip class="status-chip table-chip" *ngFor="let table of unConfirmedTables">
+            Table {{ table.number }}
+          </mat-chip>
+        </mat-chip-list>
+
+        <mat-chip-list aria-label="All table scores confirmed" class="chip-list" *ngIf="allTablesPointsConfirmed$ | async">
+          <mat-chip class="status-chip confirmed-chip">
+            <mat-icon>check_circle</mat-icon>
+            All table scores confirmed
+          </mat-chip>
+        </mat-chip-list>
+
+        <mat-chip-list aria-label="Round finalized" class="chip-list" *ngIf="round.pointsConfirmed">
+          <mat-chip class="status-chip confirmed-chip">
+            <mat-icon>emoji_events</mat-icon>
+            Round finalized
+          </mat-chip>
+        </mat-chip-list>
+      </section>
+    </div>
+  </mat-card>
+
+  <app-tables [tables]="tables" *ngIf="tables"></app-tables>
 </div>

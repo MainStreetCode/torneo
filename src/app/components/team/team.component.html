@@ -1,30 +1,36 @@
-<mat-card class="mdc-card card team-card">
+<mat-card class="team-card" [class.current-user-team]="isCurrentUserOnTeam">
     <div class="team-card-header">
         <div class="team-role">
-            <span>{{teamRoleLabel}}</span>
+            <div class="team-role-icon">
+                <mat-icon aria-hidden="true">{{isCurrentUserOnTeam ? 'group' : 'groups'}}</mat-icon>
+            </div>
+            <div>
+                <h4>{{teamRoleLabel}}</h4>
+                <p>{{teamPlayerCountLabel}}</p>
+            </div>
         </div>
-        <div class="team-confirmed-status" *ngIf="pointsConfirmed">
-            <mat-icon>check</mat-icon>
-            Confirmed
-        </div>
-        <div class="team-confirmed-status unconfirmed" *ngIf="!pointsConfirmed">
-            Unconfirmed
+        <div class="team-confirmed-status" [class.unconfirmed]="!pointsConfirmed">
+            <mat-icon aria-hidden="true">{{teamStatusIcon}}</mat-icon>
+            {{teamStatusLabel}}
         </div>
     </div>
-    <div>
+
+    <div class="team-player-list">
         <app-team-player *ngFor="let teamPlayer of teamPlayers" [teamPlayer]="teamPlayer"></app-team-player>
     </div>
-    <div>
+
+    <div class="score-entry">
         <mat-form-field class="full-width" appearance="fill">
             <mat-label>Enter score</mat-label>
             <input matInput id="teamPoints" placeholder="0" type="number" pattern="\d*" [formControl]="teamPointsFormControl" (focus)="onPointsFocus($event)" (input)="onPointsInput()" (blur)="onPointsBlur()">
-          </mat-form-field>
+        </mat-form-field>
         <div class="score-save-status" [class.unsaved]="scoreSaveStatus === 'unsaved'" [class.saving]="scoreSaveStatus === 'saving'" [class.saved]="scoreSaveStatus === 'saved'">
             <mat-icon aria-hidden="true">{{scoreSaveStatusIcon}}</mat-icon>
             <span>{{scoreSaveStatusLabel}}</span>
         </div>
     </div>
-    <div>
+
+    <div class="team-actions">
         <button mat-raised-button color="primary" class="full-width" (click)="toggleConfirmPoints(true)" *ngIf="!currentUserTeamConfirmed && canConfirmPoints">
             <mat-icon>check</mat-icon>
             {{isCurrentUserOnTeam ? 'Submit score' : 'Confirm opponent score'}}

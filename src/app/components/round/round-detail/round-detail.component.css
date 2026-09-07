@@ -1,23 +1,79 @@
-.round-status-panel {
-    border: 1px solid rgba(0, 0, 0, 0.12);
-    border-radius: 8px;
+.round-detail-view {
+    background: #f5f7fb;
+    display: grid;
+    gap: 1rem;
+    min-height: calc(100vh - 166px);
     padding: 1rem;
+}
+
+.round-overview-card {
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(20, 28, 43, 0.14);
+    display: grid;
+    gap: 1rem;
+    padding: 1rem;
+}
+
+.round-overview-header {
+    align-items: center;
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+}
+
+.round-title-group {
+    align-items: center;
+    display: flex;
+    gap: 1rem;
+    min-width: 0;
+}
+
+.round-icon {
+    align-items: center;
+    background: #eef2ff;
+    border-radius: 8px;
+    color: #3f51b5;
+    display: flex;
+    flex: 0 0 auto;
+    height: 48px;
+    justify-content: center;
+    width: 48px;
+}
+
+.round-eyebrow {
+    color: #6b7280;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: uppercase;
+}
+
+.round-title-group h1 {
+    color: #111827;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0.15rem 0 0;
 }
 
 .round-status-grid {
     align-items: start;
     display: grid;
     gap: 1rem;
-    grid-template-columns: repeat(2, minmax(0, 1fr)) auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .status-group {
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
     min-width: 0;
+    padding: 1rem;
 }
 
 .status-group-header {
     align-items: center;
-    color: rgba(0, 0, 0, 0.72);
+    color: #374151;
     display: flex;
     font-weight: 600;
     gap: 0.4rem;
@@ -25,7 +81,7 @@
 }
 
 .status-group-header mat-icon {
-    color: rgba(0, 0, 0, 0.54);
+    color: #3f51b5;
     font-size: 1.25rem;
     height: 1.25rem;
     width: 1.25rem;
@@ -80,10 +136,15 @@
 
 .round-action {
     align-self: center;
+    flex: 0 0 auto;
 }
 
 .round-action button {
     min-width: 9rem;
+}
+
+.round-action mat-icon {
+    margin-right: 0.35rem;
 }
 
 @media (max-width: 840px) {
@@ -91,7 +152,18 @@
         grid-template-columns: 1fr;
     }
 
+    .round-overview-header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
     .round-action button {
         width: 100%;
+    }
+}
+
+@media (max-width: 760px) {
+    .round-detail-view {
+        padding: 0.75rem;
     }
 }

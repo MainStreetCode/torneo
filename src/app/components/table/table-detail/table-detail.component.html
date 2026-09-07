@@ -1,42 +1,56 @@
-<mat-toolbar color="secondary" class="flex-box-rows">
-    <div class="flex-box-item">{{tableHeaderLabel}}</div>
-    <div *ngIf="isCurrentUserAdmin">
-        <div class="flex-box-item">
-            <button mat-raised-button color="primary" [disabled]="isDisabled" (click)="toggleConfirmPoints(true)" *ngIf="!pointsConfirmed">
-                <mat-icon>check</mat-icon>
-                Confirm table scores
-            </button>
-
-            <button mat-stroked-button color="primary" [disabled]="isDisabled" (click)="toggleConfirmPoints(false)" *ngIf="pointsConfirmed">
-                <mat-icon>cancel</mat-icon>
-                Change table scores
-            </button>
-        </div>    
+<mat-card class="table-card">
+  <div class="table-card-header">
+    <div class="table-title-group">
+      <div class="table-icon">
+        <mat-icon aria-hidden="true">table_restaurant</mat-icon>
+      </div>
+      <div>
+        <h3>{{tableHeaderLabel}}</h3>
+        <p>{{tablePlayerCountLabel}}</p>
+      </div>
     </div>
-</mat-toolbar>
 
-<section class="table-task-panel">
-    <div class="task-summary">
-        <div class="task-pill" *ngIf="currentUserTeamLabel">
-            <mat-icon aria-hidden="true">group</mat-icon>
-            <span>Your team</span>
-            <strong>{{currentUserTeamLabel}}</strong>
-        </div>
-        <div class="task-pill" *ngIf="opponentTeamLabel">
-            <mat-icon fontSet="material-symbols-outlined" aria-hidden="true">target</mat-icon>
-            <span>Opponent</span>
-            <strong>{{opponentTeamLabel}}</strong>
-        </div>
+    <div class="table-header-meta">
+      <span class="table-status-pill" [class.confirmed]="pointsConfirmed" [class.finalized]="allTablesConfirmed">
+        <mat-icon aria-hidden="true">{{tableStatusIcon}}</mat-icon>
+        {{tableStatusLabel}}
+      </span>
+
+      <div class="table-admin-action" *ngIf="isCurrentUserAdmin">
+        <button mat-raised-button color="primary" [disabled]="isDisabled" (click)="toggleConfirmPoints(true)" *ngIf="!pointsConfirmed">
+          <mat-icon>check</mat-icon>
+          Confirm table scores
+        </button>
+
+        <button mat-stroked-button color="primary" [disabled]="isDisabled" (click)="toggleConfirmPoints(false)" *ngIf="pointsConfirmed">
+          <mat-icon>cancel</mat-icon>
+          Change table scores
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <section class="table-task-panel">
+    <div class="task-summary" *ngIf="currentUserTeamLabel || opponentTeamLabel">
+      <div class="task-pill" *ngIf="currentUserTeamLabel">
+        <mat-icon aria-hidden="true">group</mat-icon>
+        <span>Your team</span>
+        <strong>{{currentUserTeamLabel}}</strong>
+      </div>
+      <div class="task-pill" *ngIf="opponentTeamLabel">
+        <mat-icon fontSet="material-symbols-outlined" aria-hidden="true">target</mat-icon>
+        <span>Opponent</span>
+        <strong>{{opponentTeamLabel}}</strong>
+      </div>
     </div>
 
     <div class="score-task-status" [class.waiting]="isWaitingForOtherConfirmations" [class.confirmed]="pointsConfirmed">
-        <mat-icon aria-hidden="true">{{scoreTaskStatusIcon}}</mat-icon>
-        <span>{{scoreTaskStatusMessage}}</span>
+      <mat-icon aria-hidden="true">{{scoreTaskStatusIcon}}</mat-icon>
+      <span>{{scoreTaskStatusMessage}}</span>
     </div>
-</section>
+  </section>
 
-<div [ngClass.gt-xs]="'flex-box-rows'"
-    [ngClass.lt-sm]="'flex-box-columns'">
+  <div class="teams-grid" *ngIf="(teams?.length || 0) > 0">
     <app-team
         [team]="team"
         [table]="table"
@@ -47,5 +61,6 @@
         (confirmPoints)="toggleTeamConfirmPoints($event.team, $event.confirm)"
         (pointsChange)="updateTeamPoints($event.team, $event.points)"
         *ngFor="let team of teams; trackBy: trackByTeamId"
-        class="flex-box-item"></app-team>
-</div>
+        class="team-grid-item"></app-team>
+  </div>
+</mat-card>

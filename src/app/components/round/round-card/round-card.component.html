@@ -17,8 +17,9 @@
       </span>
     </div>
 
-    <div class="bye-cell" [title]="byeSummary">
-      {{byeSummary}}
+    <div class="bye-cell" [class.has-byes]="round.byes?.length > 0" [title]="byeSummary">
+      <span class="bye-label">Byes</span>
+      <span>{{byeSummary}}</span>
     </div>
 
     <div class="round-actions" *ngIf="state.isAdmin">

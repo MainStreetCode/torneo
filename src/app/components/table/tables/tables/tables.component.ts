@@ -68,6 +68,23 @@ export class TablesComponent implements OnInit, OnChanges, OnDestroy {
     return table.id;
   }
 
+  get tableCountLabel(): string {
+    const count = this.filteredTables?.length ?? 0;
+    return `${count} table${count === 1 ? '' : 's'}`;
+  }
+
+  get filterStatusLabel(): string {
+    return this.isDataFiltered ? 'Showing my table' : 'Showing all tables';
+  }
+
+  get filterActionLabel(): string {
+    return this.isDataFiltered ? 'Show all tables' : 'Show my table';
+  }
+
+  get filterActionIcon(): string {
+    return this.isDataFiltered ? 'table_rows' : 'person_search';
+  }
+
   private checkCurrentUserTableAccess(): void {
     if (!this.currentUser) {
       this.isUserPlayer = false;

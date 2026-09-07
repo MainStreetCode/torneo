@@ -1,5 +1,89 @@
-.teams {
-    overflow-y: auto;
+.table-card {
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(20, 28, 43, 0.14);
+    overflow: hidden;
+}
+
+.table-card-header {
+    align-items: center;
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    padding: 1rem;
+}
+
+.table-title-group {
+    align-items: center;
+    display: flex;
+    gap: 0.75rem;
+    min-width: 0;
+}
+
+.table-icon {
+    align-items: center;
+    background: #eef2ff;
+    border-radius: 8px;
+    color: #3f51b5;
+    display: flex;
+    flex: 0 0 auto;
+    height: 40px;
+    justify-content: center;
+    width: 40px;
+}
+
+.table-title-group h3 {
+    color: #111827;
+    font-size: 1.15rem;
+    font-weight: 700;
+    line-height: 1.25;
+    margin: 0;
+}
+
+.table-title-group p {
+    color: #6b7280;
+    line-height: 1.35;
+    margin: 0.15rem 0 0;
+}
+
+.table-header-meta {
+    align-items: center;
+    display: flex;
+    flex: 0 0 auto;
+    gap: 0.75rem;
+}
+
+.table-status-pill {
+    align-items: center;
+    background: #fff3e0;
+    border-radius: 999px;
+    color: #6d3d00;
+    display: inline-flex;
+    font-size: 0.85rem;
+    font-weight: 700;
+    gap: 0.35rem;
+    line-height: 1.2;
+    min-height: 2rem;
+    padding: 0.35rem 0.65rem;
+}
+
+.table-status-pill.confirmed {
+    background: #eef2ff;
+    color: #303f9f;
+}
+
+.table-status-pill.finalized {
+    background: #e8f5e9;
+    color: #1b5e20;
+}
+
+.table-status-pill mat-icon {
+    font-size: 1.125rem;
+    height: 1.125rem;
+    width: 1.125rem;
+}
+
+.table-admin-action mat-icon {
+    margin-right: 0.35rem;
 }
 
 .table-task-panel {
@@ -52,6 +136,14 @@
     margin-top: 1rem;
 }
 
+.task-summary + .score-task-status {
+    margin-top: 1rem;
+}
+
+.table-task-panel > .score-task-status:first-child {
+    margin-top: 0;
+}
+
 .score-task-status mat-icon {
     color: #3f51b5;
 }
@@ -64,8 +156,33 @@
     color: #16a34a;
 }
 
+.teams-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 1rem;
+}
+
 @media (max-width: 760px) {
+    .table-card-header,
+    .table-header-meta {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .table-header-meta {
+        width: 100%;
+    }
+
+    .table-admin-action button {
+        width: 100%;
+    }
+
     .task-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .teams-grid {
         grid-template-columns: 1fr;
     }
 }

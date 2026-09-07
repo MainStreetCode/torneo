@@ -209,6 +209,31 @@ export class TableDetailComponent implements OnInit, OnDestroy {
     return this.currentUserTeamId ? `Your table: ${tableLabel}` : tableLabel;
   }
 
+  get tableStatusLabel(): string {
+    if (this.allTablesConfirmed) {
+      return 'Round finalized';
+    }
+
+    return this.pointsConfirmed ? 'Scores confirmed' : 'Needs scores';
+  }
+
+  get tableStatusIcon(): string {
+    if (this.allTablesConfirmed) {
+      return 'verified';
+    }
+
+    return this.pointsConfirmed ? 'check_circle' : 'edit_note';
+  }
+
+  get tablePlayerCount(): number {
+    return (this.table?.playerIds ?? []).length;
+  }
+
+  get tablePlayerCountLabel(): string {
+    const count = this.tablePlayerCount;
+    return `${count} player${count === 1 ? '' : 's'}`;
+  }
+
   get currentUserTeamLabel(): string {
     const currentUserTeam = this.teams?.find((team) => team.id === this.currentUserTeamId);
     return currentUserTeam ? this.formatTeamPlayers(currentUserTeam) : '';

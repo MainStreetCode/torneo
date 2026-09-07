@@ -1,13 +1,23 @@
-<mat-toolbar color="accent" class="flex-box-rows">
-    <div class="flex-box-item flex-box-item-large">Tables</div>
-    <div *ngIf="isUserPlayer">
-      <div class="flex-box-item">
-         <button mat-raised-button color="primary" (click)="filterTables()" *ngIf="isDataFiltered">Show all tables</button>
+<section class="tables-view">
+  <mat-card class="tables-summary">
+    <div class="tables-title-group">
+      <div class="tables-icon">
+        <mat-icon aria-hidden="true">table_bar</mat-icon>
       </div>
-      <div class="flex-box-item">
-        <button mat-raised-button color="primary" (click)="filterTables()" *ngIf="!isDataFiltered">Show my table</button>
+      <div>
+        <div class="tables-eyebrow">Tables</div>
+        <h2>{{tableCountLabel}}</h2>
+        <p>{{filterStatusLabel}}</p>
       </div>
     </div>
-</mat-toolbar>
 
-<app-table-detail [table]="table" *ngFor="let table of filteredTables; trackBy: trackByTableId"></app-table-detail>
+    <button mat-stroked-button color="primary" class="filter-action" *ngIf="isUserPlayer" (click)="filterTables()">
+      <mat-icon>{{filterActionIcon}}</mat-icon>
+      {{filterActionLabel}}
+    </button>
+  </mat-card>
+
+  <div class="table-list">
+    <app-table-detail [table]="table" *ngFor="let table of filteredTables; trackBy: trackByTableId"></app-table-detail>
+  </div>
+</section>

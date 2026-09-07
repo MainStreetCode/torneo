@@ -146,6 +146,23 @@ export class TeamComponent implements OnInit, OnChanges, OnDestroy {
     return this.team.id === this.currentUserTeamId ? 'Your team' : 'Opponent';
   }
 
+  get teamStatusLabel(): string {
+    return this.pointsConfirmed ? 'Confirmed' : 'Unconfirmed';
+  }
+
+  get teamStatusIcon(): string {
+    return this.pointsConfirmed ? 'check_circle' : 'pending';
+  }
+
+  get teamPlayerCount(): number {
+    return this.teamPlayers?.length ?? 0;
+  }
+
+  get teamPlayerCountLabel(): string {
+    const count = this.teamPlayerCount;
+    return `${count} player${count === 1 ? '' : 's'}`;
+  }
+
   get scoreSaveStatusIcon(): string {
     if (this.scoreSaveStatus === 'unsaved') {
       return 'edit';

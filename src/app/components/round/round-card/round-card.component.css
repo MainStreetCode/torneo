@@ -79,6 +79,7 @@
   max-width: 100%;
   min-height: 2rem;
   padding: 0.35rem 0.65rem;
+  white-space: nowrap;
 }
 
 .status-pill mat-icon {
@@ -104,13 +105,31 @@
 }
 
 .bye-cell {
+  align-items: center;
   color: #4b5563;
+  display: flex;
   font-size: 0.9rem;
+  gap: 0.4rem;
   line-height: 1.35;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.bye-cell span:last-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bye-label {
+  color: #6b7280;
+  display: none;
+  flex: 0 0 auto;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
 .round-actions {
@@ -121,22 +140,47 @@
 @media (max-width: 760px) {
   .round-card,
   .round-card.with-actions {
-    align-items: stretch;
-    grid-template-columns: 1fr;
+    align-items: center;
+    grid-template-columns: minmax(0, 1fr) auto;
   }
 
-  .status-cell,
-  .bye-cell {
-    padding-left: 3.25rem;
+  .status-cell {
+    justify-self: end;
   }
 
   .bye-cell {
+    background: #f8fafc;
+    border-radius: 8px;
+    grid-column: 1 / -1;
+    padding: 0.6rem 0.75rem;
     white-space: normal;
+  }
+
+  .bye-label {
+    display: inline;
   }
 
   .round-actions {
     border-top: 1px solid #edf0f5;
+    grid-column: 1 / -1;
     justify-content: flex-end;
     padding-top: 0.5rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .round-card,
+  .round-card.with-actions {
+    gap: 0.75rem;
+  }
+
+  .round-icon {
+    height: 36px;
+    width: 36px;
+  }
+
+  .status-pill {
+    font-size: 0.8rem;
+    padding: 0.35rem 0.55rem;
   }
 }
